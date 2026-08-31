@@ -1073,6 +1073,7 @@ const StockfishTutor: React.FC<Props> = ({ enabled, trigger, fenBefore, fenAfter
         try { setDebugLog(`analyzing move ${moveUci} | fenBefore=${fenBefore.split(' ')[0]}...`); } catch (e) { /* ignore */ }
         // Stockfish analysis endpoint (/api/analyze) is hosted on stockfishServerURL.
         // chessServerURL is websocket-only and does not handle HTTP analysis.
+        const urls = (environment && (environment as any).urls) || {};
         const rawBase = urls.stockfishServerURL || urls.stockfishServer || '';
         const baseUrl = typeof rawBase === 'string' ? rawBase.replace(/\/$/, '') : '';
 
