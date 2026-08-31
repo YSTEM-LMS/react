@@ -1071,11 +1071,9 @@ const StockfishTutor: React.FC<Props> = ({ enabled, trigger, fenBefore, fenAfter
         // eslint-disable-next-line no-console
         console.debug('StockfishTutor: analyzing move', { fenBefore, fenAfter, moveUci, uciHistory });
         try { setDebugLog(`analyzing move ${moveUci} | fenBefore=${fenBefore.split(' ')[0]}...`); } catch (e) { /* ignore */ }
-        // Safely read environment URL keys
-        const urls = (environment && (environment as any).urls) || {};
-        // Support multiple environment keys: prefer unified chessServerURL but
-        // also accept stockfishServerURL (some deployments use that name).
-        const rawBase = urls.chessServerURL || urls.stockfishServerURL || urls.chessServer || urls.stockfishServer || '';
+        // Stockfish analysis endpoint (/api/analyze) is hosted on stockfishServerURL.
+        // chessServerURL is websocket-only and does not handle HTTP analysis.
+        const rawBase = urls.stockfishServerURL || urls.stockfishServer || '';
         const baseUrl = typeof rawBase === 'string' ? rawBase.replace(/\/$/, '') : '';
 
                         if (!baseUrl) {
