@@ -13,6 +13,11 @@ const passport = require('passport');
 const Guardrail = require('../models/Guardrail');
 const requireAuth = require('../middleware/requireAuth');
 
+// Same fail-loud-in-production posture as config/db.js's seedTestUsers —
+// config-template seeding, not credential-bearing, but still an
+// unconditional side effect on import that shouldn't run in production.
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 // Ensure logs directory exists
 const LOGS_DIR = path.join(__dirname, '../../logs');
 fs.mkdirSync(LOGS_DIR, { recursive: true });
@@ -97,7 +102,9 @@ const seedDefaultTemplates = async () => {
     console.error('Error seeding CoachTemplates:', error.message);
   }
 };
-seedDefaultTemplates();
+if (!IS_PRODUCTION) {
+  seedDefaultTemplates();
+}
 
 // Seeding default guardrails in MongoDB on start
 const seedDefaultGuardrail = async () => {
@@ -113,7 +120,9 @@ const seedDefaultGuardrail = async () => {
     console.error('Error seeding Guardrails:', error.message);
   }
 };
-seedDefaultGuardrail();
+if (!IS_PRODUCTION) {
+  seedDefaultGuardrail();
+}
 
 // Middleware to authorize Tutors or Admins
 const authorizeTutorAdmin = (req, res, next) => {
