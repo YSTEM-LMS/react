@@ -16,7 +16,6 @@
 const express = require("express");
 const passport = require("passport");
 const router = express.Router();
-const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
@@ -30,6 +29,7 @@ const {
 const { sendMail } = require("../utils/nodemailer");
 const { validator } = require("../utils/middleware");
 const { getAvatarUrl, getBlobServiceClient, AVATAR_CONTAINER } = require("../utils/avatars");
+const { hashPassword } = require("../utils/password");
 const { MongoClient } = require("mongodb");
 const config = require("config");
 
@@ -106,8 +106,7 @@ router.post(
 
     //Error catching when using mongoose functions like Users.findOne()
     try {
-      const sha384 = crypto.createHash("sha384");
-      const hashedPassword = sha384.update(password).digest("hex");
+      const hashedPassword = await hashPassword(password);
       //Error checking to see if a user with the same username exists
       const user = await users.findOne({ username });
       if (user) {
@@ -139,10 +138,9 @@ router.post(
           //Insert the students into the database one at a time
           await Promise.all(
             studentsArray.map(async (student) => {
-              const sha384 = crypto.createHash("sha384");
               const newStudent = new users({
                 username: student.username,
-                password: sha384.update(student.password).digest("hex"),
+                password: await hashPassword(student.password),
                 firstName: student.first,
                 lastName: student.last,
                 email: student.email,
@@ -235,8 +233,7 @@ router.post(
     const { username, password, first, last, email, birthday, gender, gradeLevel } = req.query;
 
     try {
-      const sha384 = crypto.createHash("sha384");
-      const hashedPassword = sha384.update(password).digest("hex");
+      const hashedPassword = await hashPassword(password);
 
       const user = await users.findOne({ username });
       if (user) {
@@ -314,8 +311,7 @@ router.post("/resetPassword", validator, async (req, res) => {
       return res.status(400).send("Invalid data");
     }
     const password = req?.query;
-    const sha384 = crypto.createHash("sha384");
-    const hashedPassword = sha384?.update(password?.password)?.digest("hex");
+    const hashedPassword = password?.password ? await hashPassword(password.password) : undefined;
     const updatedUser = await updatePassword({
       username,
       password: hashedPassword,

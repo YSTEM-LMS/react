@@ -506,6 +506,7 @@ describe("Security Audit Regression: Auth Endpoint Body Credentials Hardening", 
       lastName: "Smith",
       role: "student",
       email: "alice@example.com",
+      save: jest.fn().mockResolvedValue(undefined),
     });
 
     const res = await request(app)
