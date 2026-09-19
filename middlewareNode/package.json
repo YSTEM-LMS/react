@@ -27,7 +27,7 @@
     "multer": "^2.2.0",
     "node-nlp": "^4.27.0",
     "node-schedule": "^2.1.1",
-    "nodemailer": "^6.7.8",
+    "nodemailer": "^9.1.1",
     "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.0",
