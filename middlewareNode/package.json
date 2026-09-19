@@ -23,7 +23,7 @@
     "formdata-polyfill": "^4.0.10",
     "node-domexception": "^1.0.0",
     "web-streams-polyfill": "^3.3.3",
-    "mongoose": "^6.8.4",
+    "mongoose": "^6.13.10",
     "multer": "^2.2.0",
     "node-nlp": "^4.27.0",
     "node-schedule": "^2.1.1",
