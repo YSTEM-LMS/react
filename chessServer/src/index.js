@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+const validateEnvironment = require("./validateEnvironment");
+validateEnvironment();
+
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -13,28 +16,53 @@ const server = http.createServer(app);
 // Add logging functionaility to the server
 app.use(morgan("dev")); // dev -> preset format
 
-const allowedOriginsSetting = process.env.CORS_ORIGIN || process.env.ALLOWED_ORIGINS;
-const allowedOrigins = allowedOriginsSetting
+const isProduction = process.env.NODE_ENV === "production";
+
+const allowedOriginsSetting =
+  process.env.CORS_ORIGIN || process.env.ALLOWED_ORIGINS;
+
+const allowedOrigins = (allowedOriginsSetting
   ? allowedOriginsSetting.split(",").map((o) => o.trim())
   : [
       "https://ystemandchess.com",
       "https://www.ystemandchess.com",
-      "http://localhost:3000",
-      "http://localhost:3002",
-      "http://localhost:4200",
-    ];
+      ...(isProduction
+        ? []
+        : [
+            "http://localhost:3000",
+            "http://localhost:3002",
+            "http://localhost:4200",
+          ]),
+    ]
+).map((origin) => {
+  if (origin !== "*" && origin.endsWith("/")) {
+    const normalized = origin.slice(0, -1);
+    console.warn(
+      `CORS: "${origin}" has a trailing slash, which never matches a browser's Origin header — using "${normalized}" instead`
+    );
+    return normalized;
+  }
+  return origin;
+});
+
+const hasWildcard = allowedOrigins.includes("*");
 
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+    if (hasWildcard) {
+      return callback(null, true);
+    }
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      console.warn(`CORS: rejected origin ${origin}`);
+      callback(null, false);
     }
   },
   methods: ["GET", "POST"],
-  credentials: true,
+  // When wildcard is configured, disallow credentials to prevent unsafe CORS configuration
+  credentials: !hasWildcard,
 };
 
 // Apply CORS middleware to handle cross-origin requests

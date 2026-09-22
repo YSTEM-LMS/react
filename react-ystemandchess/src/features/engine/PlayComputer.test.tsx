@@ -42,7 +42,7 @@ jest.mock('../../components/ChessBoard/ChessBoard', () => {
 });
 
 // Mock environment
-jest.mock('../../environments/environment', () => ({
+jest.mock('../../environments', () => ({
   environment: {
     urls: {
       stockfishServerURL: 'http://localhost:8080',

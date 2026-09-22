@@ -1,7 +1,7 @@
 /**
  * Unit tests for selectActivities — verifies newly generated daily
- * activities include taskId/route from activityCatalog, not just
- * name/type/completed.
+ * activities include taskId/route/displayName from activityCatalog, not
+ * just name/type/completed.
  */
 
 const mockToArray = jest.fn();
@@ -10,14 +10,25 @@ const mockCollection = jest.fn(() => ({ find: mockFind }));
 const mockDb = jest.fn(() => ({ collection: mockCollection }));
 const mockConnect = jest.fn();
 
-jest.mock("mongodb", () => ({
-  MongoClient: jest.fn().mockImplementation(() => ({
-    connect: mockConnect,
-    db: mockDb,
-  })),
-}));
+jest.mock("mongodb", () => {
+  const actual = jest.requireActual("mongodb");
+  return {
+    ...actual,
+    MongoClient: jest.fn().mockImplementation(() => ({
+      connect: mockConnect,
+      db: mockDb,
+    })),
+  };
+});
 
 jest.mock("config", () => ({ get: jest.fn(() => "mongodb://fake") }));
+
+// utils/activities.js's getDb() checks mongoose.connection.readyState first
+// before falling back to the raw MongoClient — force it into the fallback
+// path so these tests exercise the mocked MongoClient above.
+jest.mock("mongoose", () => ({
+  connection: { readyState: 0 },
+}));
 
 const { selectActivities } = require("../src/utils/activities");
 
@@ -40,17 +51,19 @@ describe("selectActivities", () => {
     expect(new Set(names).size).toBe(4);
   });
 
-  test("every generated activity has taskId and route fields", async () => {
+  test("every generated activity has taskId, route, and displayName fields", async () => {
     const activities = await selectActivities();
     activities.forEach((activity) => {
       expect(activity).toHaveProperty("taskId");
       expect(activity).toHaveProperty("route");
+      expect(activity).toHaveProperty("displayName");
       expect(typeof activity.taskId).toBe("string");
       expect(typeof activity.route).toBe("string");
+      expect(typeof activity.displayName).toBe("string");
     });
   });
 
-  test("taskId/route match the activity catalog for known activities", async () => {
+  test("taskId/route/displayName match the activity catalog for known activities", async () => {
     mockToArray.mockResolvedValue([
       { _id: "captureQueen", type: "puzzle" },
       { _id: "captureRook", type: "puzzle" },
@@ -61,6 +74,7 @@ describe("selectActivities", () => {
     const queenActivity = activities.find((a) => a.name === "captureQueen");
     expect(queenActivity.route).toBe("/puzzles");
     expect(queenActivity.taskId).toBe("captureQueen");
+    expect(queenActivity.displayName).toBe("Capture a Queen");
   });
 
   test("every generated activity starts as incomplete", async () => {

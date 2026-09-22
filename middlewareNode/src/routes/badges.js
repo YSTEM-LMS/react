@@ -20,6 +20,7 @@ const express = require("express");
 const { BADGE_CATALOG } = require("../badges/catalog");
 const { getEarned, awardIfEligible } = require("../badges/service");
 const requireAuth = require("../middleware/requireAuth");
+const requireSelf = require("../middleware/requireSelf");
 const { computeBadgePredicates } = require("../badges/predicates");
 
 const router = express.Router();
@@ -33,20 +34,10 @@ router.get("/catalog", (req, res) => {
 });
 
 /**
- * Rejects requests where the authenticated user doesn't match :userId.
- */
-function requireSelf(req, res, next) {
-  if (req.user.username !== req.params.userId) {
-    return res.status(403).json({ error: "Forbidden: cannot access another user's badges" });
-  }
-  next();
-}
-
-/**
  * GET /badges/:userId
  * Retrieves all badges earned by a specific user
  */
-router.get("/:userId", requireAuth, requireSelf, async (req, res) => {
+router.get("/:userId", requireAuth, requireSelf("userId"), async (req, res) => {
   try {
     const earned = await getEarned(req.params.userId);
     res.json({ earned });
@@ -62,7 +53,7 @@ router.get("/:userId", requireAuth, requireSelf, async (req, res) => {
  * supplied predicates body — see computeBadgePredicates) and awards any
  * newly eligible badges.
  */
-router.post("/:userId/check-and-award", requireAuth, requireSelf, async (req, res) => {
+router.post("/:userId/check-and-award", requireAuth, requireSelf("userId"), async (req, res) => {
   try {
     const predicates = await computeBadgePredicates(req.params.userId);
     const awarded = await awardIfEligible(req.params.userId, predicates);

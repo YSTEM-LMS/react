@@ -15,7 +15,7 @@ const express = require("express");
 const crypto = require("crypto");
 const passport = require("passport");
 const router = express.Router();
-const { check, validationResult } = require("express-validator");
+const { check, body, validationResult } = require("express-validator");
 const users = require("../models/users");
 const jwt = require("jsonwebtoken");
 const config = require("config");
@@ -29,7 +29,7 @@ const sha384 = crypto.createHash("sha384");
  * 
  * @access JWT authentication required
  */
-router.post("/validate", passport.authenticate("jwt"), async (req, res) => {
+router.post("/validate", passport.authenticate("jwt", { session: false }), async (req, res) => {
   if (req.user) {
     res.sendStatus(200);
   } else {
@@ -45,8 +45,8 @@ router.post("/validate", passport.authenticate("jwt"), async (req, res) => {
 router.post(
   "/login",
   [
-    check("username", "Username is required").not().isEmpty(),
-    check("password", "Password is required").not().isEmpty(),
+    body("username", "Username is required").not().isEmpty(),
+    body("password", "Password is required").not().isEmpty(),
   ],
   async (req, res) => {
     try {
@@ -57,7 +57,11 @@ router.post(
       }
 
       const sha384 = crypto.createHash("sha384");
-      const { username, password } = req.query;
+      const { username, password } = req.body || {};
+
+      if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required in request body" });
+      }
 
       //Find the user with the provided credentials
       let foundUser = await users.findOne({ username });

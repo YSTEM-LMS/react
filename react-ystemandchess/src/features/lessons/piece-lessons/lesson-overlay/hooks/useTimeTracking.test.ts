@@ -8,7 +8,7 @@ jest.mock("../../../../../globals", () => ({
 }));
 
 // mock environment URL
-jest.mock("../../../../../environments/environment", () => ({
+jest.mock("../../../../../environments", () => ({
     environment: { urls: { middlewareURL: "http://mockurl.com" } },
 }));
 

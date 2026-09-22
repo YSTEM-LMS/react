@@ -1,4 +1,20 @@
 {
+  "name": "ystemandchess",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm start --prefix react-ystemandchess",
+    "start": "npm start --prefix react-ystemandchess",
+    "build": "npm run build --prefix react-ystemandchess",
+    "start:client": "npm start --prefix react-ystemandchess",
+    "start:middleware": "npm start --prefix middlewareNode",
+    "start:chess": "npm start --prefix chessServer",
+    "start:stockfish": "npm start --prefix stockfishServer",
+    "test:client": "npm test --prefix react-ystemandchess",
+    "test:middleware": "npm test --prefix middlewareNode",
+    "test:chess": "npm test --prefix chessServer",
+    "test:stockfish": "npm test --prefix stockfishServer"
+  },
   "dependencies": {
     "chess.js": "^1.3.1",
     "dotenv": "^16.5.0",

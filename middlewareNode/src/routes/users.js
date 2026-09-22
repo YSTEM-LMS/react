@@ -343,7 +343,8 @@ const updatePassword = async (body) => {
 
 // @route GET /user/mentorless/:keyword
 // @desc for getting the mentorless students whose username matches keyword.
-router.get("/mentorless", async (req, res) => {
+// @access Private with JWT Authentication
+router.get("/mentorless", passport.authenticate("jwt", { session: false }), async (req, res) => {
   const keyword = req.query.keyword || ""; // get the keyword
   try {
     const db = await getDb();
@@ -461,7 +462,7 @@ router.get(
   }
 );
 
-router.get("/getStudent", async (req, res) => {
+router.get("/getStudent", passport.authenticate("jwt", { session: false }), async (req, res) => {
   const keyword = req.query.keyword || "";
 
   try {
@@ -517,7 +518,7 @@ router.post("/verifyRole", async (req, res) => {
   }
 });
 
-router.get("/getUser", async (req, res) => {
+router.get("/getUser", passport.authenticate("jwt", { session: false }), async (req, res) => {
   const username = req.query.username || "";
   try {
     const user = await users.findOne({ username }).select("-password");

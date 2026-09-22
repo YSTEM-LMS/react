@@ -14,6 +14,7 @@ const config = require("config");
 const express = require('express');
 const router = express.Router({mergeParams: true});
 const { MongoClient, ObjectId } = require('mongodb');
+const requireAuth = require('../middleware/requireAuth');
 require('dotenv').config();
 
 const mongoose = require("mongoose");
@@ -55,10 +56,42 @@ async function getUserId(db, username) {
 }
 
 /**
- * GET /activities
+ * Middleware to check read access on activity routes (self, mentor, tutor, or admin).
+ * Note: Platform mentors, tutors, and admins have read access to monitor student activity
+ * progress across the platform.
+ */
+function requireActivityReadAccess(req, res, next) {
+    const targetUsername = req.params.username;
+    if (
+        req.user.role === 'admin' ||
+        req.user.role === 'mentor' ||
+        req.user.role === 'tutor' ||
+        req.user.username === targetUsername
+    ) {
+        return next();
+    }
+    return res.status(403).json({ error: "Forbidden: cannot access another user's activities" });
+}
+
+/**
+ * Middleware to check write access on activity routes (self or admin)
+ */
+function requireActivityWriteAccess(req, res, next) {
+    const targetUsername = req.params.username;
+    if (
+        req.user.role === 'admin' ||
+        req.user.username === targetUsername
+    ) {
+        return next();
+    }
+    return res.status(403).json({ error: "Forbidden: cannot modify another user's activities" });
+}
+
+/**
+ * GET /activities/:username
  * Retrieves all daily activities for a user
  */
-router.get("/:username", async (req, res) => {
+router.get("/:username", requireAuth, requireActivityReadAccess, async (req, res) => {
     try {
         const db = await getDb();
         const { username } = req.params;
@@ -76,9 +109,9 @@ router.get("/:username", async (req, res) => {
         console.error('Error fetching activities: ', err);
         return res.status(500).json({error: 'Server error'});
     }
-})
+});
 
-router.get("/:username/dates", async (req, res) => {
+router.get("/:username/dates", requireAuth, requireActivityReadAccess, async (req, res) => {
     try {
         const db = await getDb(); 
         const { username } = req.params;
@@ -97,8 +130,7 @@ router.get("/:username/dates", async (req, res) => {
     }
 });
 
-
-router.put("/:username/activity", async (req, res) => {
+router.put("/:username/activity", requireAuth, requireActivityWriteAccess, async (req, res) => {
     try {
         const db = await getDb();
         const { username } = req.params;
@@ -124,7 +156,6 @@ router.put("/:username/activity", async (req, res) => {
         console.error('Error updating activities: ', err);
         return res.status(500).json({error: 'Server error'});
     }
-})
+});
 
-
-module.exports = router;
+module.exports = router;

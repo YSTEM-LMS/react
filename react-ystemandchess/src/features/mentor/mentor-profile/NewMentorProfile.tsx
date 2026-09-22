@@ -3,7 +3,7 @@ import "./NewMentorProfile.scss";
 import Images from "../../../assets/images/imageImporter";
 import { SetPermissionLevel } from '../../../globals'; 
 import { useCookies } from 'react-cookie';
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import { useNavigate } from "react-router";
 import StatsChart from "../../student/student-profile/StatsChart";
 import Lessons from "../../lessons/lessons-main/Lessons";

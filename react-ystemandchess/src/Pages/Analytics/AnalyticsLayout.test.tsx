@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AnalyticsLayout from "./AnalyticsLayout";
 
-jest.mock("../../environments/environment", () => ({
+jest.mock("../../environments", () => ({
   environment: { urls: { middlewareURL: "http://mockurl.com" } },
 }));
 

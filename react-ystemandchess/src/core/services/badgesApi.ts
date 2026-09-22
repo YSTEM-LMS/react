@@ -9,7 +9,7 @@
  * - getUserBadges: Fetches badges earned by a specific user
  */
 
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 /**
  * Fetches the complete catalog of all available badges
  *

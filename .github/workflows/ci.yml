@@ -5,6 +5,10 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  # Lets this workflow be run manually against any branch (Actions tab ->
+  # "Run workflow", or `gh workflow run`), without needing to push/PR to
+  # main first. Doesn't change push/pull_request behavior at all.
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -26,6 +30,10 @@ jobs:
 
       - name: Build middlewareNode
         run: npm run build --if-present
+        working-directory: ./middlewareNode
+
+      - name: Test middlewareNode
+        run: npm test
         working-directory: ./middlewareNode
 
       # chessServer
@@ -59,31 +67,20 @@ jobs:
         run: npm ci
         working-directory: ./react-ystemandchess
 
-      - name: Create environment file
-        run: |
-          mkdir -p src/core/environments
-          cat <<EOF > src/core/environments/environment.ts
-          export const environment = {
-            production: false,
-            agora: {
-              appId: '${{ secrets.APP_ID }}',
-            },
-            email: {
-              user: '${{ secrets.EMAIL_USER || '' }}',
-              pass: '${{ secrets.EMAIL_PASS || '' }}'
-            },
-            urls: {
-              middlewareURL: '${{ secrets.MIDDLEWARE_URL }}',
-              stockFishURL: '${{ secrets.STOCKFISH_URL }}',
-              chessServer: '${{ secrets.CHESS_SERVER }}',
-            },
-          };
-          EOF
-        working-directory: ./react-ystemandchess
-
       - name: Build react-ystemandchess
         run: CI=false npm run build --if-present
         working-directory: ./react-ystemandchess
+        env:
+          # These are read by src/environments/environment.prod.js, which is
+          # what the app actually imports (via src/environments/index.js).
+          # The previous "Create environment file" step wrote to
+          # src/core/environments/environment.ts, a path nothing in the app
+          # imports, so these secrets never reached the built app.
+          REACT_APP_MIDDLEWARE_URL: ${{ secrets.MIDDLEWARE_URL || 'https://ystemandchess.com/middleware' }}
+          REACT_APP_STOCKFISH_SERVER_URL: ${{ secrets.STOCKFISH_URL || 'https://ystemandchess.com/stockfishserver' }}
+          REACT_APP_CHESS_SERVER_URL: ${{ secrets.CHESS_SERVER || 'https://ystemandchess.com/chessserver' }}
+          REACT_APP_CHESS_CLIENT_URL: ${{ secrets.CHESS_CLIENT_URL || 'https://ystemandchess.com/chessclient' }}
+          REACT_APP_AGORA_APP_ID: ${{ secrets.APP_ID || '' }}
 
       - name: Test react-ystemandchess
         run: npm test
