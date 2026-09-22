@@ -1,0 +1,786 @@
+.chat-widget-container {
+  font-family: 'Outfit', 'Inter', 'Roboto', sans-serif;
+  z-index: 9999;
+}
+
+// Highly prominent floating AI Tutor button
+.chat-text-button {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  height: 56px;
+  padding: 0 28px;
+  background: linear-gradient(135deg, #8CC63F 0%, #10B981 50%, #059669 100%);
+  color: #FFFFFF;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 9999px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  box-shadow: 
+    0 8px 24px rgba(16, 185, 129, 0.4),
+    0 0 0 0 rgba(140, 198, 63, 0.6);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  animation: tutorGlowPulse 2.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
+
+  .button-pulse-beacon {
+    width: 10px;
+    height: 10px;
+    background-color: #38BDF8;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #38BDF8, 0 0 16px #38BDF8;
+    animation: beaconPulse 1.5s infinite alternate;
+  }
+
+  .button-sparkle {
+    font-size: 17px;
+    animation: rotateSparkle 3s infinite ease-in-out;
+  }
+
+  .button-label-text {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .button-brain-icon {
+    font-size: 19px;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 
+      0 14px 32px rgba(16, 185, 129, 0.55),
+      0 0 20px rgba(140, 198, 63, 0.8);
+    background: linear-gradient(135deg, #9BD64E 0%, #34D399 50%, #10B981 100%);
+    border-color: rgba(255, 255, 255, 0.8);
+
+    .button-brain-icon {
+      transform: scale(1.25) rotate(10deg);
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+}
+
+@keyframes tutorGlowPulse {
+  0% {
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4), 0 0 0 0 rgba(140, 198, 63, 0.6);
+  }
+  50% {
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.6), 0 0 0 14px rgba(140, 198, 63, 0);
+  }
+  100% {
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4), 0 0 0 0 rgba(140, 198, 63, 0);
+  }
+}
+
+@keyframes beaconPulse {
+  0% { opacity: 0.6; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.3); }
+}
+
+@keyframes rotateSparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(15deg); }
+}
+
+.chat-notification-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  background-color: #FF3B30;
+  border-radius: 50%;
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 5px rgba(255, 59, 48, 0.4);
+}
+
+// Widescreen Full Overlay Backdrop
+.chat-overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+// Large Chat Window
+.chat-widget-window {
+  width: 92vw;
+  max-width: 1150px;
+  height: 85vh;
+  max-height: 780px;
+  background: #F9FAF7; // Site light
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(31, 31, 31, 0.25);
+  display: flex;
+  overflow: hidden;
+  border: 3px solid #1F1F1F; // Strong brand border
+  animation: scaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  position: relative;
+  font-family: 'Lato', sans-serif;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    height: 90vh;
+    width: 95vw;
+    border-width: 2px;
+  }
+}
+
+// Left Column: Coach Mascot Sidebar
+.chat-coach-sidebar {
+  flex: 0 0 350px;
+  background: linear-gradient(180deg, #1F1F1F 0%, #2D2D2D 100%); // Dark brand gradient
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  color: #F9FAF7;
+  border-right: 3px solid #1F1F1F; // Strong brand divider
+  position: relative;
+  overflow-y: auto;
+
+  @media (max-width: 900px) {
+    flex: 0 0 auto;
+    padding: 16px 24px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-branding {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+
+    @media (max-width: 900px) {
+      margin-bottom: 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .mascot-badge {
+      background: rgba(140, 198, 63, 0.15);
+      color: #9BD64E;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid rgba(140, 198, 63, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94A3B8;
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #4ADE80;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #22C55E;
+        animation: pulse 1.8s infinite;
+      }
+    }
+  }
+}
+
+// Coach Mascot SVG Animations & Styles
+.avatar-frame-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0 24px;
+
+  @media (max-width: 900px) {
+    margin: 0;
+    flex-direction: row;
+    gap: 12px;
+  }
+}
+
+.coach-mascot-container {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #334155 0%, #1E293B 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 4px solid #334155;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: visible;
+
+  @media (max-width: 900px) {
+    width: 60px;
+    height: 60px;
+    border-width: 2px;
+  }
+
+  .mascot-svg {
+    width: 90%;
+    height: 90%;
+    overflow: visible;
+  }
+
+  // Common animations
+  .aura-bg {
+    fill: rgba(140, 198, 63, 0.05);
+    transition: fill 0.3s;
+  }
+
+  // State-specific styles & animations
+  &.welcome {
+    border-color: #8CC63F;
+    .aura-bg { fill: rgba(140, 198, 63, 0.15); }
+    animation: gentleBreathe 4s ease-in-out infinite;
+  }
+
+  &.thinking {
+    border-color: #F59E0B;
+    .aura-bg { fill: rgba(245, 158, 11, 0.15); }
+    
+    .looking-up {
+      animation: thinkingEyes 3s ease-in-out infinite;
+    }
+    
+    .thought-dots {
+      .dot-1 { animation: thoughtDot 1.2s 0.2s infinite alternate; }
+      .dot-2 { animation: thoughtDot 1.2s 0.4s infinite alternate; }
+      .dot-3 { animation: thoughtDot 1.2s 0.6s infinite alternate; }
+    }
+  }
+
+  &.speaking {
+    border-color: #8CC63F;
+    .aura-bg { fill: rgba(140, 198, 63, 0.2); }
+    animation: gentleBreathe 2s ease-in-out infinite;
+
+    .speaking-mouth {
+      animation: mouthTalk 0.4s ease-in-out infinite alternate;
+      transform-origin: 60px 54px;
+    }
+  }
+
+  &.happy {
+    border-color: #10B981;
+    .aura-bg { fill: rgba(16, 185, 129, 0.25); }
+    animation: happyBounce 0.6s ease infinite alternate;
+    
+    .celebration-sparkles {
+      animation: rotateSparkles 4s linear infinite;
+      transform-origin: 60px 60px;
+    }
+  }
+
+  &.thumbsup {
+    border-color: #3B82F6;
+    .aura-bg { fill: rgba(59, 130, 246, 0.2); }
+    animation: gentleBreathe 3s ease-in-out infinite;
+
+    .thumbsup-hand {
+      animation: handWave 0.8s ease-in-out infinite alternate;
+      transform-origin: 95px 65px;
+    }
+  }
+}
+
+// Coach Speech Bubble
+.coach-bubble {
+  background-color: #2D2D2D;
+  border: 2px solid #7FCC26; // Site primary green highlight
+  padding: 16px 20px;
+  border-radius: 18px;
+  margin-top: 24px;
+  position: relative;
+  max-width: 280px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+
+  @media (max-width: 900px) {
+    display: none; // Hide on smaller screens to save space
+  }
+
+  .bubble-arrow {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #2D2D2D;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #F9FAF7;
+    font-weight: 500;
+    text-align: center;
+  }
+}
+
+// Info Card in Sidebar
+.coach-tips-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 20px;
+  margin-top: auto;
+
+  @media (max-width: 900px) {
+    display: none; // Hide on small screens
+  }
+
+  h5 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #7FCC26;
+    letter-spacing: 0.2px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #BFD99E;
+  }
+}
+
+// Right Column: Chat Workspace
+.chat-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #E5F3D2; // Site soft green background
+  position: relative;
+}
+
+// Header
+.chat-header {
+  background: #F9FAF7; // Site light color
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #1F1F1F; // Strong brand border
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+  @media (max-width: 900px) {
+    padding: 14px 20px;
+    border-bottom-width: 2px;
+  }
+
+  .header-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    h4 {
+      margin: 0;
+      font-weight: 800;
+      font-size: 18px;
+      color: #1F1F1F; // Dark neutral
+      letter-spacing: -0.3px;
+    }
+
+    .topic-tag {
+      background: #BFD99E; // Secondary brand green
+      color: #1F1F1F;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #1F1F1F;
+      text-transform: capitalize;
+    }
+  }
+
+  .chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .end-btn {
+      background: #FEF2F2;
+      border: 1px solid #FEE2E2;
+      color: #EF4444;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #FEE2E2;
+        transform: translateY(-1px);
+      }
+    }
+
+    .close-btn {
+      background: #F1F5F9;
+      border: none;
+      color: #64748B;
+      font-size: 26px;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: #E2E8F0;
+        color: #0F172A;
+      }
+    }
+  }
+}
+
+// Conversation Box
+.chat-messages {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    padding: 16px;
+  }
+}
+
+// Onboarding: Topic Grid Selector
+.chat-topic-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 20px 40px;
+  margin: auto 0;
+
+  h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 10px 0;
+  }
+
+  p {
+    font-size: 15px;
+    color: #64748B;
+    margin-bottom: 30px;
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 650px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .topic-card {
+    background: white;
+    border: 2px solid #E2E8F0;
+    border-radius: 20px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &:hover {
+      border-color: #8CC63F;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(140, 198, 63, 0.1);
+
+      .start-topic-btn {
+        background: #8CC63F;
+        color: white;
+      }
+    }
+
+    .topic-card-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    h4 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0F172A;
+      text-transform: capitalize;
+    }
+
+    .start-topic-btn {
+      width: 100%;
+      background: #F1F5F9;
+      border: none;
+      color: #475569;
+      border-radius: 12px;
+      padding: 10px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+  }
+}
+
+// Chat Message Bubbles
+.chat-message {
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+  animation: messageSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  .message-sender-label {
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .message-text {
+    padding: 14px 18px;
+    border-radius: 20px;
+    font-size: 14.5px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  &.user {
+    align-self: flex-end;
+    
+    .message-sender-label {
+      align-self: flex-end;
+      color: #1F1F1F;
+    }
+
+    .message-text {
+      background: #7FCC26; // Primary brand green
+      color: #1F1F1F; // Highly readable text
+      border: 2px solid #1F1F1F; // Brand border
+      border-bottom-right-radius: 4px;
+      box-shadow: 4px 4px 0px rgba(31, 31, 31, 0.15);
+    }
+  }
+
+  &.bot {
+    align-self: flex-start;
+
+    .message-text {
+      background: #F9FAF7; // Site light color
+      color: #1F1F1F;
+      border: 2px solid #1F1F1F; // Brand border
+      border-bottom-left-radius: 4px;
+      box-shadow: 4px 4px 0px rgba(31, 31, 31, 0.05);
+    }
+
+    &.loading {
+      .message-text {
+        padding: 16px 24px;
+      }
+    }
+  }
+}
+
+// Typing Loader Animation
+.typing-loader {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 15px;
+
+  span {
+    width: 6px;
+    height: 6px;
+    background: #64748B;
+    border-radius: 50%;
+    animation: typingDots 1.4s infinite ease-in-out both;
+
+    &:nth-child(1) { animation-delay: -0.32s; }
+    &:nth-child(2) { animation-delay: -0.16s; }
+  }
+}
+
+// Bottom Input Bar
+.chat-input-area {
+  padding: 20px 30px;
+  background-color: #F9FAF7; // Site light color
+  border-top: 3px solid #1F1F1F; // Strong brand border
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  @media (max-width: 900px) {
+    padding: 14px 20px;
+    border-top-width: 2px;
+  }
+
+  input {
+    flex: 1;
+    padding: 14px 20px;
+    border: 2px solid #1F1F1F; // Strong input borders
+    border-radius: 24px;
+    outline: none;
+    font-size: 14.5px;
+    transition: all 0.2s;
+    background-color: white;
+    color: #1F1F1F;
+
+    &:focus {
+      border-color: #7FCC26; // Primary brand green
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba(127, 204, 38, 0.25);
+    }
+  }
+
+  button {
+    background: #7FCC26; // Primary brand green
+    color: #1F1F1F; // Highly readable dark text
+    border: 2px solid #1F1F1F; // Strong button border
+    border-radius: 24px;
+    padding: 0 28px;
+    height: 48px;
+    font-weight: 700;
+    font-size: 14.5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #1F1F1F; // Brand shadow offset
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #BFD99E; // Secondary brand green
+      transform: translateY(-1px) translateX(-1px);
+      box-shadow: 3px 3px 0px #1F1F1F;
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0) translateX(0);
+      box-shadow: 1px 1px 0px #1F1F1F;
+    }
+
+    &:disabled {
+      background: #D6D6D6;
+      color: #8A8A8A;
+      border-color: #8A8A8A;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes messageSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+  100% { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+@keyframes gentleBreathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes happyBounce {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-12px) scale(1.02); }
+}
+
+@keyframes thinkingEyes {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px) translateX(1px); }
+}
+
+@keyframes thoughtDot {
+  from { transform: scale(0.5); opacity: 0.3; }
+  to { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes mouthTalk {
+  from { transform: scaleY(0.3); }
+  to { transform: scaleY(1.3); }
+}
+
+@keyframes rotateSparkles {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes handWave {
+  from { transform: rotate(-5deg); }
+  to { transform: rotate(15deg); }
+}
+
+@keyframes typingDots {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
+}

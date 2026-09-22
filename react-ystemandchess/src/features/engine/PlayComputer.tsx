@@ -1,22 +1,94 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Chess } from 'chess.js';
-import { io, Socket } from 'socket.io-client';
+// chess.js can export either a default/module object or a named Chess export depending on build.
+// import it first (satisfies import/first rule) then normalize below.
+import { Chess as ChessClass } from 'chess.js';
+import { io } from 'socket.io-client';
 import { useLocation } from 'react-router';
 import { Move } from '../../core/types/chess';
 import ChessBoard, { ChessBoardRef } from '../../components/ChessBoard/ChessBoard';
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
+// Module styles (placeholder file should exist at the same folder)
+import styles from './PlayComputer.module.scss';
+import StockfishTutor from './StockfishTutor';
+
+// chess.js exposes a named export `Chess`; normalize to a local constructor variable.
+const Chess: any = ChessClass;
 
 type Difficulty = 1 | 5 | 10 | 15 | 20;
 
-const controlBtnClass =
-  "bg-light border-solid border-dark text-dark font-semibold px-5 py-2 rounded-xl " +
-  "transition-all duration-200 enabled:hover:text-white enabled:hover:border-primary enabled:hover:bg-primary " +
-  "enabled:hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed";
+// SVG Icons matching user mock-up
+const CpuIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5A991E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <rect x="9" y="9" width="6" height="6" />
+    <line x1="9" y1="1" x2="9" y2="4" />
+    <line x1="15" y1="1" x2="15" y2="4" />
+    <line x1="9" y1="20" x2="9" y2="23" />
+    <line x1="15" y1="20" x2="15" y2="23" />
+    <line x1="20" y1="9" x2="23" y2="9" />
+    <line x1="20" y1="15" x2="23" y2="15" />
+    <line x1="1" y1="9" x2="4" y2="9" />
+    <line x1="1" y1="15" x2="4" y2="15" />
+  </svg>
+);
+
+const UserIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5A991E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const StarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F2C94C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+const GearIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A5568" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+const RibbonIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7FCC26" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+const UndoIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 7v6h6" />
+    <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+  </svg>
+);
+
+const ResetIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+  </svg>
+);
+
+const PlayIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="5 3 19 12 5 21 5 3" />
+  </svg>
+);
+
+const SwapIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="16 3 21 3 21 8" />
+    <line x1="4" y1="20" x2="21" y2="3" />
+    <polyline points="8 21 3 21 3 16" />
+  </svg>
+);
 
 const PlayComputer: React.FC = () => {
   const chessBoardRef = useRef<ChessBoardRef>(null);
-  const socketRef = useRef<Socket | null>(null);
-  const gameRef = useRef<Chess>(new Chess());
+  const socketRef = useRef<any>(null);
+  const gameRef = useRef<any>(new Chess());
   const playerColorRef = useRef<'white' | 'black'>('white');
   const sessionStartedRef = useRef<boolean>(false);
   const difficultyRef = useRef<Difficulty>(10);
@@ -31,9 +103,19 @@ const PlayComputer: React.FC = () => {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [highlightSquares, setHighlightSquares] = useState<string[]>([]);
+  const [fenHistory, setFenHistory] = useState<string[]>([gameRef.current.fen()]);
+  const [uciHistoryArr, setUciHistoryArr] = useState<string[]>([]);
   const [showSettings, setShowSettings] = useState(true);
   const [showGameEndModal, setShowGameEndModal] = useState(false);
   const [gameEndMessage, setGameEndMessage] = useState('');
+  // status text shown in the status bar (e.g. check, checkmate, draw messages)
+  const [gameStatus, setGameStatus] = useState<string>('');
+  const [tutorEnabled, setTutorEnabled] = useState<boolean>(true);
+  const [tutorTrigger, setTutorTrigger] = useState<number>(0);
+  const [tutorFenBefore, setTutorFenBefore] = useState<string | undefined>(undefined);
+  const [tutorMoveUci, setTutorMoveUci] = useState<string | undefined>(undefined);
+  const [tutorFenAfter, setTutorFenAfter] = useState<string | undefined>(undefined);
+
 
   // When the user clicks "Play" in the navbar while a game is active, reset to settings
   useEffect(() => {
@@ -102,11 +184,15 @@ const PlayComputer: React.FC = () => {
             setFen(updatedFen);
             setHighlightSquares([moveResult.from, moveResult.to]);
             setMoveHistory(prev => [...prev, `${moveResult.from} -> ${moveResult.to}`]);
+            setFenHistory(prev => [...prev, updatedFen]);
+            setUciHistoryArr(prev => [...prev, `${moveResult.from}${moveResult.to}${moveResult.promotion ?? ''}`]);
             if (chessBoardRef.current) {
               chessBoardRef.current.setPosition(updatedFen);
               chessBoardRef.current.highlightMove(moveResult.from, moveResult.to);
             }
             checkGameStatus();
+            // Trigger tutor to analyze the player's move now that the computer has responded
+            setTutorTrigger(t => t + 1);
           }
         } catch (err) {
           console.error('Failed to apply computer move:', err);
@@ -137,6 +223,9 @@ const PlayComputer: React.FC = () => {
 
   const handleMove = useCallback((move: Move) => {
     try {
+      // capture fen before the move so the tutor can analyze the player's move
+      const fenBefore = gameRef.current.fen();
+
       const moveResult = gameRef.current.move({
         from: move.from,
         to: move.to,
@@ -148,8 +237,21 @@ const PlayComputer: React.FC = () => {
       setFen(newFen);
       setHighlightSquares([move.from, move.to]);
       setMoveHistory(prev => [...prev, `${move.from} -> ${move.to}`]);
+      setFenHistory(prev => [...prev, newFen]);
+      setUciHistoryArr(prev => [...prev, `${moveResult.from}${moveResult.to}${moveResult.promotion ?? ''}`]);
 
-      if (checkGameStatus()) return;
+      // set tutor context for this player move (but don't trigger analysis yet)
+      const currentMoveUci = `${moveResult.from}${moveResult.to}${moveResult.promotion ?? ''}`;
+      setTutorFenBefore(fenBefore);
+      setTutorMoveUci(currentMoveUci);
+      setTutorFenAfter(newFen);
+
+      // Check if game ended
+      if (checkGameStatus()) {
+        // Trigger tutor immediately if the game ends because the computer won't make a move
+        setTutorTrigger(t => t + 1);
+        return;
+      }
 
       if (socketRef.current) {
         socketRef.current.emit('update-fen', { fen: newFen });
@@ -193,6 +295,11 @@ const PlayComputer: React.FC = () => {
     setMoveHistory([]);
     setHighlightSquares([]);
     setIsThinking(false);
+    setTutorFenBefore(undefined);
+    setTutorMoveUci(undefined);
+    setFenHistory([startFen]);
+    setUciHistoryArr([]);
+
     if (chessBoardRef.current) chessBoardRef.current.reset();
     if (socketRef.current && sessionStartedRef.current) {
       socketRef.current.emit('update-fen', { fen: startFen });
@@ -210,6 +317,8 @@ const PlayComputer: React.FC = () => {
     setShowSettings(true);
     setSessionStarted(false);
     sessionStartedRef.current = false;
+    setTutorFenBefore(undefined);
+    setTutorMoveUci(undefined);
   }, [resetGame]);
 
   const undoMove = useCallback(() => {
@@ -220,9 +329,75 @@ const PlayComputer: React.FC = () => {
     setFen(newFen);
     setMoveHistory(prev => prev.slice(0, -2));
     setHighlightSquares([]);
-    if (chessBoardRef.current) chessBoardRef.current.setPosition(newFen);
-    if (socketRef.current) socketRef.current.emit('update-fen', { fen: newFen });
+    setGameStatus('');
+    setTutorFenBefore(undefined);
+    setTutorMoveUci(undefined);
+
+    if (chessBoardRef.current) {
+      chessBoardRef.current.setPosition(newFen);
+    }
+
+    // Update server
+    if (socketRef.current) {
+      socketRef.current.emit('update-fen', { fen: newFen });
+    }
+    try {
+      setFenHistory(prev => prev.slice(0, -2));
+      setUciHistoryArr(prev => prev.slice(0, -2));
+    } catch (e) {}
   }, [moveHistory.length]);
+
+  const gotoPly = useCallback((plyIndex: number) => {
+    try {
+      const targetFen = fenHistory[plyIndex + 1];
+      const uci = uciHistoryArr[plyIndex];
+      if (!targetFen) return;
+      // Load the target FEN into the game engine so subsequent moves continue from here
+      try {
+        if (gameRef.current && typeof gameRef.current.load === 'function') {
+          gameRef.current.load(targetFen);
+        } else {
+          // Some builds of chess.js may not expose a .load method on the instance; recreate the game from FEN
+          try {
+            // eslint-disable-next-line new-cap
+            gameRef.current = new Chess(targetFen);
+          } catch (e) {
+            // As a last resort, leave the engine as-is; the board UI will still reflect the chosen FEN
+          }
+        }
+      } catch (e) { /* ignore load errors */ }
+
+      setFen(targetFen);
+      if (uci && uci.length >= 4) {
+        const from = uci.slice(0, 2);
+        const to = uci.slice(2, 4);
+        setHighlightSquares([from, to]);
+        if (chessBoardRef.current) {
+          chessBoardRef.current.setPosition(targetFen);
+          chessBoardRef.current.highlightMove(from, to);
+        }
+      } else {
+        setHighlightSquares([]);
+        if (chessBoardRef.current) chessBoardRef.current.setPosition(targetFen);
+      }
+      // Trim histories so the app state reflects continuing from this ply
+      try {
+        setFenHistory(prev => prev.slice(0, plyIndex + 2)); // keep starting fen + positions up to target
+        setUciHistoryArr(prev => prev.slice(0, plyIndex + 1)); // keep UCIs up to target
+        setMoveHistory(prev => prev.slice(0, plyIndex + 1));
+      } catch (e) {}
+
+      const fenBefore = fenHistory[plyIndex];
+      setTutorFenBefore(fenBefore);
+      setTutorMoveUci(uci);
+      setTutorTrigger(t => t + 1);
+
+      // Notify server so remote engine state can be updated to match this new position
+      try {
+        if (socketRef.current) socketRef.current.emit('update-fen', { fen: targetFen });
+      } catch (e) {}
+    } catch (e) { console.error('gotoPly failed', e); }
+  }, [fenHistory, uciHistoryArr]);
 
   const difficulties: { label: string; value: Difficulty }[] = [
     { label: 'Easy', value: 1 },
@@ -233,31 +408,22 @@ const PlayComputer: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center mt-8 px-4 py-8 bg-soft">
-
-      <h1 className="text-3xl font-bold text-dark mb-8 text-center">Play vs Computer</h1>
-
+    <div className={styles.playPageContainer}>
       {showSettings ? (
-        /* ── Settings card ── */
-        <div className="bg-light border-2 border-dark rounded-2xl shadow-md p-10 flex flex-col items-center w-full max-w-lg">
-          <h2 className="text-2xl font-bold text-dark mb-8 text-center">Game Settings</h2>
+        <div className={styles.settingsCard}>
+          <h2 className={styles.settingsHeader}>Game Settings</h2>
 
-          {/* Play as */}
-          <div className="w-full">
-            <label className="block mb-3 font-semibold text-lg text-muted">Play as</label>
-            <div className="grid grid-cols-2 gap-4">
+          <div className={styles.settingsGroup}>
+            <label className={styles.settingsLabel}>Play as</label>
+            <div className={styles.buttonGrid2}>
               <button
-                className={`py-5 font-semibold text-lg rounded-xl border-solid bg-white text-dark
-                  transition-all duration-200 hover:-translate-y-0.5
-                  ${playerColor === 'white' ? 'border-primary shadow-md scale-[1.02]' : 'border-borderLight'}`}
+                className={`${styles.colorBtnWhite} ${playerColor === 'white' ? styles.active : ''}`}
                 onClick={() => setPlayerColor('white')}
               >
                 White
               </button>
               <button
-                className={`py-5 font-semibold text-lg rounded-xl border-solid bg-dark text-light
-                  transition-all duration-200 hover:-translate-y-0.5
-                  ${playerColor === 'black' ? 'border-primary shadow-md scale-[1.02]' : 'border-borderLight'}`}
+                className={`${styles.colorBtnBlack} ${playerColor === 'black' ? styles.active : ''}`}
                 onClick={() => setPlayerColor('black')}
               >
                 Black
@@ -265,33 +431,24 @@ const PlayComputer: React.FC = () => {
             </div>
           </div>
 
-          {/* Difficulty */}
-          <div className="w-full mt-6">
-            <label className="block mb-3 font-semibold text-lg text-muted">Difficulty</label>
-            <div className="grid grid-cols-3 gap-3 w-full">
+          <div className={styles.settingsGroup}>
+            <label className={styles.settingsLabel}>Difficulty</label>
+            <div className={styles.difficultyGrid}>
               {difficulties.slice(0, 3).map(({ label, value }) => (
                 <button
                   key={value}
-                  className={`py-3 rounded-xl border-solid font-semibold
-                    transition-all duration-200 hover:-translate-y-0.5
-                    ${difficulty === value
-                      ? 'bg-primary text-light border-primary'
-                      : 'bg-white text-dark border-borderLight hover:border-primary'}`}
+                  className={`${styles.difficultyBtn} ${difficulty === value ? styles.active : ''}`}
                   onClick={() => setDifficulty(value)}
                 >
                   {label}
                 </button>
               ))}
             </div>
-            <div className="grid grid-cols-2 gap-3 w-full mt-3">
+            <div className={`${styles.difficultyGrid} ${styles.row2}`}>
               {difficulties.slice(3).map(({ label, value }) => (
                 <button
                   key={value}
-                  className={`py-3 rounded-xl border-solid font-semibold
-                    transition-all duration-200 hover:-translate-y-0.5
-                    ${difficulty === value
-                      ? 'bg-primary text-light border-primary'
-                      : 'bg-white text-dark border-borderLight hover:border-primary'}`}
+                  className={`${styles.difficultyBtn} ${difficulty === value ? styles.active : ''}`}
                   onClick={() => setDifficulty(value)}
                 >
                   {label}
@@ -300,102 +457,225 @@ const PlayComputer: React.FC = () => {
             </div>
           </div>
 
-
-          <button className="btn-green w-full mt-8 mb-4" onClick={startSession} disabled={!connected}>
+          <button 
+            className={styles.startButton} 
+            onClick={startSession} 
+            disabled={!connected}
+          >
             {connected ? 'Start Game' : 'Connecting...'}
           </button>
         </div>
       ) : (
-        <>
-          {/* ── Game controls ── */}
-          <div className="flex gap-3 mb-8 flex-wrap justify-center">
-            <button className={controlBtnClass} onClick={undoMove} disabled={moveHistory.length < 2 || isThinking}>
-              Undo
-            </button>
-            <button className={controlBtnClass} onClick={resetGame} disabled={isThinking}>
-              Reset
-            </button>
-            <button className={controlBtnClass} onClick={newGame}>
-              New Game
-            </button>
-            <button className={controlBtnClass} onClick={() => chessBoardRef.current?.flip()}>
-              Flip Board
-            </button>
-          </div>
+        <div className={styles.outerFrame}>
+          {/* Left Column: Opponent, Tutor, Chessboard, Player */}
+          <div className={styles.leftColumn}>
+            {/* Stockfish Header Card */}
+            <div className={styles.stockfishHeaderCard}>
+              <div className={styles.headerLeft}>
+                <div className={styles.iconSquare}>
+                  <CpuIcon />
+                </div>
+                <div className={styles.headerText}>
+                  <div className={styles.headerTitle}>Stockfish Computer</div>
+                  <div className={styles.headerSubtitle}>Level {difficulty} ({difficulty === 1 ? 'Easy' : difficulty === 5 ? 'Medium' : difficulty === 10 ? 'Hard' : difficulty === 15 ? 'Expert' : 'Master'})</div>
+                </div>
+              </div>
+              <div className={styles.readyBadge}>
+                <span className={styles.dot}></span>
+                Ready
+              </div>
+            </div>
 
-          {/* ── Chessboard ── */}
-          <div className="mb-8 shadow-xl rounded-lg overflow-hidden">
-            <ChessBoard
-              mode="engine"
-              ref={chessBoardRef}
-              fen={fen}
-              orientation={playerColor}
-              highlightSquares={highlightSquares}
-              onMove={handleMove}
-              disabled={isThinking}
-            />
-          </div>
+            {/* AI Tutor Card */}
+            <div className={styles.tutorCardWrapper}>
+              <div className={styles.tutorToggle}>
+                <label className={styles.tutorToggleLabel}>
+                  <input 
+                    type="checkbox" 
+                    checked={tutorEnabled} 
+                    onChange={(e) => setTutorEnabled(e.target.checked)} 
+                    className={styles.tutorCheckbox}
+                  /> 
+                  <span className={styles.tutorToggleText}>Show AI Tutor</span>
+                </label>
+              </div>
+              
+              <StockfishTutor
+                enabled={tutorEnabled}
+                trigger={tutorTrigger}
+                fenBefore={tutorFenBefore}
+                fenAfter={tutorFenAfter || fen}
+                moveUci={tutorMoveUci}
+                uciHistory={uciHistoryArr.join(' ')}
+                onRequestGotoFen={(fen: string, highlights?: string[] | null) => {
+                  try {
+                    setFen(fen);
+                    setHighlightSquares(highlights || []);
+                    if (chessBoardRef.current) {
+                      chessBoardRef.current.setPosition(fen);
+                      if (highlights && highlights.length === 2) chessBoardRef.current.highlightMove(highlights[0], highlights[1]);
+                    }
+                  } catch (e) {}
+                }}
+              />
+            </div>
 
-          {/* ── Move history ── */}
-          <div className="bg-light border-2 border-dark rounded-2xl p-6 w-full max-w-xl my-3">
-            <h3 className="font-bold text-dark text-lg mb-3">
-              Move History
-            </h3>
-            <div
-              ref={movesContainerRef}
-              className="flex flex-col gap-1 max-h-48 overflow-y-auto activity-scrollbar"
-            >
-              {moveHistory.reduce((acc: JSX.Element[], move, idx) => {
-                if (idx % 2 === 0) {
-                  const moveNumber = Math.floor(idx / 2) + 1;
-                  acc.push(
-                    <div
-                      key={idx}
-                      className="grid grid-cols-[40px_1fr_1fr] gap-2 px-3 py-2 rounded-lg border border-borderLight items-center hover:border-primary transition-colors duration-150"
-                    >
-                      <span className="text-primary font-bold text-right text-sm">{moveNumber}.</span>
-                      <span className="bg-white text-dark border-2 border-primary px-3 py-1 rounded font-mono text-sm">
-                        {move}
-                      </span>
-                      {moveHistory[idx + 1] && (
-                        <span className="bg-dark text-light border-2 border-primary px-3 py-1 rounded font-mono text-sm">
-                          {moveHistory[idx + 1]}
-                        </span>
-                      )}
-                    </div>
-                  );
-                }
-                return acc;
-              }, [])}
+            {/* Chessboard Card */}
+            <div className={styles.chessboardCard}>
+              <div className={styles.statusBarFixed}>
+                {gameStatus && (
+                  <div className={`${styles.statusMessage} ${styles.check}`}>
+                    {gameStatus}
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.chessboardContainer}>
+                <ChessBoard
+                  mode="engine"
+                  ref={chessBoardRef}
+                  fen={fen}
+                  orientation={playerColor}
+                  highlightSquares={highlightSquares}
+                  onMove={handleMove}
+                  disabled={isThinking || gameStatus.includes('wins') || gameStatus === 'Draw!'}
+                />
+              </div>
+            </div>
+
+            {/* You Footer Card */}
+            <div className={styles.playerFooterCard}>
+              <div className={styles.headerLeft}>
+                <div className={styles.iconSquare}>
+                  <UserIcon />
+                </div>
+                <div className={styles.headerText}>
+                  <div className={styles.headerTitle}>You</div>
+                  <div className={styles.headerSubtitle}>Playing as {playerColor.charAt(0).toUpperCase() + playerColor.slice(1)}</div>
+                </div>
+              </div>
+              {playerColor === (gameRef.current.turn() === 'w' ? 'white' : 'black') ? (
+                <div className={styles.turnBadgeActive}>Your Turn</div>
+              ) : (
+                <div className={styles.turnBadgeThinking}>Opponent Thinking</div>
+              )}
             </div>
           </div>
-        </>
+
+          {/* Right Column: Game Info, Actions, Move History */}
+          <div className={styles.rightColumn}>
+            {/* Game Info Panel */}
+            <div className={styles.infoCard}>
+              <div className={styles.cardHeader}>
+                <StarIcon />
+                <span>Game Info</span>
+              </div>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoCell}>
+                  <div className={styles.infoCellLabel}>Active Turn</div>
+                  <div className={styles.infoCellValue}>
+                    <span className={`${styles.turnColorDot} ${gameRef.current.turn() === 'w' ? styles.whiteDot : styles.blackDot}`}></span>
+                    {gameRef.current.turn() === 'w' ? 'White' : 'Black'}
+                  </div>
+                </div>
+                <div className={styles.infoCell}>
+                  <div className={styles.infoCellLabel}>Total Moves</div>
+                  <div className={styles.infoCellValueNum}>{moveHistory.length}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions Panel */}
+            <div className={styles.actionsCard}>
+              <div className={styles.cardHeader}>
+                <GearIcon />
+                <span>Actions</span>
+              </div>
+              <div className={styles.actionsGrid}>
+                <button 
+                  className={styles.actionGridBtn} 
+                  onClick={undoMove} 
+                  disabled={moveHistory.length < 2 || isThinking}
+                >
+                  <UndoIcon />
+                  <span>Undo</span>
+                </button>
+                <button 
+                  className={styles.actionGridBtn} 
+                  onClick={resetGame} 
+                  disabled={isThinking}
+                >
+                  <ResetIcon />
+                  <span>Reset</span>
+                </button>
+                <button 
+                  className={styles.actionGridBtn} 
+                  onClick={newGame}
+                >
+                  <PlayIcon />
+                  <span>New Game</span>
+                </button>
+                <button 
+                  className={styles.actionGridBtn} 
+                  onClick={() => chessBoardRef.current?.flip()}
+                >
+                  <SwapIcon />
+                  <span>Flip Board</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Move History Panel */}
+            <div className={styles.moveHistoryCard}>
+              <div className={styles.cardHeader}>
+                <RibbonIcon />
+                <span>Move History</span>
+              </div>
+              <div ref={movesContainerRef} className={styles.moveHistoryScroll}>
+                {moveHistory.reduce((acc: JSX.Element[], move, idx) => {
+                  if (idx % 2 === 0) {
+                    const moveNumber = Math.floor(idx / 2) + 1;
+                    acc.push(
+                      <div key={idx} className={styles.moveHistoryRow}>
+                        <span className={styles.moveNumberText}>{moveNumber}.</span>
+                        <button 
+                          onClick={() => {
+                            const hasOpponent = moveHistory.length > idx + 1;
+                            const target = hasOpponent ? idx + 1 : idx;
+                            gotoPly(target);
+                          }} 
+                          className={styles.movePillPlayer}
+                        >
+                          {move}
+                        </button>
+                        {moveHistory[idx + 1] ? (
+                          <button 
+                            onClick={() => gotoPly(idx + 1)} 
+                            className={styles.movePillOpponent}
+                          >
+                            {moveHistory[idx + 1]}
+                          </button>
+                        ) : (
+                          <span className={styles.movePillPlaceholder}></span>
+                        )}
+                      </div>
+                    );
+                  }
+                  return acc;
+                }, [])}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* ── Game end modal ── */}
       {showGameEndModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/50"
-          onClick={() => setShowGameEndModal(false)}
-        >
-          <div
-            className="bg-light w-full max-w-sm rounded-2xl border-solid border-primary shadow-xl p-10 text-center animate-modal-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-2xl font-bold text-dark mb-8">{gameEndMessage}</h2>
-            <div className="flex gap-3">
-              <button
-                className="btn-green flex-1"
-                onClick={() => { setShowGameEndModal(false); newGame(); }}
-              >
-                New Game
-              </button>
-              <button
-                className="flex-1 py-3 px-4 rounded-xl border-solid border-borderLight font-semibold text-gray hover:border-dark hover:text-dark transition-colors duration-200"
-                onClick={() => setShowGameEndModal(false)}
-              >
-                Close
-              </button>
+        <div className={styles.modalOverlay} onClick={() => setShowGameEndModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>{gameEndMessage}</h2>
+            <div className={styles.modalButtons}>
+              <button className={styles.modalBtnPrimary} onClick={() => { setShowGameEndModal(false); newGame(); }}>New Game</button>
+              <button className={styles.modalBtnSecondary} onClick={() => setShowGameEndModal(false)}>Close</button>
             </div>
           </div>
         </div>

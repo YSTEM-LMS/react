@@ -14,8 +14,18 @@
     "express-session": "^1.18.0",
     "express-validator": "^6.9.2",
     "googleapis": "^107.0.0",
+    "gcp-metadata": "^7.0.1",
+    "gaxios": "^7.3.0",
+    "google-logging-utils": "^1.2.0",
+    "node-fetch": "^3.3.2",
+    "data-uri-to-buffer": "^4.0.1",
+    "fetch-blob": "^3.2.0",
+    "formdata-polyfill": "^4.0.10",
+    "node-domexception": "^1.0.0",
+    "web-streams-polyfill": "^3.3.3",
     "mongoose": "^6.8.4",
     "multer": "^2.2.0",
+    "node-nlp": "^4.27.0",
     "node-schedule": "^2.1.1",
     "nodemailer": "^6.7.8",
     "nodemon": "^3.1.10",
@@ -31,11 +41,11 @@
   "author": "",
   "license": "ISC",
   "volta": {
-    "node": "18.20.8"
+    "node": "20.19.0"
   },
   "devDependencies": {
     "jest": "^30.3.0",
-    "mongodb-memory-server": "^10.2.0",
+    "mongodb-memory-server": "^11.2.0",
     "supertest": "^7.2.2"
   }
 }

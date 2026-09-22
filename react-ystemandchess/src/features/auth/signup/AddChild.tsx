@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import AuthLayout from "./AuthLayout";
 import stemette from "../../../assets/images/StreakProgressAssets/stemette.svg";
 

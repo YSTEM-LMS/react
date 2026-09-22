@@ -42,7 +42,7 @@ jest.mock('../../components/ChessBoard/ChessBoard', () => {
 });
 
 // Mock environment
-jest.mock('../../environments/environment', () => ({
+jest.mock('../../environments', () => ({
   environment: {
     urls: {
       stockfishServerURL: 'http://localhost:8080',
@@ -86,7 +86,7 @@ describe('PlayComputer', () => {
   describe('Initialization', () => {
     it('should render the component', () => {
       renderComponent();
-      expect(screen.getByText('Play vs Computer')).toBeInTheDocument();
+      expect(screen.getByText('Game Settings')).toBeInTheDocument();
     });
 
     it('should show settings panel on initial render', () => {
@@ -166,7 +166,7 @@ describe('PlayComputer', () => {
       const whiteButton = screen.getByText('White');
       fireEvent.click(whiteButton);
 
-      expect(whiteButton.className).toContain('border-primary');
+      expect(whiteButton.className).toContain('active');
     });
 
     it('should allow selecting black as player color', () => {
@@ -175,7 +175,7 @@ describe('PlayComputer', () => {
       const blackButton = screen.getByText('Black');
       fireEvent.click(blackButton);
 
-      expect(blackButton.className).toContain('border-primary');
+      expect(blackButton.className).toContain('active');
     });
 
     it('should allow selecting difficulty levels', () => {
@@ -188,10 +188,10 @@ describe('PlayComputer', () => {
       const masterButton = screen.getByText('Master');
 
       fireEvent.click(mediumButton);
-      expect(mediumButton.className).toContain('bg-primary');
+      expect(mediumButton.className).toContain('active');
 
       fireEvent.click(hardButton);
-      expect(hardButton.className).toContain('bg-primary');
+      expect(hardButton.className).toContain('active');
     });
 
     it('should start session when start button is clicked', () => {
@@ -473,7 +473,7 @@ describe('PlayComputer', () => {
       });
 
       await waitFor(() => {
-        const undoButton = screen.getByText('Undo');
+        const undoButton = screen.getByRole('button', { name: /undo/i });
         expect(undoButton).toBeDisabled();
       });
     });

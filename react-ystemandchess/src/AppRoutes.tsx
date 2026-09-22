@@ -38,6 +38,7 @@ import StudentInventory from "./features/student/student-inventory/StudentInvent
 import NewMentorProfile from "./features/mentor/mentor-profile/NewMentorProfile";
   
 import NewStudentProfile from "./features/student/student-profile/NewStudentProfile";
+import AdminProfile from "./features/admin/AdminProfile";
 import userPortraitImg from "./assets/images/user-portrait-placeholder.svg";
 
 const userName = "Nimesh Patel";
@@ -109,6 +110,16 @@ const AppRoutes = () => {
         path="/student-profile"
         element={<NewStudentProfile userPortraitSrc={userPortraitImg} />}
       />
+      <Route
+        path="/admin-profile"
+        element={<AdminProfile />}
+      />
+      <Route
+        path="/tutor-profile"
+        element={<AdminProfile />}
+      />
+      
+      {/* Student inventory/dashboard page with user data */}
       <Route
         path="/student-inventory"
         element={<StudentInventory userName={userName} userPortraitSrc={userPortraitImg} />}

@@ -34,6 +34,33 @@ export interface ChessBoardRef {
   clearHighlights: () => void;
 }
 
+const normalizeFen = (fen: string): string => {
+  if (!fen || typeof fen !== "string") {
+    return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  }
+
+  const trimmed = fen.trim();
+  if (trimmed === "start") {
+    return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  }
+
+  const parts = trimmed.split(" ");
+
+  if (parts.length === 6) return trimmed;
+  if (parts.length === 1 && parts[0].split("/").length === 8) {
+    return `${parts[0]} w KQkq - 0 1`;
+  }
+
+  const defaults = ["w", "KQkq", "-", "0", "1"];
+  const paddedParts = [...parts];
+
+  while (paddedParts.length < 6) {
+    paddedParts.push(defaults[paddedParts.length - 1]);
+  }
+
+  return paddedParts.join(" ");
+};
+
 const ChessBoard = forwardRef<ChessBoardRef, ChessBoardProps>(
   (
     {
@@ -88,12 +115,13 @@ const ChessBoard = forwardRef<ChessBoardRef, ChessBoardProps>(
     useEffect(() => {
       if (fen) {
         try {
+          const normalized = normalizeFen(fen);
           const currentFen = gameRef.current.fen();
 
           // Only update if FEN has actually changed
-          if (fen !== currentFen) {
-            gameRef.current.load(fen);
-            setBoardPosition(fen);
+          if (normalized !== currentFen) {
+            gameRef.current.load(normalized);
+            setBoardPosition(normalized);
           }
         } catch (err) {
           console.error("ChessBoard: Invalid FEN from props:", fen, err);
@@ -138,8 +166,9 @@ const ChessBoard = forwardRef<ChessBoardRef, ChessBoardProps>(
 
       loadPosition: (newFen: string) => {
         try {
-          gameRef.current.load(newFen);
-          setBoardPosition(newFen);
+          const normalized = normalizeFen(newFen);
+          gameRef.current.load(normalized);
+          setBoardPosition(normalized);
           setGreySquares([]);
         } catch (err) {
           console.error("Failed to load FEN:", newFen, err);
@@ -148,8 +177,9 @@ const ChessBoard = forwardRef<ChessBoardRef, ChessBoardProps>(
 
       setPosition: (newFen: string) => {
         try {
-          gameRef.current.load(newFen);
-          setBoardPosition(newFen);
+          const normalized = normalizeFen(newFen);
+          gameRef.current.load(normalized);
+          setBoardPosition(normalized);
           setGreySquares([]);
         } catch (err) {
           console.error("Failed to set position:", newFen, err);

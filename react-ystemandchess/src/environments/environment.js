@@ -6,7 +6,7 @@ export const environment = {
 	urls: {
     middlewareURL: 'http://localhost:8000',
     stockfishServerURL: 'http://localhost:8080', // unified naming
-    chessServerURL: 'http://localhost:3001',     // removed trailing slash for consistency
+    chessServerURL: 'http://localhost:8080',     // point to mock stockfish server for testing
   },
 	productionType: 'development', // development/production
 };

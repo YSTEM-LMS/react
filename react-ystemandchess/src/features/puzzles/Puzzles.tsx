@@ -4,7 +4,7 @@ import {
   themesDescription,
 } from "../../core/services/themesService";
 import Modal, { ModalProps } from "../../components/modal/Modal";
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 import { v4 as uuidv4 } from "uuid";
 import { SetPermissionLevel } from "../../globals";
 import { useCookies } from "react-cookie";
@@ -64,6 +64,8 @@ const Puzzles: React.FC<PuzzlesProps> = ({
   const dbIndexRef = useRef(0);
   const getNextPuzzleRef = useRef<() => void>();
   const initializeComponentRef = useRef<() => Promise<void>>();
+  const socketRef = useRef<any>(null);
+  const updateInfoBoxRef = useRef<(themes?: string[]) => void>(() => {});
 
   // State
   const [puzzleArray, setPuzzleArray] = useState<any[]>([]);
@@ -112,7 +114,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     }
   };
 
-  const prefetchPuzzles = async () => {
+  const prefetchPuzzles = useCallback(async () => {
     try {
       const response = await fetch(
         `${environment.urls.middlewareURL}/puzzles/random?limit=20`
@@ -128,7 +130,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     } catch (error) {
       console.error("Error prefetching puzzles:", error);
     }
-  };
+  }, []);
 
   // Reveal pieces once the first puzzle FEN arrives
   useEffect(() => {
@@ -145,7 +147,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     ) {
       prefetchPuzzles();
     }
-  }, [puzzleArray.length]);
+  }, [puzzleArray.length, prefetchPuzzles]);
 
   initializeComponentRef.current = async () => {
     if (isInitialized || isInitializingRef.current) return;
@@ -169,7 +171,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
 
         setThemeList(firstPuzzle.Themes.split(" "));
         setStateAsActive(firstPuzzle);
-        updateInfoBox(firstPuzzle.Themes.split(" "));
+        updateInfoBoxRef.current(firstPuzzle.Themes.split(" "));
       }
     } finally {
       isInitializingRef.current = false;
@@ -209,6 +211,17 @@ const Puzzles: React.FC<PuzzlesProps> = ({
 
     socket.setGameStateWithColor(normalizedFen, color, puzzle.Themes);
 
+    // Broadcast puzzle metadata (solution moves, themes, rating) to the guest client
+    socket.sendMessage(
+      JSON.stringify({
+        type: "puzzle_data",
+        moves: puzzle.Moves,
+        themes: puzzle.Themes,
+        rating: puzzle.Rating,
+        fen: puzzle.FEN,
+      })
+    );
+
     if (chessBoardRef.current) {
       chessBoardRef.current.clearHighlights();
     }
@@ -226,7 +239,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
         if (puzzles && puzzles.length > 0) {
           dbIndexRef.current = 0;
           setStateAsActive(puzzles[0]);
-          updateInfoBox(puzzles[0].Themes.split(" "));
+          updateInfoBoxRef.current(puzzles[0].Themes.split(" "));
         }
       });
       return;
@@ -247,7 +260,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     setThemeList(nextPuzzle.Themes.split(" "));
 
     setStateAsActive(nextPuzzle);
-    updateInfoBox(nextPuzzle.Themes.split(" "));
+    updateInfoBoxRef.current(nextPuzzle.Themes.split(" "));
   };
 
   // ============================================================================
@@ -349,13 +362,36 @@ const Puzzles: React.FC<PuzzlesProps> = ({
 
   const handleSocketMessage = useCallback(
     (msg: string) => {
+      // Try parsing JSON messages (e.g. puzzle metadata sync)
+      try {
+        const data = JSON.parse(msg);
+        if (data && data.type === "puzzle_data") {
+          if (status === "guest") {
+            moveListRef.current = data.moves?.split(" ") || [];
+            setThemeList(data.themes?.split(" ") || []);
+            currentPuzzleRef.current = {
+              FEN: data.fen,
+              Moves: data.moves,
+              Themes: data.themes,
+              Rating: data.rating,
+            };
+            isPuzzleEndRef.current = false;
+            setHighlightSquares([]);
+            updateInfoBoxRef.current(data.themes?.split(" ") || []);
+          }
+          return;
+        }
+      } catch (e) {
+        // Not a JSON message, fallback to default checks below
+      }
+
       if (msg === "puzzle completed") {
         if (status === "guest") {
           setModal({
             type: "success",
             title: "Puzzle completed",
             message: "Good job!",
-            onConfirm: () => socket.sendMessage("next puzzle"),
+            onConfirm: () => socketRef.current?.sendMessage("next puzzle"),
           });
         }
       } else if (msg === "next puzzle") {
@@ -363,9 +399,10 @@ const Puzzles: React.FC<PuzzlesProps> = ({
 
         if (status === "guest") {
           setModal({ type: "loading", title: "Loading next puzzle", message: "Please wait…" });
+        } else {
+          // Only the host triggers the next puzzle loading
+          getNextPuzzleRef.current?.();
         }
-
-        getNextPuzzleRef.current?.();
       } else if (msg === "new game received") {
         closeModal();
       } else if (msg.startsWith("<div")) {
@@ -439,11 +476,14 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     },
   });
 
+  const { connected: socketConnected, startNewPuzzle } = socket;
+  socketRef.current = socket;
+
   // ============================================================================
   // HINT SYSTEM
   // ============================================================================
 
-  const updateInfoBox = (themes?: string[]) => {
+  updateInfoBoxRef.current = (themes?: string[]) => {
     const currentThemes = themes || themeList;
     if (!currentThemes || currentThemes.length === 0) return;
 
@@ -459,7 +499,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
       hints += `<div style="margin-bottom: 14px;"><b>${name}:</b> ${desc}</div>`;
     }
 
-    socket.sendMessage(hints);
+    socketRef.current?.sendMessage(hints);
 
     const hintText = document.getElementById("hint-text");
     if (hintText) {
@@ -480,7 +520,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
   // TIME TRACKING
   // ============================================================================
 
-  async function startRecording() {
+  const startRecording = useCallback(async () => {
     const uInfo = await SetPermissionLevel(cookies);
     if (uInfo?.error) return;
 
@@ -506,7 +546,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     } catch (err) {
       console.error("Failed to start time tracking:", err);
     }
-  }
+  }, [cookies]);
 
   handleUnloadRef.current = async () => {
     if (!startTime || !username || !eventID) return;
@@ -546,18 +586,18 @@ const Puzzles: React.FC<PuzzlesProps> = ({
       window.removeEventListener("beforeunload", handleUnloadRef.current);
       handleUnloadRef.current();
     };
-  }, []);
+  }, [startRecording]);
 
   useEffect(() => {
     if (
-      socket.connected &&
+      socketConnected &&
       status === "" &&
       !isInitialized &&
       !isInitializingRef.current
     ) {
-      socket.startNewPuzzle();
+      startNewPuzzle();
     }
-  }, [socket.connected, status, isInitialized, socket]);
+  }, [socketConnected, status, isInitialized, startNewPuzzle]);
 
   // ============================================================================
   // RENDER
@@ -588,7 +628,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
           highlightSquares={highlightSquares}
           onMove={handlePlayerMove}
           onInvalidMove={handleInvalidMove}
-          disabled={isPuzzleEndRef.current || !socket.connected || hidePieces}
+          disabled={isPuzzleEndRef.current || !socketConnected || hidePieces}
         />
       </div>
 
@@ -607,7 +647,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
               isPuzzleEndRef.current = false;
               socket.sendMessage("next puzzle");
             }}
-            disabled={!socket.connected}
+            disabled={!socketConnected}
           >
             Get New Puzzle
           </button>
@@ -616,7 +656,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
             className={puzzleButtonClass}
             data-testid="hint-button"
             onClick={openDialog}
-            disabled={!socket.connected}
+            disabled={!socketConnected}
           >
             Show Hint
           </button>

@@ -1,0 +1,40 @@
+
+services:
+  frontend:
+    build: ./react-ystemandchess
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  chess-server:
+    build: ./chessServer
+    container_name: chess-server
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  chess-client:
+    build: ./chessclient
+    container_name: chess-client
+    ports:
+      - "3002:80"
+    restart: unless-stopped
+
+  middleware:
+    build: ./middlewareNode
+    container_name: middleware
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./middlewareNode/config/production.json:/app/config/production.json:ro
+    restart: unless-stopped
+
+  stockfish-server:
+    build: ./stockfishServer
+    container_name: stockfish-server
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

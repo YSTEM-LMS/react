@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta content="utf-8" http-equiv="encoding" />
+    <link rel="stylesheet" type="text/css" href="./css/chessboard-1.0.0.css" />
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="js/chessboard-1.0.0.js"></script>
+    <script src="node_modules/chess960.js/chess.min.js"></script>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+  </head>
+
+
+  <style type="text/css">
+    .lastmove {
+      box-shadow: inset 0 0 10px 10px #44b863;
+    }
+
+    /* Add this CSS to your styles */
+    .nextmove {
+      box-shadow: inset 0 0 10px 10px #ffef5d;
+    }
+
+    #cursor {
+            position: fixed;
+            width: 12vw;
+            height: 12vh;
+            pointer-events: none;
+            opacity: .5;
+        }
+
+  </style>
+
+  <!-- Divider holding the chess.js board-->
+  <div id="myBoard" frameborder="0"></div>
+
+  <img id="cursor" src="img/cursor.png"></div>
+
+
+
+  <script src="index.js"></script>
+</html>

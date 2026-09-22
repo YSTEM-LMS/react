@@ -5,6 +5,10 @@
  */
 
 jest.mock("../src/models/timeTracking");
+jest.mock("../src/middleware/requireAuth", () => (req, _res, next) => {
+  req.user = { username: req.query?.username || "alice", role: "student" };
+  next();
+});
 
 const express = require("express");
 const request = require("supertest");

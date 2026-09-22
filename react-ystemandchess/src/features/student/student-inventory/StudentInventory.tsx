@@ -4,6 +4,7 @@ import Images from "../../../assets/images/imageImporter";
 import { createChessBoard, isInBounds, getPawnMoves, getRookMoves, getKnightMoves, getBishopMoves, getKingMoves, getQueenMoves } from '../../lessons/lessons-main/Lessons'
 import LessonSelection from "../../lessons/lessons-selection/LessonsSelection";
 import Lessons from '../../lessons/lessons-main/Lessons';
+import ChatWidget from '../../../components/ChatWidget/ChatWidget';
 
 type Board = (string | null)[][];
 type Piece = {
@@ -810,9 +811,9 @@ const StudentInventory = ({ userPortraitSrc, userName }: any) => {
             </ul>
           </nav>
 
-          <div className="inv-inventory-content-content">{renderTabContent()}</div>
         </div>
       </section>
+      <ChatWidget />
     </main>
   );
 };

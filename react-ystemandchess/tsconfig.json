@@ -6,11 +6,11 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": false,
     "strict": false,
-    "ignoreDeprecations": "6.0",
+    "skipLibCheck": true,
     "typeRoots": [
       "node_modules/@types",
       "src/types"

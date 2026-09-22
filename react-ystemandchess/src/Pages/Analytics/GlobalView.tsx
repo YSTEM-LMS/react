@@ -10,7 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 import { DateRange } from '../../components/Analytics/DateRangeFilter';
 import LoadingSpinner from '../../components/Analytics/LoadingSpinner';
 import ErrorBanner from '../../components/Analytics/ErrorBanner';

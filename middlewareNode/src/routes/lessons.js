@@ -19,6 +19,8 @@ const jwt = require('jsonwebtoken');
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
+const mongoose = require("mongoose");
+
 // Cache database client to prevent repeated connections
 let cachedClient = null;
 
@@ -27,6 +29,9 @@ let cachedClient = null;
  * @returns {MongoDB.Db} Database instance
  */
 async function getDb() {
+  if (mongoose.connection && mongoose.connection.readyState === 1) {
+    return mongoose.connection.db;
+  }
   if (!cachedClient) {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();

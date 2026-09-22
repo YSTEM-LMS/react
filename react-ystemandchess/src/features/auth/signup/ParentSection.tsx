@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import treesGroup from "../../../assets/images/Trees-Group.png";
 import stemmyVine from "../../../assets/images/ActivitiesAssets/stemmy.svg";
 import OnboardingSteps from "./OnboardingSteps";

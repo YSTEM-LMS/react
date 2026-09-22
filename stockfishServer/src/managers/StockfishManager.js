@@ -43,64 +43,80 @@ class StockfishManager {
     }
 
     // Attach an event listener to listen for output from the engine
+    // Also log any stderr from the engine so it appears in server logs
+    try {
+      if (engine.stderr && typeof engine.stderr.on === 'function') {
+        engine.stderr.on('data', (errData) => {
+          const text = String(errData || '').trim();
+          if (text) console.error(`Stockfish [stderr] (${session.socket.id}):`, text);
+        });
+      }
+    } catch (e) {
+      // ignore
+    }
+
     engine.stdout.on("data", (data) => {
-      const lines = data.toString().trim().split("\n");
+      const lines = data.toString().split(/\r?\n/);
 
       // Process each line of output from Stockfish
       for (const line of lines) {
-        let cleanLine = line.trim();
+        let cleanLine = (line || '').trim();
 
-        if (!cleanLine) return;
-        if (!session.awaitingResponse) return;
+        // Always print raw engine output to server debug logs to aid troubleshooting
+        try {
+          if (cleanLine) console.debug(`Stockfish [stdout] (${session.socket.id}):`, cleanLine);
+        } catch (e) {}
+
+        // Skip empty lines
+        if (!cleanLine) continue;
+
+        // If we're not awaiting a response for this session we still log but otherwise ignore handling
+        if (!session.awaitingResponse) continue;
 
         const isInfoMode = session.infoMode;
 
         // In info mode, collect all engine analysis output
         if (isInfoMode) {
-        session.outputBuffer.push(cleanLine);
+          session.outputBuffer.push(cleanLine);
 
-        if (cleanLine.startsWith("bestmove")) {
+          if (cleanLine.startsWith("bestmove")) {
+            session.socket.emit("evaluation-complete", {
+              mode: 'info',
+              output: session.outputBuffer,
+            });
+
+            session.awaitingResponse = false;
+            session.outputBuffer = [];
+          }
+        // In move mode, extract and execute the best move
+        } else if (cleanLine.startsWith("bestmove")) {
+          const moveStr = cleanLine.split(/\s+/)[1];
+
+          // Attempt to execute the move on the game instance
+          let moveResult = null;
+          try {
+            moveResult = session.gameInstance.move(moveStr, { sloppy: true });
+          } catch (e) {
+            return session.socket.emit("evaluation-error", {
+              error: "Invalid move from engine",
+            });
+          }
+
+          const newFEN = session.gameInstance.fen();
+
+          // Send the move result back to the client
           session.socket.emit("evaluation-complete", {
-            mode: 'info',
-            output: session.outputBuffer,
+            mode: 'move',
+            move: moveStr,
+            moveDetails: moveResult,
+            newFEN,
           });
 
           session.awaitingResponse = false;
           session.outputBuffer = [];
         }
-      // In move mode, extract and execute the best move
-      } else if (cleanLine.startsWith("bestmove")) {
-        const moveStr = cleanLine.split(" ")[1];
-
-        // Attempt to execute the move on the game instance
-        let moveResult = null;
-        try {
-          moveResult = session.gameInstance.move(moveStr, { sloppy: true });
-        } catch (e) {
-          return session.socket.emit("evaluation-error", {
-            error: "Invalid move from engine",
-          });
-        }
-
-        const newFEN = session.gameInstance.fen();
-
-        // Send the move result back to the client
-        session.socket.emit("evaluation-complete", {
-          mode: 'move',
-          move: moveStr,
-          moveDetails: moveResult,
-          newFEN,
-        });
-
-        session.awaitingResponse = false;
-        session.outputBuffer = [];
       }
-      }
-
-      
-
-    })
-
+    });
 
     
   }
@@ -125,6 +141,27 @@ class StockfishManager {
 
     const sessionId = crypto.randomUUID();
     const engine = spawn(enginePath);
+
+    // The OS-level failure when enginePath isn't executable (EACCES) surfaces
+    // asynchronously as an 'error' event, not a synchronous throw from spawn().
+    // Without this listener, Node rethrows it as an uncaught exception and
+    // crashes the whole process for every connected client.
+    engine.on('error', (err) => {
+      console.error(`Stockfish engine failed to start for session ${sessionId}:`, err.message);
+      if (this.sessions.has(socketId)) {
+        this.sessions.delete(socketId);
+      }
+      try {
+        socket.emit('session-error', { error: 'Chess engine failed to start' });
+      } catch (e) {
+        // socket already closed, nothing to notify
+      }
+    });
+
+    // Log engine spawn for debugging (enginePath and pid)
+    try {
+      console.log(`Spawned Stockfish engine for session ${sessionId} at ${enginePath} (pid=${engine.pid})`);
+    } catch (e) {}
 
     // Create and store the session data
     this.sessions.set(socketId, {
@@ -217,3 +254,4 @@ class StockfishManager {
 }
 
 module.exports = StockfishManager;
+module.exports.enginePath = enginePath;
