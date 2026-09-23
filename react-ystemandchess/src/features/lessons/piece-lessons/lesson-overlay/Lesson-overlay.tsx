@@ -998,7 +998,7 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
             {lessonNum + 1} / {totalLessons}: {name}
           </h1>
 
-          <p className="mt-4 max-h-[280px] overflow-y-auto text-lg leading-relaxed text-gray">{info}</p>
+          <p data-testid="lesson-description" className="mt-4 max-h-[280px] overflow-y-auto text-lg leading-relaxed text-gray">{info}</p>
 
           {isInfoOnly && (
             <button
@@ -1050,10 +1050,10 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
         {isInfoOnly && videoUrl ? (
           <div className="flex w-full max-w-[700px] items-start justify-center">
             <div
-              className="flex aspect-video w-full max-w-[700px] cursor-pointer flex-col items-center justify-center gap-3 rounded-md border-2 border-dark bg-[#1a1a1a] transition hover:border-red-500"
+              className="flex aspect-video w-full max-w-[700px] cursor-pointer flex-col items-center justify-center gap-3 rounded-md border-2 border-dark bg-[#1a1a1a] transition hover:border-red"
               onClick={() => window.open(toAbsoluteUrl(videoUrl), '_blank')}
             >
-              <div className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-[#333] text-3xl text-white transition hover:bg-red-500">▶</div>
+              <div className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-[#333] text-3xl text-white transition hover:bg-red">▶</div>
               <p className="m-0 text-[15px] font-bold text-[#aaa]">Watch on YouTube</p>
             </div>
           </div>

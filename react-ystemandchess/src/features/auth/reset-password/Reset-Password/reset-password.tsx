@@ -46,7 +46,7 @@ const ResetPassword = () => {
       <h1 className="mb-8 text-center text-4xl font-bold text-slate-800">Reset Password</h1>
 
       {error && (
-        <div className="mb-4 w-full max-w-md rounded border border-red-400 bg-red-100 px-4 py-3 font-semibold text-red-700" role="alert" aria-live="assertive">
+        <div className="mb-4 w-full max-w-md rounded border border-red bg-redLight px-4 py-3 font-semibold text-red" role="alert" aria-live="assertive">
           {error}
         </div>
       )}
@@ -83,7 +83,7 @@ const ResetPassword = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#69b51d] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg bg-primary px-6 py-3 text-base font-semibold text-dark transition hover:-translate-y-0.5 hover:bg-[#69b51d] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
           data-testid="reset-submit"
           aria-busy={isLoading}
         >

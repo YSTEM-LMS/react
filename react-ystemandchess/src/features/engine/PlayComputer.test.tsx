@@ -166,7 +166,7 @@ describe('PlayComputer', () => {
       const whiteButton = screen.getByText('White');
       fireEvent.click(whiteButton);
 
-      expect(whiteButton.className).toContain('outline-[#7FCC26]');
+      expect(whiteButton).toHaveAttribute('aria-pressed', 'true');
     });
 
     it('should allow selecting black as player color', () => {
@@ -175,7 +175,7 @@ describe('PlayComputer', () => {
       const blackButton = screen.getByText('Black');
       fireEvent.click(blackButton);
 
-      expect(blackButton.className).toContain('outline-[#7FCC26]');
+      expect(blackButton).toHaveAttribute('aria-pressed', 'true');
     });
 
     it('should allow selecting difficulty levels', () => {
@@ -188,10 +188,10 @@ describe('PlayComputer', () => {
       const masterButton = screen.getByText('Master');
 
       fireEvent.click(mediumButton);
-      expect(mediumButton.className).toContain('bg-[#7FCC26]');
+      expect(mediumButton).toHaveAttribute('aria-pressed', 'true');
 
       fireEvent.click(hardButton);
-      expect(hardButton.className).toContain('bg-[#7FCC26]');
+      expect(hardButton).toHaveAttribute('aria-pressed', 'true');
     });
 
     it('should start session when start button is clicked', () => {

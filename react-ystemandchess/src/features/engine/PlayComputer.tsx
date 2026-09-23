@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import { useLocation } from 'react-router';
 import { Move } from '../../core/types/chess';
 import ChessBoard, { ChessBoardRef } from '../../components/ChessBoard/ChessBoard';
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 import { cn } from '../../core/utils/cn';
 import StockfishTutor from './StockfishTutor';
 
@@ -418,12 +418,14 @@ const PlayComputer: React.FC = () => {
               <button
                 className={cn('rounded-2xl border-[3px] border-[#1F1F1F] outline outline-[3px] outline-[#1F1F1F] bg-white px-0 py-5 text-lg font-extrabold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5', playerColor === 'white' && 'scale-[1.02] border-[#7FCC26] outline-[#7FCC26]')}
                 onClick={() => setPlayerColor('white')}
+                aria-pressed={playerColor === 'white'}
               >
                 White
               </button>
               <button
                 className={cn('rounded-2xl border-[3px] border-[#1F1F1F] outline outline-[3px] outline-[#1F1F1F] bg-[#1F1F1F] px-0 py-5 text-lg font-extrabold text-white transition-all duration-200 hover:-translate-y-0.5', playerColor === 'black' && 'scale-[1.02] border-[#7FCC26] outline-[#7FCC26]')}
                 onClick={() => setPlayerColor('black')}
+                aria-pressed={playerColor === 'black'}
               >
                 Black
               </button>
@@ -438,6 +440,7 @@ const PlayComputer: React.FC = () => {
                   key={value}
                   className={cn('rounded-2xl border-[2px] border-[#1F1F1F] outline outline-2 outline-[#1F1F1F] bg-white px-0 py-3 text-sm font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5', difficulty === value && 'bg-[#7FCC26]')}
                   onClick={() => setDifficulty(value)}
+                  aria-pressed={difficulty === value}
                 >
                   {label}
                 </button>
@@ -449,6 +452,7 @@ const PlayComputer: React.FC = () => {
                   key={value}
                   className={cn('rounded-2xl border-[2px] border-[#1F1F1F] outline outline-2 outline-[#1F1F1F] bg-white px-0 py-3 text-sm font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5', difficulty === value && 'bg-[#7FCC26]')}
                   onClick={() => setDifficulty(value)}
+                  aria-pressed={difficulty === value}
                 >
                   {label}
                 </button>

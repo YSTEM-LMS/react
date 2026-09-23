@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 import { cn } from '../../core/utils/cn';
 import { CoachMascot, CoachExpression } from '../../components/animations/CoachMascot/CoachMascot';
 import { Chess as ChessClass } from 'chess.js';

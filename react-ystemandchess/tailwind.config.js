@@ -16,7 +16,6 @@ module.exports = {
         // Neutrals
         dark: "#1F1F1F",
         gray: "#5C5C5C",
-
         muted: "#8A8A8A",
         borderLight: "#D6D6D6",
         light: "#F9FAF7",

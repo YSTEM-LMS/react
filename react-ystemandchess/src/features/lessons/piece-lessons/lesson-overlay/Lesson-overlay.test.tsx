@@ -449,7 +449,7 @@ describe("LessonOverlay", () => {
     });
     
     // Verify the lesson info displays the puzzle instruction in the lesson description area
-    const lessonDescription = container.querySelector('[class*="leading-relaxed"]');
+    const lessonDescription = container.querySelector('[data-testid="lesson-description"]');
     expect(lessonDescription).toHaveTextContent("Checkmate in 3 moves");
   });
 
@@ -475,7 +475,7 @@ describe("LessonOverlay", () => {
     });
     
     // Verify the lesson info displays in the lesson description area
-    const lessonDescription = container.querySelector('[class*="leading-relaxed"]');
+    const lessonDescription = container.querySelector('[data-testid="lesson-description"]');
     expect(lessonDescription).toHaveTextContent("get a winning position");
   });
 });

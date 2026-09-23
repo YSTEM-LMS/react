@@ -69,7 +69,7 @@ const SetPassword = () => {
     return (
       <div className="mx-auto max-w-md p-6">
         <div
-          className="rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+          className="rounded border border-red bg-redLight px-4 py-3 text-red"
           role="alert"
           aria-live="assertive"
         >
@@ -92,7 +92,7 @@ const SetPassword = () => {
 
         {error && (
           <div
-            className="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+            className="mb-4 rounded border border-red bg-redLight px-4 py-3 text-red"
             role="alert"
             aria-live="assertive"
           >
@@ -138,7 +138,7 @@ const SetPassword = () => {
             data-testid="setBtn"
             type="submit"
             disabled={isLoading}
-            className={`w-full rounded-lg bg-primary px-4 py-3 font-semibold text-white transition ${
+            className={`w-full rounded-lg bg-primary px-4 py-3 font-semibold text-dark transition ${
               isLoading ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#69b51d]'
             }`}
             aria-busy={isLoading}
