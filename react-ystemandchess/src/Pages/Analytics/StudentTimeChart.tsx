@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 import StatsChart from '../../features/student/student-profile/StatsChart';
 import LoadingSpinner from '../../components/Analytics/LoadingSpinner';
 import ErrorBanner from '../../components/Analytics/ErrorBanner';

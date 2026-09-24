@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 import styles from './StockfishTutor.module.scss';
 import { CoachMascot, CoachExpression } from '../../components/animations/CoachMascot/CoachMascot';
 import { Chess as ChessClass } from 'chess.js';

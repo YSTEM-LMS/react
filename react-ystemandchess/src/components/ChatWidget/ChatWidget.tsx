@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ChatWidget.scss';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 import { useCookies } from 'react-cookie';
 import { CoachMascot, CoachExpression } from '../animations/CoachMascot/CoachMascot';
 
@@ -73,7 +73,11 @@ const TOPICS = [
 
 
 const ChatWidget = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  // Closed by default — this previously opened on every page load, with its
+  // full-screen chat-overlay-backdrop covering the whole page and blocking
+  // every other click (badges, activities, streak, etc.) until manually
+  // dismissed. A chat widget should wait to be opened, like any other.
+  const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [topic, setTopic] = useState<string>('general tutoring');
   const [messages, setMessages] = useState<{ sender: 'user' | 'bot', text: string }[]>([]);

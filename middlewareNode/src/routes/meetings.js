@@ -51,7 +51,7 @@ var isBusy = false;
 router.get(
   "/singleRecording",
   [check("filename", "The filename is required").not().isEmpty()],
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     try {
       const account = config.get("azureStorageAccount");
@@ -90,7 +90,7 @@ router.get(
 // @route   GET /meetings/recordings
 // @desc    GET all recordings available for the student or mentor
 // @access  Public with jwt Authentication
-router.get("/recordings", passport.authenticate("jwt"), async (req, res) => {
+router.get("/recordings", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { role, username, firstName, lastName } = req.user;
     let filters = { CurrentlyOngoing: false };
@@ -127,7 +127,7 @@ router.get("/recordings", passport.authenticate("jwt"), async (req, res) => {
 // @access  Public with jwt Authentication
 router.get(
   "/usersRecordings",
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     // console.log(req);
     try {
@@ -163,7 +163,7 @@ router.get(
 router.get(
   "/parents/recordings",
   [check("childUsername", "The child's username is required").not().isEmpty()],
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -211,7 +211,7 @@ router.get(
 // @route   GET /meetings/inMeeting
 // @desc    GET the meeting if the USER is in a meeting otherwise return message
 // @access  Public with jwt Authentication
-router.get("/inMeeting", passport.authenticate("jwt"), async (req, res) => {
+router.get("/inMeeting", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { role, username } = req.user;
 
@@ -229,7 +229,7 @@ router.get("/inMeeting", passport.authenticate("jwt"), async (req, res) => {
 // @route   POST /meetings/queue
 // @desc    POST an entry to the waitingStudents or waitingMentors collection depending on role
 // @access  Public with jwt Authentication
-router.post("/queue", passport.authenticate("jwt"), async (req, res) => {
+router.post("/queue", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { role, username, firstName, lastName } = req.user; //Data retrieved from jwt authentication
 
@@ -268,7 +268,7 @@ router.post("/queue", passport.authenticate("jwt"), async (req, res) => {
 // @route   POST /meetings/pairUp
 // @desc    POST a meeting with a student and mentor
 // @access  Public with jwt Authentication
-router.post("/pairUp", passport.authenticate("jwt"), async (req, res) => {
+router.post("/pairUp", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { role, username, firstName, lastName } = req.user;
     let studentInfo = {};
@@ -374,7 +374,7 @@ router.post("/pairUp", passport.authenticate("jwt"), async (req, res) => {
 // @route   PUT /meetings/endMeeting
 // @desc    PUT a meeting to end and stop the agora recording
 // @access  Public with jwt Authentication
-router.put("/endMeeting", passport.authenticate("jwt"), async (req, res) => {
+router.put("/endMeeting", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { role, username, firstName, lastName } = req.user; //retrieve jwt info
     let filters = { CurrentlyOngoing: true };
@@ -463,7 +463,7 @@ router.put("/endMeeting", passport.authenticate("jwt"), async (req, res) => {
 // @route   DELETE meetings/dequeue
 // @desc    DELETE the user from the waitingStudents or waitingMentors collection depending on role
 // @access  Public with jwt Authentication
-router.delete("/dequeue", passport.authenticate("jwt"), async (req, res) => {
+router.delete("/dequeue", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { role, username } = req.user;
     let deleted = await deleteUser(role, username);
@@ -592,14 +592,53 @@ const updateUndoPermission = async (meetingId, value) => {
   // return newdata;
 };
 
-router.post("/boardState", passport.authenticate("jwt"), async (req, res) => {
+/**
+ * Verifies that the authenticated user is a participant of the meeting (or admin)
+ */
+const isMeetingParticipant = (meeting, user) => {
+  if (!meeting || !user) return false;
+  if (user.role === "admin") return true;
+  return (
+    user.username === meeting.studentUsername ||
+    user.username === meeting.mentorUsername
+  );
+};
+
+/**
+ * Verifies that the authenticated user is the owner of the gameMoves record (or admin)
+ */
+const isGameOwner = (game, user) => {
+  if (!game || !user) return false;
+  if (user.role === "admin") return true;
+  return (
+    !game.userId ||
+    game.userId === user.username ||
+    game.userId === user._id?.toString()
+  );
+};
+
+router.post("/boardState", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { meetingId, fen, pos, image, role } = req.query;
+    if (!meetingId) {
+      return res.status(400).json({ error: "meetingId is required" });
+    }
+    let meeting = await getMoves(meetingId);
+    if (!meeting) {
+      meeting = await meetings.findOne({ meetingId });
+    }
+    if (!meeting) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+    if (!isMeetingParticipant(meeting, req.user)) {
+      return res.status(403).json({ error: "Forbidden: not a participant of this meeting" });
+    }
+
     if (pos == "") {
       // do nothing
+      return res.status(200).send([]);
     } else {
-      let meeting = await getMoves(meetingId);
-      let moveArray = meeting.moves;
+      let moveArray = meeting.moves || [];
       let oldMovesArr = [];
       let moveArrayLength = moveArray.length;
       if (moveArray.length > 0) {
@@ -625,11 +664,23 @@ router.post("/boardState", passport.authenticate("jwt"), async (req, res) => {
   }
 });
 
-router.get("/getBoardState", passport.authenticate("jwt"), async (req, res) => {
+router.get("/getBoardState", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { meetingId } = req.query;
-    const getBoardStates = await getMoves(meetingId);
-    res.status(200).send(getBoardStates);
+    if (!meetingId) {
+      return res.status(400).json({ error: "meetingId is required" });
+    }
+    let meeting = await getMoves(meetingId);
+    if (!meeting) {
+      meeting = await meetings.findOne({ meetingId });
+    }
+    if (!meeting) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+    if (!isMeetingParticipant(meeting, req.user)) {
+      return res.status(403).json({ error: "Forbidden: not a participant of this meeting" });
+    }
+    res.status(200).send(meeting);
   } catch (error) {
     console.error(error.message);
     res.status(500).json("Server error");
@@ -638,12 +689,24 @@ router.get("/getBoardState", passport.authenticate("jwt"), async (req, res) => {
 
 router.post(
   "/newBoardState",
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     try {
       const { meetingId } = req.query;
+      if (!meetingId) {
+        return res.status(400).json({ error: "meetingId is required" });
+      }
       let meeting = await getMoves(meetingId);
-      let moveArray = meeting.moves;
+      if (!meeting) {
+        meeting = await meetings.findOne({ meetingId });
+      }
+      if (!meeting) {
+        return res.status(404).json({ error: "Meeting not found" });
+      }
+      if (!isMeetingParticipant(meeting, req.user)) {
+        return res.status(403).json({ error: "Forbidden: not a participant of this meeting" });
+      }
+      let moveArray = meeting.moves || [];
       let oldMovesArr = [];
       let moveArrayLength = moveArray.length;
       moveArray[moveArrayLength] = oldMovesArr;
@@ -656,12 +719,18 @@ router.post(
   },
 );
 
-router.post("/storeMoves", async (req, res) => {
+router.post("/storeMoves", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { gameId, fen, pos, image } = req.query;
     if (gameId) {
       const getbyId = await getMovesByGameId(gameId);
-      let moveArray = getbyId.moves;
+      if (!getbyId) {
+        return res.status(404).json({ error: "Game not found" });
+      }
+      if (!isGameOwner(getbyId, req.user)) {
+        return res.status(403).json({ error: "Forbidden: cannot mutate another user's game moves" });
+      }
+      let moveArray = getbyId.moves || [];
       let oldMovesArr = [];
       let moveArrayLength = moveArray.length;
       if (moveArray.length > 0) {
@@ -682,9 +751,8 @@ router.post("/storeMoves", async (req, res) => {
     } else {
       const newGameId = uuidv4();
       const ipAddress = requestIp.getClientIp(req);
-      const { userId } = req?.query || null;
+      const userId = req.user.username || req.user._id?.toString();
       const moves = [];
-      // await movesList.find().populate("userId");
       let response = await movesList.create({
         gameId: newGameId,
         userId: userId,
@@ -699,11 +767,20 @@ router.post("/storeMoves", async (req, res) => {
   }
 });
 
-router.post("/newGameStoreMoves", async (req, res) => {
+router.post("/newGameStoreMoves", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { gameId } = req.query;
-    let meeting = await getMovesByGameId(gameId);
-    let moveArray = meeting.moves;
+    if (!gameId) {
+      return res.status(400).json({ error: "gameId is required" });
+    }
+    let game = await getMovesByGameId(gameId);
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    if (!isGameOwner(game, req.user)) {
+      return res.status(403).json({ error: "Forbidden: cannot mutate another user's game moves" });
+    }
+    let moveArray = game.moves || [];
     let oldMovesArr = [];
     let moveArrayLength = moveArray.length;
     moveArray[moveArrayLength] = oldMovesArr;
@@ -715,15 +792,32 @@ router.post("/newGameStoreMoves", async (req, res) => {
   }
 });
 
-router.get("/getStoreMoves", async (req, res) => {
+router.get("/getStoreMoves", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { gameId, meetingId } = req.query;
     if (meetingId) {
-      const getBoardStates = await getMoves(meetingId);
+      let getBoardStates = await getMoves(meetingId);
+      if (!getBoardStates) {
+        getBoardStates = await meetings.findOne({ meetingId });
+      }
+      if (!getBoardStates) {
+        return res.status(404).json({ error: "Meeting not found" });
+      }
+      if (!isMeetingParticipant(getBoardStates, req.user)) {
+        return res.status(403).json({ error: "Forbidden: not a participant of this meeting" });
+      }
+      res.status(200).send(getBoardStates);
+    } else if (gameId) {
+      const getBoardStates = await getMovesByGameId(gameId);
+      if (!getBoardStates) {
+        return res.status(404).json({ error: "Game not found" });
+      }
+      if (!isGameOwner(getBoardStates, req.user)) {
+        return res.status(403).json({ error: "Forbidden: cannot access another user's game moves" });
+      }
       res.status(200).send(getBoardStates);
     } else {
-      const getBoardStates = await getMovesByGameId(gameId);
-      res.status(200).send(getBoardStates);
+      res.status(400).json({ error: "gameId or meetingId is required" });
     }
   } catch (error) {
     console.error(error.message);
@@ -731,9 +825,22 @@ router.get("/getStoreMoves", async (req, res) => {
   }
 });
 
-router.post("/checkUndoPermission", async (req, res) => {
+router.post("/checkUndoPermission", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { meetingId } = req.query;
+    if (!meetingId) {
+      return res.status(400).json({ error: "meetingId is required" });
+    }
+    let meeting = await getMoves(meetingId);
+    if (!meeting) {
+      meeting = await meetings.findOne({ meetingId });
+    }
+    if (!meeting) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+    if (!isMeetingParticipant(meeting, req.user)) {
+      return res.status(403).json({ error: "Forbidden: not a participant of this meeting" });
+    }
     const checkPermission = await undoPermission.findOne({
       meetingId: meetingId,
     });
@@ -744,13 +851,29 @@ router.post("/checkUndoPermission", async (req, res) => {
   }
 });
 
-router.post("/undoMeetingMoves", async (req, res) => {
+router.post("/undoMeetingMoves", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { meetingId } = req.query;
-    const getBoardState = await getMoves(meetingId);
-    const movesData = getBoardState.moves;
-    const newData = movesData[movesData.length - 1];
-    const finalData = newData.splice(-2, 2);
+    if (!meetingId) {
+      return res.status(400).json({ error: "meetingId is required" });
+    }
+    let getBoardState = await getMoves(meetingId);
+    if (!getBoardState) {
+      getBoardState = await meetings.findOne({ meetingId });
+    }
+    if (!getBoardState) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+    if (!isMeetingParticipant(getBoardState, req.user)) {
+      return res.status(403).json({ error: "Forbidden: not a participant of this meeting" });
+    }
+    const movesData = getBoardState.moves || [];
+    if (movesData.length > 0) {
+      const newData = movesData[movesData.length - 1];
+      if (Array.isArray(newData)) {
+        newData.splice(-2, 2);
+      }
+    }
     const deletedData = await deleteMovesByMeetingId(meetingId, movesData);
     res.status(200).send(deletedData);
   } catch (error) {
@@ -767,13 +890,26 @@ const deleteMovesByMeetingId = async (meetingId, deletedData) => {
   return deletedMove;
 };
 
-router.post("/undoMoves", async (req, res) => {
+router.post("/undoMoves", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
     const { gameId } = req.query;
+    if (!gameId) {
+      return res.status(400).json({ error: "gameId is required" });
+    }
     const getBoardState = await getMovesByGameId(gameId);
-    const movesData = getBoardState.moves;
-    const newData = movesData[movesData.length - 1];
-    const finalData = newData.splice(-2, 2);
+    if (!getBoardState) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    if (!isGameOwner(getBoardState, req.user)) {
+      return res.status(403).json({ error: "Forbidden: cannot mutate another user's game moves" });
+    }
+    const movesData = getBoardState.moves || [];
+    if (movesData.length > 0) {
+      const newData = movesData[movesData.length - 1];
+      if (Array.isArray(newData)) {
+        newData.splice(-2, 2);
+      }
+    }
     const deletedData = await deleteMovesByGameId(gameId, movesData);
     res.status(200).send(deletedData);
   } catch (error) {

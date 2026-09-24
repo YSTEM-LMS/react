@@ -26,7 +26,7 @@ import { ReactComponent as TopicBag } from "../../../../assets/images/Activities
 import { ReactComponent as ShortBottomVine} from "../../../../assets/images/ActivitiesAssets/short_bottom_vine.svg";
 import { ReactComponent as BottomVine} from "../../../../assets/images/ActivitiesAssets/bottom_vine.svg";
 import { ReactComponent as Stemmy} from "../../../../assets/images/ActivitiesAssets/stemmy.svg";
-import { environment } from "../../../../environments/environment"; 
+import { environment } from "../../../../environments"; 
 import { useCookies } from "react-cookie";
 import { parseActivities } from "../../../../core/utils/activityNames";
 

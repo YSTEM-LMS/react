@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useAnalyticsApi } from "./useAnalyticsApi";
 
-jest.mock("../../environments/environment", () => ({
+jest.mock("../../environments", () => ({
   environment: { urls: { middlewareURL: "http://mockurl.com" } },
 }));
 

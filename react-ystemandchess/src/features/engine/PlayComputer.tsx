@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import { useLocation } from 'react-router';
 import { Move } from '../../core/types/chess';
 import ChessBoard, { ChessBoardRef } from '../../components/ChessBoard/ChessBoard';
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 // Module styles (placeholder file should exist at the same folder)
 import styles from './PlayComputer.module.scss';
 import StockfishTutor from './StockfishTutor';

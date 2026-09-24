@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, lazy, Suspense } from "react";
 import { SetPermissionLevel } from '../../../globals';
 import { useCookies } from 'react-cookie';
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import { useNavigate } from "react-router";
 import StatsChart from "./StatsChart";
 import Puzzles from "../../puzzles/Puzzles";

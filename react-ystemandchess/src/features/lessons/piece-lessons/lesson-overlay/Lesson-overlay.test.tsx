@@ -4,7 +4,7 @@
 jest.mock("socket.io-client");
 
 // Mock environment
-jest.mock("../../../../environments/environment");
+jest.mock("../../../../environments");
 
 // Mock utility modules
 jest.mock("../../../../core/utils/goalEvaluator");
@@ -103,7 +103,7 @@ const mockIo = io as jest.MockedFunction<typeof io>;
 // Import mocked modules
 const goalEvaluator = require("../../../../core/utils/goalEvaluator");
 const eventLogger = require("../../../../core/utils/eventLogger");
-const { environment } = require("../../../../environments/environment");
+const { environment } = require("../../../../environments");
 
 // Create socket factory
 const createMockSocket = () => {

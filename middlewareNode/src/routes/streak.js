@@ -12,7 +12,8 @@
 
 const express = require('express');
 const router = express.Router();
-const TimeTracking = require('../models/timeTracking'); 
+const TimeTracking = require('../models/timeTracking');
+const requireAuth = require('../middleware/requireAuth');
 
 /**
  * Checks if a day's activities meet completion requirements
@@ -23,6 +24,26 @@ const TimeTracking = require('../models/timeTracking');
 function dayCompleted(events) {
   const required = ['lesson', 'puzzle'];
   return required.every((r) => events.includes(r));
+}
+
+/**
+ * Checks if the user is authorized to access the requested user's streak.
+ * Platform mentors, tutors, and admins have read access to student streak progress.
+ */
+function checkStreakAccess(req, res, next) {
+  const targetUsername = req.query.username;
+  if (!targetUsername) {
+    return res.status(400).json({ error: 'username is required' });
+  }
+  if (
+    req.user.role === 'admin' ||
+    req.user.role === 'mentor' ||
+    req.user.role === 'tutor' ||
+    req.user.username === targetUsername
+  ) {
+    return next();
+  }
+  return res.status(403).json({ error: "Forbidden: cannot view another user's streak" });
 }
  
 /**
@@ -38,12 +59,9 @@ function dayCompleted(events) {
  * - longestStreak: Best streak ever achieved
  * - lastCompletedDate: Most recent day with completed activities
  */
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, checkStreakAccess, async (req, res) => {
   try {
     const username = req.query.username;
-    if (!username) {
-      return res.status(400).json({ error: 'username is required' });
-    }
 
     const userEvents = await TimeTracking.find({ username }).lean();
 
@@ -88,11 +106,11 @@ router.get('/', async (req, res) => {
 });
 
 // GET /streak/calendar
-router.get('/calendar', async (req, res) => {
+router.get('/calendar', requireAuth, checkStreakAccess, async (req, res) => {
   try {
     const { username, month } = req.query; 
-    if (!username || !month) {
-      return res.status(400).json({ error: 'username and month are required' });
+    if (!month) {
+      return res.status(400).json({ error: 'month is required' });
     }
 
     const start = new Date(`${month}-01T00:00:00Z`);

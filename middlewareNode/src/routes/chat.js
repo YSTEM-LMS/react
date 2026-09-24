@@ -11,6 +11,7 @@ const chatService = require('../utils/chatService');
 const { detectCrisis, getCrisisResponse } = require('../utils/guardrails');
 const passport = require('passport');
 const Guardrail = require('../models/Guardrail');
+const requireAuth = require('../middleware/requireAuth');
 
 // Ensure logs directory exists
 const LOGS_DIR = path.join(__dirname, '../../logs');
@@ -161,7 +162,7 @@ const getLlmApiConfig = () => {
 };
 
 // Observability metrics endpoint
-router.get('/metrics', (req, res) => {
+router.get('/metrics', authorizeTutorAdmin, (req, res) => {
   const avgLatency = chatMetrics.totalLlmCalls > 0 ? (chatMetrics.totalLatencyMs / chatMetrics.totalLlmCalls).toFixed(2) : 0;
   res.json({
     totalRequests: chatMetrics.totalRequests,
@@ -173,7 +174,7 @@ router.get('/metrics', (req, res) => {
 });
 
 // Educator API: Get student coaching sessions with topic, date range filters, student search & pagination
-router.get('/educator/sessions', async (req, res) => {
+router.get('/educator/sessions', authorizeTutorAdmin, async (req, res) => {
   try {
     const { topic, student, startDate, endDate, skip = 0, limit = 10 } = req.query;
     const query = {};
@@ -219,7 +220,7 @@ router.get('/educator/sessions', async (req, res) => {
 });
 
 // Educator API: Get transcript (all messages) for a specific session
-router.get('/educator/session/:sessionId/transcript', async (req, res) => {
+router.get('/educator/session/:sessionId/transcript', authorizeTutorAdmin, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const messages = await ChatMessage.find({ sessionId }).sort({ createdAt: 1 });
@@ -231,11 +232,25 @@ router.get('/educator/session/:sessionId/transcript', async (req, res) => {
 });
 
 // 1. Create a new session
-router.post('/session', async (req, res) => {
+router.post('/session', requireAuth, async (req, res) => {
   try {
-    const { userId, topic } = req.body;
+    let { userId, topic } = req.body;
+    if (!userId && req.user) {
+      userId = req.user._id || req.user.id || req.user.username;
+    }
     if (!userId || !topic) {
       return res.status(400).json({ error: 'userId and topic are required' });
+    }
+
+    // Enforce ownership: students cannot create sessions on behalf of other users
+    const callerId = (req.user._id || req.user.id || '').toString();
+    const callerUsername = req.user.username || '';
+    if (
+      req.user.role !== 'admin' &&
+      callerId !== userId.toString() &&
+      callerUsername !== userId.toString()
+    ) {
+      return res.status(403).json({ error: 'Forbidden: cannot create session for another user' });
     }
 
     // Resolve matching template
@@ -268,10 +283,24 @@ router.post('/session', async (req, res) => {
 });
 
 // 2. Get historical sessions for a user
-router.get('/sessions', async (req, res) => {
+router.get('/sessions', requireAuth, async (req, res) => {
   try {
     const { userId, skip = 0, limit = 10 } = req.query;
     if (!userId) return res.status(400).json({ error: 'userId is required' });
+
+    // Enforce ownership: callers can only fetch their own sessions.
+    // Note: Tutors and admins have read-only observation access to review student coaching sessions,
+    // whereas write/mutate operations (/message, /end) are restricted to session owners and admins.
+    const callerId = (req.user._id || req.user.id || '').toString();
+    const callerUsername = req.user.username || '';
+    if (
+      req.user.role !== 'admin' &&
+      req.user.role !== 'tutor' &&
+      callerId !== userId.toString() &&
+      callerUsername !== userId.toString()
+    ) {
+      return res.status(403).json({ error: "Forbidden: cannot access another user's sessions" });
+    }
 
     const sessions = await ChatSession.find({ userId })
       .sort({ createdAt: -1 })
@@ -285,11 +314,24 @@ router.get('/sessions', async (req, res) => {
 });
 
 // 3. Get specific session details and messages
-router.get('/session/:sessionId', async (req, res) => {
+router.get('/session/:sessionId', requireAuth, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const session = await ChatSession.findById(sessionId);
     if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    // Enforce ownership: only session owner or tutor/admin can access
+    const callerId = (req.user._id || req.user.id || '').toString();
+    const callerUsername = req.user.username || '';
+    const sessionOwner = (session.userId || '').toString();
+    if (
+      req.user.role !== 'admin' &&
+      req.user.role !== 'tutor' &&
+      sessionOwner !== callerId &&
+      sessionOwner !== callerUsername
+    ) {
+      return res.status(403).json({ error: "Forbidden: cannot access another user's session" });
+    }
 
     const messages = await ChatMessage.find({ sessionId }).sort({ createdAt: 1 });
     res.json({ session, messages });
@@ -299,7 +341,7 @@ router.get('/session/:sessionId', async (req, res) => {
 });
 
 // 4. Send message to session (with SSE streaming)
-router.post('/message', rateLimiter, async (req, res) => {
+router.post('/message', requireAuth, rateLimiter, async (req, res) => {
   chatMetrics.totalRequests++;
   const start = Date.now();
   const { sessionId, message } = req.body;
@@ -310,6 +352,18 @@ router.post('/message', rateLimiter, async (req, res) => {
     const session = await ChatSession.findById(sessionId);
     if (!session || session.status !== 'active') {
       return res.status(400).json({ error: 'Invalid or inactive session' });
+    }
+
+    // Enforce ownership: only session owner or admin can post messages to session
+    const callerId = (req.user._id || req.user.id || '').toString();
+    const callerUsername = req.user.username || '';
+    const sessionOwner = (session.userId || '').toString();
+    if (
+      req.user.role !== 'admin' &&
+      sessionOwner !== callerId &&
+      sessionOwner !== callerUsername
+    ) {
+      return res.status(403).json({ error: "Forbidden: cannot send message to another user's session" });
     }
 
     // Save user message
@@ -577,12 +631,24 @@ router.post('/message', rateLimiter, async (req, res) => {
 });
 
 // 5. End session and generate summary/actions
-router.post('/session/:sessionId/end', async (req, res) => {
+router.post('/session/:sessionId/end', requireAuth, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const session = await ChatSession.findById(sessionId);
     if (!session || session.status !== 'active') {
       return res.status(400).json({ error: 'Invalid or inactive session' });
+    }
+
+    // Enforce ownership: only session owner or admin can end session
+    const callerId = (req.user._id || req.user.id || '').toString();
+    const callerUsername = req.user.username || '';
+    const sessionOwner = (session.userId || '').toString();
+    if (
+      req.user.role !== 'admin' &&
+      sessionOwner !== callerId &&
+      sessionOwner !== callerUsername
+    ) {
+      return res.status(403).json({ error: "Forbidden: cannot end another user's session" });
     }
 
     // Fetch all messages in this session to extract the user's committed plan
@@ -754,7 +820,7 @@ router.get('/educator/logs', authorizeTutorAdmin, async (req, res) => {
 });
 
 // User: Get AI-driven Socratic feedback for a chess move played
-router.post('/chess-feedback', async (req, res) => {
+router.post('/chess-feedback', requireAuth, async (req, res) => {
   const { fenBefore, fenAfter, moveUci, bestMove, score, moveIndicator, nextStepHint } = req.body;
   
   try {

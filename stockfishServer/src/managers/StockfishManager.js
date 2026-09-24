@@ -142,6 +142,22 @@ class StockfishManager {
     const sessionId = crypto.randomUUID();
     const engine = spawn(enginePath);
 
+    // The OS-level failure when enginePath isn't executable (EACCES) surfaces
+    // asynchronously as an 'error' event, not a synchronous throw from spawn().
+    // Without this listener, Node rethrows it as an uncaught exception and
+    // crashes the whole process for every connected client.
+    engine.on('error', (err) => {
+      console.error(`Stockfish engine failed to start for session ${sessionId}:`, err.message);
+      if (this.sessions.has(socketId)) {
+        this.sessions.delete(socketId);
+      }
+      try {
+        socket.emit('session-error', { error: 'Chess engine failed to start' });
+      } catch (e) {
+        // socket already closed, nothing to notify
+      }
+    });
+
     // Log engine spawn for debugging (enginePath and pid)
     try {
       console.log(`Spawned Stockfish engine for session ${sessionId} at ${enginePath} (pid=${engine.pid})`);
@@ -238,3 +254,4 @@ class StockfishManager {
 }
 
 module.exports = StockfishManager;
+module.exports.enginePath = enginePath;

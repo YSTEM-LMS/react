@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import ChessBoard, { ChessBoardRef } from '../../../../components/ChessBoard/ChessBoard';
 import PromotionPopup from '../../lessons-main/PromotionPopup';
 import MoveTracker from '../move-tracker/MoveTracker';
-import { environment } from "../../../../environments/environment";
+import { environment } from "../../../../environments";
 
 import { Move } from "../../../../core/types/chess";
 import { EvaluationContext, Goal } from '../../../../core/types/goals';
