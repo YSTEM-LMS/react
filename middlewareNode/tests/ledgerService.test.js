@@ -39,6 +39,7 @@ const {
   processEvent,
   applyLedgerEntry,
   getLifetimeEarnedOrZero,
+  getLifetimeEarnedMap,
 } = require("../src/services/ledgerService");
 
 const userId = new mongoose.Types.ObjectId();
@@ -64,6 +65,56 @@ describe("getLifetimeEarnedOrZero", () => {
     await UserBalance.create({ userId, balance: 5, lifetimeEarned: 5 });
     const result = await getLifetimeEarnedOrZero(userId);
     expect(result).toBe(5);
+  });
+});
+
+describe("getLifetimeEarnedMap", () => {
+  it("returns a Map keyed by userId string for every user with a balance document", async () => {
+    const alice = new mongoose.Types.ObjectId();
+    const bob = new mongoose.Types.ObjectId();
+    await UserBalance.create({ userId: alice, balance: 10, lifetimeEarned: 10 });
+    await UserBalance.create({ userId: bob, balance: 25, lifetimeEarned: 25 });
+
+    const map = await getLifetimeEarnedMap([alice, bob]);
+
+    expect(map.get(String(alice))).toBe(10);
+    expect(map.get(String(bob))).toBe(25);
+  });
+
+  it("has no entry for a user with no UserBalance document — callers must default to 0 themselves", async () => {
+    const noBalanceUser = new mongoose.Types.ObjectId();
+    const map = await getLifetimeEarnedMap([noBalanceUser]);
+
+    expect(map.has(String(noBalanceUser))).toBe(false);
+    expect(map.get(String(noBalanceUser)) || 0).toBe(0);
+  });
+
+  it("issues one query regardless of candidate list size (batched, not per-user)", async () => {
+    const ids = Array.from({ length: 20 }, () => new mongoose.Types.ObjectId());
+    for (const id of ids) {
+      await UserBalance.create({ userId: id, balance: 1, lifetimeEarned: 1 });
+    }
+
+    const findSpy = jest.spyOn(UserBalance, "find");
+    await getLifetimeEarnedMap(ids);
+
+    expect(findSpy).toHaveBeenCalledTimes(1);
+    findSpy.mockRestore();
+  });
+
+  it("returns an empty Map for an empty candidate list without querying the database", async () => {
+    // Not just "returns the right answer" — an empty candidate list (e.g.
+    // a filtered leaderboard query matching no students) must skip the
+    // query entirely. Without this, a caller in a context with no live
+    // DB connection mocked (leaderboard.security.test.js, which mocks
+    // Users.find but not UserBalance) would hang on a real query for
+    // nothing.
+    const findSpy = jest.spyOn(UserBalance, "find");
+    const map = await getLifetimeEarnedMap([]);
+
+    expect(map.size).toBe(0);
+    expect(findSpy).not.toHaveBeenCalled();
+    findSpy.mockRestore();
   });
 });
 

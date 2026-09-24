@@ -1,17 +1,23 @@
 /**
- * Real-database consistency test — LB-02.
+ * Real-database consistency test — LB-02, rewritten for the currency
+ * rollout's leaderboard swap.
  *
- * Confirms /leaderboard and /analytics/student/:username derive identical
- * underlying stats (time played, streak, activities completed, badges
- * earned) for the same student and date, since both routes import the
- * same utils/studentStats helpers. A discrepancy here would mean the
- * shared module was bypassed or duplicated somewhere, and the two
- * features would silently disagree about a student's numbers.
+ * Previously this test proved /leaderboard's score and /analytics's raw
+ * stats came from the same weighted-formula computation — both routes
+ * imported the same utils/studentStats helpers, and a discrepancy would
+ * mean that shared module had been bypassed or duplicated. That coupling
+ * is now gone on purpose: /leaderboard's score comes from
+ * UserBalance.lifetimeEarned (services/ledgerService.js), while /analytics
+ * still reports the old engagement stats directly. They are now two
+ * different signals by design (see routes/leaderboard.js's module
+ * header) — reasserting the old cross-endpoint equality would be
+ * asserting a coupling this swap was built to remove.
  *
- * Uses mongodb-memory-server + real Mongoose models — no mocks — since
- * the whole point is verifying two independently-written route handlers
- * genuinely compute the same thing from the same data, not that they
- * both call an identical mock.
+ * What this file verifies instead: /leaderboard's score is genuinely
+ * sourced from the real ledger, not a stale in-memory computation —
+ * using real Mongoose models (UserBalance, Users), not mocks, since the
+ * property under test is "the route reads what's actually in the
+ * database," which a mock can't demonstrate.
  */
 
 const { MongoMemoryServer } = require("mongodb-memory-server");
@@ -31,16 +37,11 @@ beforeAll(async () => {
   mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 30000 } });
   await mongoose.connect(mongod.getUri() + "ystem");
 
-  // Bypass real JWT for both admin (analytics) and any-role (leaderboard) auth
-  const adminGuard = (req, res, next) => { req.user = { username: "admin", role: "admin" }; next(); };
   const requireAuth = (req, res, next) => { req.user = { username: "alice", role: "student" }; next(); };
-
-  const analyticsRoute = require("../src/routes/analytics");
   const leaderboardRoute = require("../src/routes/leaderboard");
 
   app = express();
   app.use(express.json());
-  app.use("/analytics", adminGuard, analyticsRoute);
   app.use("/leaderboard", requireAuth, leaderboardRoute);
 });
 
@@ -54,67 +55,75 @@ afterEach(async () => {
   await Promise.all(Object.values(collections).map((c) => c.deleteMany({})));
 });
 
-describe("LB-02 — leaderboard and analytics agree on the same student's stats", () => {
-  test("time, streak, and badge counts match between /leaderboard inputs and /analytics/student", async () => {
+describe("LB-02 — leaderboard score reflects the real currency ledger", () => {
+  test("a student's leaderboard score matches their real UserBalance.lifetimeEarned", async () => {
     const Users = require("../src/models/users");
-    const TimeTracking = require("../src/models/timeTracking");
-    const UserBadges = require("../src/models/UserBadges");
+    const UserBalance = require("../src/models/userBalance");
 
     const alice = await Users.create({
       username: "alice", email: "alice@test.com", password: "hashed",
       firstName: "Alice", lastName: "Test", role: "student", school: "Test School",
     });
+    await UserBalance.create({ userId: alice._id, balance: 42, lifetimeEarned: 42 });
 
-    const now = new Date();
-    await TimeTracking.create([
-      { username: "alice", eventType: "puzzle", eventId: "e1", startTime: now, totalTime: 3600 },
-      { username: "alice", eventType: "lesson", eventId: "e2", startTime: now, totalTime: 1800 },
-    ]);
-    await UserBadges.create({ userId: "alice", earned: [{ badgeId: "first_lesson" }, { badgeId: "streak_5" }] });
+    const res = await request(app).get("/leaderboard?school=" + encodeURIComponent("Test School"));
+    expect(res.status).toBe(200);
 
-    const analyticsRes = await request(app).get("/analytics/student/alice");
-    expect(analyticsRes.status).toBe(200);
-
-    const leaderboardRes = await request(app).get("/leaderboard?school=" + encodeURIComponent("Test School"));
-    expect(leaderboardRes.status).toBe(200);
-
-    // Analytics exposes the raw stats directly; leaderboard only exposes
-    // the composed score, so recompute the leaderboard's expected score
-    // from the SAME analytics numbers to prove they came from one source.
-    const { stats } = analyticsRes.body;
-    const aliceEntry = leaderboardRes.body.data.leaderboard.find((e) => e.username === "alice");
+    const aliceEntry = res.body.data.leaderboard.find((e) => e.username === "alice");
     expect(aliceEntry).toBeDefined();
-
-    const WEIGHTS = { time: 1, streak: 5, badge: 10, activity: 3 }; // route defaults
-    const expectedScore = Math.round(
-      (stats.puzzleTimeHours + stats.lessonTimeHours) * WEIGHTS.time +
-      stats.currentStreak * WEIGHTS.streak +
-      stats.badgesEarned * WEIGHTS.badge +
-      stats.activitiesCompleted * WEIGHTS.activity
-    );
-
-    expect(aliceEntry.score).toBe(expectedScore);
-    // 3600s puzzle + 1800s lesson = 1.5 hours total, 2 badges, streak from
-    // a single day with both lesson+puzzle = 1.
-    expect(stats.puzzleTimeHours + stats.lessonTimeHours).toBe(1.5);
-    expect(stats.badgesEarned).toBe(2);
+    expect(aliceEntry.score).toBe(42);
   });
 
-  test("a student absent from timeTracking shows score 0 on both endpoints consistently", async () => {
+  test("a student with no UserBalance document shows score 0, not omitted or undefined", async () => {
     const Users = require("../src/models/users");
     await Users.create({
       username: "quiet", email: "quiet@test.com", password: "hashed",
       firstName: "Quiet", lastName: "Student", role: "student", school: "Silent School",
     });
 
-    const analyticsRes = await request(app).get("/analytics/student/quiet");
-    const leaderboardRes = await request(app).get("/leaderboard?school=" + encodeURIComponent("Silent School"));
+    const res = await request(app).get("/leaderboard?school=" + encodeURIComponent("Silent School"));
+    const quietEntry = res.body.data.leaderboard.find((e) => e.username === "quiet");
 
-    expect(analyticsRes.body.stats.totalTimeHours).toBe(0);
-    expect(analyticsRes.body.stats.currentStreak).toBe(0);
-    expect(analyticsRes.body.stats.badgesEarned).toBe(0);
-
-    const quietEntry = leaderboardRes.body.data.leaderboard.find((e) => e.username === "quiet");
+    expect(quietEntry).toBeDefined();
     expect(quietEntry.score).toBe(0);
+  });
+
+  test("score reflects lifetimeEarned, not spendable balance — the two diverge once currency is spent", async () => {
+    const Users = require("../src/models/users");
+    const UserBalance = require("../src/models/userBalance");
+
+    const bob = await Users.create({
+      username: "bob", email: "bob@test.com", password: "hashed",
+      firstName: "Bob", lastName: "Test", role: "student", school: "Spend Test School",
+    });
+    // Simulates a student who earned 100 total but has since spent some —
+    // balance (spendable) is lower than lifetimeEarned (monotonic). This
+    // scenario doesn't exist yet in production (no spend path this
+    // window), but the leaderboard must already be reading the field that
+    // stays correct once one ships.
+    await UserBalance.create({ userId: bob._id, balance: 30, lifetimeEarned: 100 });
+
+    const res = await request(app).get("/leaderboard?school=" + encodeURIComponent("Spend Test School"));
+    const bobEntry = res.body.data.leaderboard.find((e) => e.username === "bob");
+
+    expect(bobEntry.score).toBe(100); // lifetimeEarned, not the lower balance of 30
+  });
+
+  test("ranking order follows real lifetimeEarned across multiple students", async () => {
+    const Users = require("../src/models/users");
+    const UserBalance = require("../src/models/userBalance");
+
+    const low = await Users.create({ username: "low", email: "low@test.com", password: "h", firstName: "L", lastName: "L", role: "student", school: "Rank School" });
+    const high = await Users.create({ username: "high", email: "high@test.com", password: "h", firstName: "H", lastName: "H", role: "student", school: "Rank School" });
+    const none = await Users.create({ username: "none", email: "none@test.com", password: "h", firstName: "N", lastName: "N", role: "student", school: "Rank School" });
+
+    await UserBalance.create({ userId: low._id, balance: 5, lifetimeEarned: 5 });
+    await UserBalance.create({ userId: high._id, balance: 50, lifetimeEarned: 50 });
+    // "none" has no UserBalance document at all.
+
+    const res = await request(app).get("/leaderboard?school=" + encodeURIComponent("Rank School"));
+    const order = res.body.data.leaderboard.map((e) => e.username);
+
+    expect(order).toEqual(["high", "low", "none"]);
   });
 });

@@ -1,14 +1,19 @@
 /**
  * Integration tests — Leaderboard endpoint
  *
- * Users model and studentStats helpers are mocked.
- * Uses supertest against a minimal Express app. requireAuth is mocked
- * to always pass through (auth enforcement is covered separately in
+ * Users model, studentStats (chess only now), avatars, and ledgerService
+ * are mocked. Uses supertest against a minimal Express app. requireAuth is
+ * mocked to always pass through (auth enforcement is covered separately in
  * requireAuth.test.js and leaderboard.security.test.js).
  *
  * Response contract matches LeaderboardModal.tsx:
  *   { success, data: { leaderboard: [{id, rank, username, school_name,
  *     score, avatar_url}], pagination: { has_more } } }
+ *
+ * `score` comes from ledgerService.getLifetimeEarnedMap (currency rollout
+ * swap — see routes/leaderboard.js's module header) rather than the old
+ * time/streak/badge/activity weighted formula. Chess record stays a
+ * separate stat via studentStats.getChessRecords, untouched by this swap.
  *
  * Endpoints tested: GET /leaderboard, GET /leaderboard/schools
  */
@@ -21,6 +26,7 @@ jest.mock("../src/middleware/requireAuth", () => (req, _res, next) => {
 jest.mock("../src/models/users");
 jest.mock("../src/utils/studentStats");
 jest.mock("../src/utils/avatars");
+jest.mock("../src/services/ledgerService");
 
 const express = require("express");
 const request = require("supertest");
@@ -29,6 +35,7 @@ const leaderboard = require("../src/routes/leaderboard");
 const Users = require("../src/models/users");
 const studentStats = require("../src/utils/studentStats");
 const { getAvatarUrl } = require("../src/utils/avatars");
+const ledgerService = require("../src/services/ledgerService");
 
 const app = express();
 app.use(express.json());
@@ -42,21 +49,22 @@ const STUDENTS = [
   { _id: "3", username: "carol", country: "Canada", state: null, school: null },
 ];
 
-function mockStatsFor(scoreByUsername) {
-  studentStats.getUserTimeStats.mockImplementation(async (username) => ({
-    puzzleTimeHours: scoreByUsername[username]?.puzzleTimeHours || 0,
-    lessonTimeHours: scoreByUsername[username]?.lessonTimeHours || 0,
-    totalTimeHours: 0,
-    gameTimeHours: 0,
-    mentorTimeHours: 0,
-  }));
-  studentStats.getUserStreak.mockImplementation(
-    async (username) => scoreByUsername[username]?.streak || 0
-  );
-  studentStats.getActivitiesCompleted.mockImplementation(async () => 0);
-  studentStats.getBadgesEarned.mockImplementation(
-    async (username) => scoreByUsername[username]?.badges || 0
-  );
+/**
+ * Sets up ledgerService.getLifetimeEarnedMap to return the given
+ * score for each username (looked up by _id, matching real usage) and
+ * studentStats.getChessRecords for chess data — chess stays a completely
+ * separate, unaffected mock from the currency-score swap.
+ */
+function mockScoresFor(scoreByUsername, students = STUDENTS) {
+  const byId = new Map(students.map((s) => [String(s._id), scoreByUsername[s.username]?.score ?? 0]));
+  ledgerService.getLifetimeEarnedMap.mockImplementation(async (userIds) => {
+    const map = new Map();
+    for (const id of userIds) {
+      const key = String(id);
+      if (byId.has(key)) map.set(key, byId.get(key));
+    }
+    return map;
+  });
   // Chess record is a separate stat, batched for the whole page.
   studentStats.getChessRecords.mockImplementation(
     async (usernames) =>
@@ -81,10 +89,10 @@ describe("GET /leaderboard", () => {
     getAvatarUrl.mockImplementation((avatarKey) =>
       avatarKey ? `https://s3.example.com/${avatarKey}` : null
     );
-    mockStatsFor({
-      alice: { puzzleTimeHours: 10, streak: 5, badges: 2 },
-      bob: { puzzleTimeHours: 5, streak: 2, badges: 1 },
-      carol: { puzzleTimeHours: 1, streak: 0, badges: 0 },
+    mockScoresFor({
+      alice: { score: 87 },
+      bob: { score: 41 },
+      carol: { score: 3 },
     });
   });
 
@@ -222,7 +230,8 @@ describe("GET /leaderboard", () => {
         school: "Test School",
       }))
     );
-    mockStatsFor({});
+    ledgerService.getLifetimeEarnedMap.mockResolvedValue(new Map());
+    studentStats.getChessRecords.mockImplementation(async (usernames) => new Map(usernames.map((u) => [u, { wins: 0, draws: 0, losses: 0, gamesPlayed: 0, chessScore: 0 }])));
     const res = await request(app).get("/leaderboard?limit=500");
     expect(res.body.data.leaderboard.length).toBeLessThanOrEqual(100);
   });
@@ -235,7 +244,8 @@ describe("GET /leaderboard", () => {
         school: "Test School",
       }))
     );
-    mockStatsFor({});
+    ledgerService.getLifetimeEarnedMap.mockResolvedValue(new Map());
+    studentStats.getChessRecords.mockImplementation(async (usernames) => new Map(usernames.map((u) => [u, { wins: 0, draws: 0, losses: 0, gamesPlayed: 0, chessScore: 0 }])));
     // No filters applied — unfiltered path should cap candidates before scoring.
     const res = await request(app).get("/leaderboard?limit=100&page=8"); // page 8 * 100 = would need 800 candidates
     // Total reported can never exceed the 500-candidate cap, regardless of
@@ -254,7 +264,8 @@ describe("GET /leaderboard", () => {
         school: "Big School",
       }))
     );
-    mockStatsFor({});
+    ledgerService.getLifetimeEarnedMap.mockResolvedValue(new Map());
+    studentStats.getChessRecords.mockImplementation(async (usernames) => new Map(usernames.map((u) => [u, { wins: 0, draws: 0, losses: 0, gamesPlayed: 0, chessScore: 0 }])));
     // Page size is still capped at MAX_LIMIT (100) regardless of filtering,
     // but the underlying candidate set for a filtered query is NOT capped
     // at 500 — walk to the last page and confirm has_more only goes false
@@ -271,7 +282,8 @@ describe("GET /leaderboard", () => {
     Users.find.mockResolvedValue([
       { _id: "1", username: "quiet", school: "Test School" },
     ]);
-    mockStatsFor({}); // no entry for "quiet" -> all stats default to 0
+    ledgerService.getLifetimeEarnedMap.mockResolvedValue(new Map());
+    studentStats.getChessRecords.mockImplementation(async (usernames) => new Map(usernames.map((u) => [u, { wins: 0, draws: 0, losses: 0, gamesPlayed: 0, chessScore: 0 }]))); // no entry for "quiet" -> all stats default to 0
     const res = await request(app).get("/leaderboard");
     expect(res.status).toBe(200);
     expect(res.body.data.leaderboard).toHaveLength(1);
@@ -378,10 +390,9 @@ describe("GET /leaderboard/states", () => {
 
 describe("GET /leaderboard — country/state now included in entry response", () => {
   test("entries include country and state fields", async () => {
-    Users.find.mockResolvedValue([
-      { _id: "1", username: "alice", country: "USA", state: "FL", school: "Jefferson Middle" },
-    ]);
-    mockStatsFor({ alice: { streak: 1 } });
+    const singleStudent = [{ _id: "1", username: "alice", country: "USA", state: "FL", school: "Jefferson Middle" }];
+    Users.find.mockResolvedValue(singleStudent);
+    mockScoresFor({ alice: { score: 5 } }, singleStudent);
     const res = await request(app).get("/leaderboard");
     expect(res.body.data.leaderboard[0]).toMatchObject({ country: "USA", state: "FL" });
   });
@@ -406,10 +417,9 @@ describe("GET /leaderboard — chess record as its own column", () => {
   const CHESS = { wins: 4, draws: 2, losses: 1, gamesPlayed: 7, chessScore: 14 };
 
   test("entries carry chess_score and chess_record alongside score", async () => {
-    Users.find.mockResolvedValue([
-      { _id: "1", username: "alice", country: "USA", state: "FL", school: "Jefferson Middle" },
-    ]);
-    mockStatsFor({ alice: { streak: 1, chess: CHESS } });
+    const singleStudent = [{ _id: "1", username: "alice", country: "USA", state: "FL", school: "Jefferson Middle" }];
+    Users.find.mockResolvedValue(singleStudent);
+    mockScoresFor({ alice: { score: 5, chess: CHESS } }, singleStudent);
 
     const res = await request(app).get("/leaderboard");
     const entry = res.body.data.leaderboard[0];
@@ -417,16 +427,15 @@ describe("GET /leaderboard — chess record as its own column", () => {
     expect(entry.chess_record).toEqual({ wins: 4, draws: 2, losses: 1, gamesPlayed: 7 });
   });
 
-  test("chess results do NOT change the engagement score", async () => {
-    Users.find.mockResolvedValue([
-      { _id: "1", username: "alice", country: "USA", state: "FL", school: "Jefferson Middle" },
-    ]);
+  test("chess results do NOT change the currency score", async () => {
+    const singleStudent = [{ _id: "1", username: "alice", country: "USA", state: "FL", school: "Jefferson Middle" }];
+    Users.find.mockResolvedValue(singleStudent);
 
-    mockStatsFor({ alice: { streak: 1 } }); // no games
+    mockScoresFor({ alice: { score: 20 } }, singleStudent); // no games
     const without = await request(app).get("/leaderboard");
     const scoreWithoutGames = without.body.data.leaderboard[0].score;
 
-    mockStatsFor({ alice: { streak: 1, chess: CHESS } }); // same engagement, many wins
+    mockScoresFor({ alice: { score: 20, chess: CHESS } }, singleStudent); // same currency score, many wins
     const with_ = await request(app).get("/leaderboard");
     const entry = with_.body.data.leaderboard[0];
 
@@ -435,21 +444,22 @@ describe("GET /leaderboard — chess record as its own column", () => {
   });
 
   test("a student with no games shows a zeroed record, not a missing column", async () => {
-    Users.find.mockResolvedValue([{ _id: "3", username: "carol", school: null }]);
-    mockStatsFor({ carol: {} });
+    const singleStudent = [{ _id: "3", username: "carol", school: null }];
+    Users.find.mockResolvedValue(singleStudent);
+    mockScoresFor({ carol: { score: 0 } }, singleStudent);
 
     const entry = (await request(app).get("/leaderboard")).body.data.leaderboard[0];
     expect(entry.chess_score).toBe(0);
     expect(entry.chess_record).toEqual({ wins: 0, draws: 0, losses: 0, gamesPlayed: 0 });
   });
 
-  test("sortBy=chess ranks by chess score, independent of engagement score", async () => {
+  test("sortBy=chess ranks by chess score, independent of currency score", async () => {
     Users.find.mockResolvedValue(STUDENTS);
-    mockStatsFor({
-      // alice leads on engagement, bob leads on chess.
-      alice: { puzzleTimeHours: 100, streak: 10, badges: 5, chess: { wins: 0, draws: 0, losses: 3, gamesPlayed: 3, chessScore: 0 } },
-      bob: { puzzleTimeHours: 1, chess: { wins: 9, draws: 0, losses: 0, gamesPlayed: 9, chessScore: 27 } },
-      carol: { chess: { wins: 1, draws: 0, losses: 0, gamesPlayed: 1, chessScore: 3 } },
+    mockScoresFor({
+      // alice leads on currency score, bob leads on chess.
+      alice: { score: 100, chess: { wins: 0, draws: 0, losses: 3, gamesPlayed: 3, chessScore: 0 } },
+      bob: { score: 1, chess: { wins: 9, draws: 0, losses: 0, gamesPlayed: 9, chessScore: 27 } },
+      carol: { score: 0, chess: { wins: 1, draws: 0, losses: 0, gamesPlayed: 1, chessScore: 3 } },
     });
 
     const byChess = await request(app).get("/leaderboard?sortBy=chess");

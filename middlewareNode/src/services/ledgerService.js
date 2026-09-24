@@ -26,13 +26,43 @@ const DUPLICATE_KEY_ERROR = 11000;
 
 /**
  * Reads a user's lifetimeEarned, treating "no UserBalance document yet"
- * as 0 rather than undefined. Used by the leaderboard swap (Jimmy's lane)
- * and anywhere else that needs a safe-to-sort number for every user,
- * including ones who have never earned anything.
+ * as 0 rather than undefined. Used anywhere that needs a safe-to-sort
+ * number for exactly one user, including ones who have never earned
+ * anything. For a whole candidate list (e.g. the leaderboard), prefer
+ * getLifetimeEarnedMap below — this one query per call would reintroduce
+ * the same per-student round-trip cost the leaderboard's chess-record
+ * lookup was already batched to avoid.
  */
 async function getLifetimeEarnedOrZero(userId) {
   const doc = await UserBalance.findOne({ userId }, { lifetimeEarned: 1, _id: 0 });
   return doc ? doc.lifetimeEarned : 0;
+}
+
+/**
+ * Batched version of getLifetimeEarnedOrZero for a whole candidate list —
+ * one query for every UserBalance document that exists among the given
+ * userIds, rather than one query per user. Returns a Map<userId string,
+ * lifetimeEarned>; a userId with no UserBalance document simply has no
+ * entry, so callers should read via `map.get(id) || 0` (see
+ * routes/leaderboard.js) to get the same "missing means 0, not
+ * undefined" guarantee as the single-user helper.
+ */
+async function getLifetimeEarnedMap(userIds) {
+  // An empty candidate list (e.g. a filtered leaderboard query matching
+  // no students) has nothing to look up — skip the query entirely rather
+  // than issuing `$in: []`, which some drivers/mocks handle fine but is
+  // pure overhead either way.
+  if (!userIds || userIds.length === 0) return new Map();
+
+  const docs = await UserBalance.find(
+    { userId: { $in: userIds } },
+    { userId: 1, lifetimeEarned: 1, _id: 0 }
+  );
+  const map = new Map();
+  for (const doc of docs) {
+    map.set(String(doc.userId), doc.lifetimeEarned);
+  }
+  return map;
 }
 
 /**
@@ -196,6 +226,7 @@ module.exports = {
   processEvent,
   applyLedgerEntry,
   getLifetimeEarnedOrZero,
+  getLifetimeEarnedMap,
   isWithinCooldown,
   hasHitDailyCap,
 };
