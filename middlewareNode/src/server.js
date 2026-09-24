@@ -20,6 +20,7 @@ const streakRoutes = require("./routes/streak");
 const adminGuard   = require("./middleware/adminGuard");
 const requireAuth  = require("./middleware/requireAuth");
 const rateLimit    = require("express-rate-limit");
+const currencyConsumer = require("./services/currencyConsumer");
 
 const analyticsLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -37,9 +38,26 @@ const leaderboardLimiter = rateLimit({
   message: { error: "Too many requests, please try again later" },
 });
 
+// Currency rollout, Week 3 hardening: rate limit on event-triggering
+// endpoints — currently just /gameResults, the one endpoint that can
+// produce a currency-earning ActionEvent today. Cooldowns/daily caps
+// (ledgerService.js) already cap how much a legitimate flood of requests
+// can earn, but a limiter stops the flood itself from reaching the DB at
+// all. Reused as-is once Jimmy's lesson/puzzle producer endpoints land —
+// same limiter, mounted on whatever routes end up calling into the
+// currency pipeline.
+const currencyEventLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: parseInt(process.env.CURRENCY_EVENT_RATE_LIMIT_MAX) || 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later" },
+});
+
 // Enable schedulers
 require("./scheduler/activitiesScheduler.js");
 require("./scheduler/analyticsSummaryScheduler.js");
+require("./scheduler/currencyAnomalyScheduler.js");
 
 // Enable CORS for cross-origin requests
 const configuredCorsOrigin = config.get("corsOptions.origin");
@@ -76,8 +94,18 @@ app.use(
   })
 );
 
-// Connect to MongoDB database
-connectDB();
+// Connect to MongoDB database, then start the currency consumer.
+// Sequenced deliberately: the consumer's poll loop hits Mongoose models
+// (ActionEvent, ActionRule, ...) on an interval starting immediately, so
+// starting it before connectDB() resolves would throw on every tick until
+// the connection came up. Skipped entirely under Jest — a setInterval
+// timer with no matching stop() would otherwise leak across test files as
+// an open handle.
+connectDB().then(() => {
+  if (process.env.NODE_ENV !== "test") {
+    currencyConsumer.start();
+  }
+});
 
 // Initialize JSON middleware for parsing request bodies
 app.use(express.json({ extended: false }));
@@ -113,7 +141,7 @@ app.use("/streak", streakRoutes);
 app.use("/badges", require("./routes/badges"));
 app.use("/chat", require("./routes/chat"));
 app.use("/challenge", require("./routes/challenge"));
-app.use("/gameResults", requireAuth, require("./routes/gameResults"));
+app.use("/gameResults", currencyEventLimiter, requireAuth, require("./routes/gameResults"));
 app.use("/analytics", analyticsLimiter, adminGuard, require("./routes/analytics"));
 app.use("/leaderboard", leaderboardLimiter, requireAuth, require("./routes/leaderboard"));
 
