@@ -28,7 +28,13 @@ type Row = {
   rank: number;
   name: string;
   school: string;
-  /** Engagement score — time, streak, activities, badges. */
+  /**
+   * Currency ledger standing (lifetime currency earned from engaging
+   * actions — lessons, puzzles, etc.), not spendable balance. See
+   * middlewareNode/src/routes/leaderboard.js and services/ledgerService.js.
+   * Previously a weighted time/streak/activities/badges formula; replaced
+   * by the currency rollout plan.
+   */
   score: number;
   /**
    * Student-vs-student chess score, kept as its own column on purpose.
