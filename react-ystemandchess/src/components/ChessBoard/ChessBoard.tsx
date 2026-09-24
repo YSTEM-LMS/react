@@ -100,14 +100,12 @@ const ChessBoard = forwardRef<ChessBoardRef, ChessBoardProps>(
 
           // Only update if FEN has actually changed
           if (fen !== currentFen) {
-            gameRef.current.load(fen, { skipValidation: true });
+            gameRef.current.load(fen);
             setBoardPosition(fen || start_fen);
           }
         } catch (err) {
+          // Invalid FEN: keep the current board rather than resetting it.
           console.error("ChessBoard: Invalid FEN from props:", fen, err);
-          // On error, reset to a valid starting position
-            gameRef.current = new Chess();
-            setBoardPosition(start_fen);
         }
       }
     }, [fen]);
@@ -142,7 +140,7 @@ const ChessBoard = forwardRef<ChessBoardRef, ChessBoardProps>(
 
       loadPosition: (newFen: string) => {
         try {
-          gameRef.current.load(newFen, { skipValidation: true });
+          gameRef.current.load(newFen);
           setBoardPosition(newFen);
           setGreySquares([]);
         } catch (err) {
@@ -152,7 +150,7 @@ const ChessBoard = forwardRef<ChessBoardRef, ChessBoardProps>(
 
       setPosition: (newFen: string) => {
         try {
-          gameRef.current.load(newFen, { skipValidation: true });
+          gameRef.current.load(newFen);
           setBoardPosition(newFen);
           setGreySquares([]);
         } catch (err) {

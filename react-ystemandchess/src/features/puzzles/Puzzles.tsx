@@ -513,6 +513,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     student: studentId,
     mentor: mentorId,
     role: role,
+    credentials: cookies.login,
     serverUrl: environment.urls.chessServerURL,
     mode: "puzzle",
 

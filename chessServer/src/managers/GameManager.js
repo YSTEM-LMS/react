@@ -165,14 +165,65 @@ class GameManager {
     }
 
     /**
+     * Verifies that the holder of `credentials` is the real, paired mentor of
+     * `claimedStudent`, via middlewareNode's GET /user/getMentorship (the same
+     * bearer-forwarding pattern EventHandlers.js already uses for /gameResults).
+     * Fails closed: missing config, a missing/invalid token, a non-200 response,
+     * a network error, or a mismatched pairing all throw and reject the join.
+     * @param {string} claimedStudent
+     * @param {string} credentials
+     */
+    async verifyMentorPairing(claimedStudent, credentials) {
+        if (!process.env.MIDDLEWARE_URL) {
+            console.error("[createOrJoinPuzzle] MIDDLEWARE_URL unset — rejecting mentor join");
+            throw new Error("Server misconfigured: cannot verify mentor pairing");
+        }
+        if (!credentials) {
+            throw new Error("A login token is required to join as a mentor");
+        }
+
+        let data;
+        try {
+            const response = await fetch(`${process.env.MIDDLEWARE_URL}/user/getMentorship`, {
+                headers: {
+                    // NOTE: /gameResults uses "Authentication" here, matching its own
+                    // requireAuth check — but GET /user/getMentorship is protected by
+                    // passport-jwt's fromAuthHeaderAsBearerToken(), which only reads
+                    // the standard "Authorization" header. Using "Authentication" here
+                    // would make this check silently reject every valid token.
+                    Authorization: `Bearer ${credentials}`,
+                },
+            });
+            if (response.status !== 200) {
+                throw new Error("Could not verify mentor pairing");
+            }
+            data = await response.json();
+        } catch (e) {
+            throw new Error("Could not verify mentor pairing");
+        }
+
+        if (!data || !data.username || data.username !== claimedStudent) {
+            throw new Error("You are not this student's mentor");
+        }
+    }
+
+    /**
      *
      * @param {Object} param0 - Contains student, mentor, role, socketId
      * @returns {Object} Game object, assigned color, and new game status
      */
-    createOrJoinPuzzle({ student, mentor, role, socketId, credentials }, io) {
+    async createOrJoinPuzzle({ student, mentor, role, socketId, credentials }, io) {
         // must be a student or mentor to connect to server
         if (role !== "student" && role !== "mentor") {
             throw new Error("Invalid role!");
+        }
+
+        // The mentor seat gets a live view into another user's puzzle session,
+        // so it must be verified against the real mentor/student pairing before
+        // anyone is seated. Student joins are unchanged (see PuzzleStreak.tsx,
+        // which shares this room model but has no real mentor to verify against).
+        if (role === "mentor") {
+            await this.verifyMentorPairing(student, credentials);
         }
 
         const socket = io.sockets.sockets.get(socketId);
@@ -200,6 +251,7 @@ class GameManager {
                 boardState: new Chess(),
                 pastStates: [],
                 puzzle: "No hints available",
+                isPuzzle: true,
             };
             this.ongoingGames.push(game);
         } else {
@@ -248,6 +300,10 @@ class GameManager {
 
         if (!game) {
             throw new Error("Game not found for this socket!");
+        }
+
+        if (game.isPuzzle && socketId !== game.student.id) {
+            throw new Error("Only the student may move in a puzzle!");
         }
 
         const board = game.boardState;
@@ -334,6 +390,10 @@ class GameManager {
 
         if (!game) {
             throw new Error("Cannot undo: no active game found for this socket.");
+        }
+
+        if (game.isPuzzle && socketId !== game.student.id) {
+            throw new Error("Only the student may undo in a puzzle!");
         }
 
         const board = game.boardState;

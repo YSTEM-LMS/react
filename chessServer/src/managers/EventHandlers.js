@@ -185,12 +185,12 @@ const registerSocketHandlers = (socket, io) => {
      * Handles creating a new puzzle or joining an existing one
      * Expected payload: { student, mentor, role }
      */
-    socket.on("newPuzzle", (msg) => {
+    socket.on("newPuzzle", async (msg) => {
         try {
             const parsed = JSON.parse(msg);
             console.log('data',parsed, msg);
             // create the new puzzle
-            gameManager.createOrJoinPuzzle({
+            await gameManager.createOrJoinPuzzle({
                 student: parsed.student,
                 mentor: parsed.mentor,
                 role: parsed.role,
