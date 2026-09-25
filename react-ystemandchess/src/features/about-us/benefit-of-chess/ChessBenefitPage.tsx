@@ -1,27 +1,29 @@
 import React from "react";
-import "./ChessBenefitPage.scss";
 import Images from "../../../assets/images/imageImporter";
+
+const paragraphClasses = "mx-auto max-w-[800px] px-5 text-[1.05rem] leading-[1.7] text-dark text-justify";
+const sectionClasses = "bg-[#dff2c8] py-5";
 
 const ChessBenefitPage = () => {
   return (
-    <main id="main-content-chess" role="main">
-      <section className="container-chess" role="region" aria-label="Main chess benefit section" tabIndex={0}>
-        <div className="text-title-md-chess txt-p">
-          <h1 style={{ fontWeight: "bold" }}>The Benefits of Chess</h1>
+    <main id="main-content-chess" className="bg-[#dff2c8]" role="main">
+      <section className={sectionClasses} aria-label="Main chess benefit section">
+        <div className="text-center">
+          <h1 className="pt-[10px] text-[2.2rem] font-black text-[#556b2f]">The Benefits of Chess</h1>
         </div>
 
-        <figure>
+        <figure className="mx-auto max-w-[800px]">
           <img
-            className="picture-chess"
+            className="mx-auto mt-[15px] block w-[90%] max-w-[800px] rounded-[10px] object-cover"
             src={Images.mathComputerImg}
             alt="Students practicing chess on computers"
           />
-          <figcaption className="text-caption-chess txt-p">
+          <figcaption className="mt-[5px] text-center text-[0.85rem] text-muted">
             Students practicing their chess skills in the classroom
           </figcaption>
         </figure>
 
-        <div className="text-normal-chess txt-p">
+        <div className={paragraphClasses}>
           <p>
             The Importance of Online Expansion of Y STEM and Chess Inc. focuses
             on using technology to scale. Yes, we are nonprofit but more
@@ -38,7 +40,7 @@ const ChessBenefitPage = () => {
           </p>
         </div>
 
-        <div className="text-normal-chess txt-p ">
+        <div className={`${paragraphClasses} mt-[15px]`}>
           <p>
             Deployment of our learning program online will also provide us with
             a reliable form of donation generation. For those who are not
@@ -54,16 +56,16 @@ const ChessBenefitPage = () => {
           </p>
         </div>
       </section>
-      <section className="container rectdiv2Chess" role="region" aria-label="Quote section" tabIndex={0}>
-        <div className="rectdiv2-wrapper">
-          <p className="recttextchess">
-            "Playing chess encourages students to put their best effort into
-            other classes and sparks their interest in school"
-          </p>
+
+      <section className="flex min-h-[160px] items-center justify-center bg-[#c1dcaf]" aria-label="Quote section">
+        <div className="max-w-[500px] px-5 text-center text-[1.2rem] font-bold leading-[1.7] text-dark">
+          "Playing chess encourages students to put their best effort into
+          other classes and sparks their interest in school"
         </div>
       </section>
-      <section className="container-chess" role="region" aria-label="Chess benefit details section" tabIndex={0}>
-        <div className="text-normal-chess txt-p">
+
+      <section className={sectionClasses} aria-label="Chess benefit details section">
+        <div className={paragraphClasses}>
           <p>
             Chess gives students skills they can use anywhere in life, like
             problem-solving, concentration, and confidence. Chess teaches
@@ -81,7 +83,7 @@ const ChessBenefitPage = () => {
           </p>
         </div>
 
-        <div className="text-normal-chess txt-p">
+        <div className={`${paragraphClasses} mt-[15px]`}>
           <p>
             Alongside these skills, chess can boost students' confidence. A
             survey by the Saint Louis Chess Club found that the majority of
@@ -93,7 +95,7 @@ const ChessBenefitPage = () => {
           </p>
         </div>
 
-        <div className="text-normal-chess txt-p">
+        <div className={`${paragraphClasses} mt-[15px]`}>
           <p>
             Many students also pursue interest in the game itself, playing in
             championships at even the state level. June, one of the students at
@@ -105,18 +107,18 @@ const ChessBenefitPage = () => {
           </p>
         </div>
 
-        <figure>
+        <figure className="mx-auto max-w-[800px]">
           <img
-            className="pictureChess"
+            className="mx-auto mt-[15px] block h-[450px] w-[max(100%,300px)] object-contain"
             src={Images.mathChampImg}
             alt="A student standing and holding a trophy alongside their mentor."
           />
-          <figcaption className="text-caption-chess txt-p">
+          <figcaption className="mt-[5px] text-center text-[0.85rem] text-muted">
             A student with their mentor after winning an award.
           </figcaption>
         </figure>
 
-        <div className="text-normal-chess txt-p">
+        <div className={`${paragraphClasses} mt-[15px]`}>
           <p>
             Y STEM and Chess dedicates itself to helping students like June, and
             chess is a fundamental part of how we at Y STEM and Chess aim to
@@ -129,7 +131,7 @@ const ChessBenefitPage = () => {
             children learn valuable skills.
           </p>
         </div>
-        <div className="text-normal-chess txt-p">
+        <div className={`${paragraphClasses} mt-[15px]`}>
           <p>
             Today, Y STEM and Chess has reached over seven hundred students in
             five states and three countries, and with a team of over a hundred
@@ -143,4 +145,5 @@ const ChessBenefitPage = () => {
     </main>
   );
 };
+
 export default ChessBenefitPage;
