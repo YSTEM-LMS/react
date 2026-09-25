@@ -1,10 +1,10 @@
-FROM node:18.20.8-alpine AS build
+FROM node:24.21.0-alpine AS build
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
@@ -22,7 +22,7 @@ ENV REACT_APP_AGORA_APP_ID=$REACT_APP_AGORA_APP_ID
 
 RUN npm run build
 
-FROM node:18.20.8-alpine
+FROM node:24.21.0-alpine
 
 WORKDIR /app
 
