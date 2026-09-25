@@ -8,5 +8,5 @@ export const environment = {
     stockfishServerURL: 'http://localhost:8080', // unified naming
     chessServerURL: 'http://localhost:8080',     // point to mock stockfish server for testing
   },
-	productionType: 'development', // development/production
+  productionType: 'development',
 };

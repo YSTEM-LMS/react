@@ -165,89 +165,125 @@ class GameManager {
     }
 
     /**
+     * Verifies that the holder of `credentials` is the real, paired mentor of
+     * `claimedStudent`, via middlewareNode's GET /user/getMentorship (the same
+     * bearer-forwarding pattern EventHandlers.js already uses for /gameResults).
+     * Fails closed: missing config, a missing/invalid token, a non-200 response,
+     * a network error, or a mismatched pairing all throw and reject the join.
+     * @param {string} claimedStudent
+     * @param {string} credentials
+     */
+    async verifyMentorPairing(claimedStudent, credentials) {
+        if (!process.env.MIDDLEWARE_URL) {
+            console.error("[createOrJoinPuzzle] MIDDLEWARE_URL unset — rejecting mentor join");
+            throw new Error("Server misconfigured: cannot verify mentor pairing");
+        }
+        if (!credentials) {
+            throw new Error("A login token is required to join as a mentor");
+        }
+
+        let data;
+        try {
+            const response = await fetch(`${process.env.MIDDLEWARE_URL}/user/getMentorship`, {
+                headers: {
+                    // NOTE: /gameResults uses "Authentication" here, matching its own
+                    // requireAuth check — but GET /user/getMentorship is protected by
+                    // passport-jwt's fromAuthHeaderAsBearerToken(), which only reads
+                    // the standard "Authorization" header. Using "Authentication" here
+                    // would make this check silently reject every valid token.
+                    Authorization: `Bearer ${credentials}`,
+                },
+            });
+            if (response.status !== 200) {
+                throw new Error("Could not verify mentor pairing");
+            }
+            data = await response.json();
+        } catch (e) {
+            throw new Error("Could not verify mentor pairing");
+        }
+
+        if (!data || !data.username || data.username !== claimedStudent) {
+            throw new Error("You are not this student's mentor");
+        }
+    }
+
+    /**
      *
      * @param {Object} param0 - Contains student, mentor, role, socketId
      * @returns {Object} Game object, assigned color, and new game status
      */
-    createOrJoinPuzzle({ student, mentor, role, socketId, credentials }, io) {
-        let game = this.ongoingGames.find(
-            (g) => g.student.username === student || g.mentor.username === mentor
-        );
-        const socket = io.sockets.sockets.get(socketId); // the socket id that initiated connection
-
+    async createOrJoinPuzzle({ student, mentor, role, socketId, credentials }, io) {
         // must be a student or mentor to connect to server
-        if (role != "student" && role != "mentor") {
+        if (role !== "student" && role !== "mentor") {
             throw new Error("Invalid role!");
         }
 
-        // Player already in a puzzle, so serve as a guest
-        if (game) {
-            console.log("already in a game")
-            if (role == "student") {
-                game.student.id = socketId; // record guest socket id
-                socket.emit("guest"); // notify client that they join as guest
-                const socket2 = io.sockets.sockets.get(game.mentor.id);
-                socket2.emit("guest"); 
-                socket.emit("boardstate", JSON.stringify({ 
-                    boardState: game.boardState.fen(), // pass existing game state to guest client
-                    color: game.student.color
-                }));
-                socket.emit("message", JSON.stringify({ message: game.puzzle }));
-                console.log("emtting hints!!", game.puzzle);
-                return { game, color: game.student.color, newGame: false };
-            }
-            else if (role == "mentor") {
-                game.mentor.id = socketId; // record guest socket id
-                socket.emit("guest"); // notify client that they join as guest
-                const socket2 = io.sockets.sockets.get(game.student.id);
-                socket2.emit("guest"); 
-                socket.emit("boardstate", JSON.stringify({ 
-                    boardState: game.boardState.fen(), // pass existing game state to guest client
-                    color: game.student.color 
-                }));
-                socket.emit("message", JSON.stringify({ message: game.puzzle }));
-                console.log("emtting hints!!", game.puzzle);
-                return { game, color: game.mentor.color, newGame: false };
-            }
-            else {
-                throw new Error("Invalid role!");
+        // The mentor seat gets a live view into another user's puzzle session,
+        // so it must be verified against the real mentor/student pairing before
+        // anyone is seated. Student joins are unchanged (see PuzzleStreak.tsx,
+        // which shares this room model but has no real mentor to verify against).
+        if (role === "mentor") {
+            await this.verifyMentorPairing(student, credentials);
+        }
+
+        const socket = io.sockets.sockets.get(socketId);
+
+        // A puzzle room is keyed to the STUDENT (the solver). Both the student's
+        // client and the mentor's client send the same student username, so both
+        // resolve to the same room regardless of who connects first.
+        let game = this.ongoingGames.find((g) => g.student.username === student);
+
+        if (!game) {
+            // First contact for this student — create the room. The student seat
+            // is the host/solver; the mentor seat is a passive observer.
+            game = {
+                student: {
+                    username: student,
+                    id: role === "student" ? socketId : null,
+                    color: "white",
+                    credentials: credentials,
+                },
+                mentor: {
+                    username: mentor,
+                    id: role === "mentor" ? socketId : null,
+                    color: "white", // student & mentor are on the same side in a puzzle
+                },
+                boardState: new Chess(),
+                pastStates: [],
+                puzzle: "No hints available",
+                isPuzzle: true,
+            };
+            this.ongoingGames.push(game);
+        } else {
+            // Room exists — record/refresh this client's socket id on its seat.
+            if (role === "student") {
+                game.student.id = socketId;
+                if (credentials) game.student.credentials = credentials;
+            } else {
+                game.mentor.id = socketId;
             }
         }
 
-        // Game has not been created yet, so player will serve as host
-        socket.emit("host");
-        console.log("creating new game in game manager")
-
-        // Create a new game instance
-        const board = new Chess(); // default to a simple chess game
-        const studentColor = "white"; // default to white
-        const mentorColor = "white"; // in a puzzle, student and mentor are on the same side
-
-        const newGame = {
-            student: {
-                username: student,
-                id: role === "student" ? socketId : null,
-                color: studentColor,
-                credentials: credentials,
-            },
-            mentor: {
-                username: mentor,
-                id: role === "mentor" ? socketId : null,
-                color: mentorColor
-            },
-            boardState: board,
-            pastStates: [],
-            puzzle: "No hints available",
-        };
-        console.log("created puzzle:", newGame.puzzle);
-
-        // record the new game created
-        this.ongoingGames.push(newGame);
+        // Role — not connection order — decides who drives the puzzle:
+        //   student => host (solves), mentor => guest (watches only).
+        // This makes the Socratic flow deterministic: the student always solves
+        // and the mentor always observes, even if the mentor connects first.
+        if (role === "student") {
+            socket.emit("host");
+        } else {
+            socket.emit("guest");
+            // Show the observing mentor the current board + hints immediately.
+            socket.emit("boardstate", JSON.stringify({
+                boardState: game.boardState.fen(),
+                color: game.student.color,
+            }));
+            socket.emit("message", JSON.stringify({ message: game.puzzle }));
+        }
 
         return {
-            game: newGame,
-            color: role === "student" ? studentColor : mentorColor,
-            newGame: true
+            game,
+            color: role === "student" ? game.student.color : game.mentor.color,
+            newGame: role === "student",
         };
     }
 
@@ -264,6 +300,10 @@ class GameManager {
 
         if (!game) {
             throw new Error("Game not found for this socket!");
+        }
+
+        if (game.isPuzzle && socketId !== game.student.id) {
+            throw new Error("Only the student may move in a puzzle!");
         }
 
         const board = game.boardState;
@@ -350,6 +390,10 @@ class GameManager {
 
         if (!game) {
             throw new Error("Cannot undo: no active game found for this socket.");
+        }
+
+        if (game.isPuzzle && socketId !== game.student.id) {
+            throw new Error("Only the student may undo in a puzzle!");
         }
 
         const board = game.boardState;

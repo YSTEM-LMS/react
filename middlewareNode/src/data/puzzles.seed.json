@@ -1,0 +1,4970 @@
+[
+  {
+    "PuzzleId": "00008",
+    "FEN": "r6k/pp2r2p/4Rp1Q/3p4/8/1N1P2R1/PqP2bPP/7K b - - 0 24",
+    "Moves": "f2g3 e6e7 b2b1 b3c1 b1c1 h6c1",
+    "Rating": 1939,
+    "NbPlays": 10000,
+    "Themes": "crushing hangingPiece long middlegame",
+    "GameUrl": "https://lichess.org/training/00008"
+  },
+  {
+    "PuzzleId": "0000D",
+    "FEN": "5rk1/1p3ppp/pq3b2/8/8/1P1Q1N2/P4PPP/3R2K1 w - - 2 27",
+    "Moves": "d3d6 f8d8 d6d8 f6d8",
+    "Rating": 1559,
+    "NbPlays": 37137,
+    "Themes": "advantage endgame short",
+    "GameUrl": "https://lichess.org/training/0000D"
+  },
+  {
+    "PuzzleId": "0008Q",
+    "FEN": "8/4R3/1p2P3/p4r2/P6p/1P3Pk1/4K3/8 w - - 1 64",
+    "Moves": "e7f7 f5e5 e2f1 e5e6",
+    "Rating": 1383,
+    "NbPlays": 767,
+    "Themes": "advantage endgame rookEndgame short",
+    "GameUrl": "https://lichess.org/training/0008Q"
+  },
+  {
+    "PuzzleId": "0009B",
+    "FEN": "r2qr1k1/b1p2ppp/pp4n1/P1P1p3/4P1n1/B2P2Pb/3NBP1P/RN1QR1K1 b - - 1 16",
+    "Moves": "b6c5 e2g4 h3g4 d1g4",
+    "Rating": 1066,
+    "NbPlays": 608,
+    "Themes": "advantage middlegame short",
+    "GameUrl": "https://lichess.org/training/0009B"
+  },
+  {
+    "PuzzleId": "000Pw",
+    "FEN": "6k1/5p1p/4p3/4q3/3nN3/2Q3P1/PP3P1P/6K1 w - - 2 37",
+    "Moves": "e4d2 d4e2 g1f1 e2c3",
+    "Rating": 1547,
+    "NbPlays": 629,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/000Pw"
+  },
+  {
+    "PuzzleId": "000Sa",
+    "FEN": "2Q2bk1/5p1p/p5p1/2p3P1/2r1B3/7P/qPQ2P2/2K4R b - - 0 32",
+    "Moves": "c4c2 e4c2 a2a1 c2b1",
+    "Rating": 1622,
+    "NbPlays": 2204,
+    "Themes": "advantage endgame short",
+    "GameUrl": "https://lichess.org/training/000Sa"
+  },
+  {
+    "PuzzleId": "000VW",
+    "FEN": "r4r2/1p3pkp/p5p1/3R1N1Q/3P4/8/P1q2P2/3R2K1 b - - 3 25",
+    "Moves": "g6f5 d5c5 c2e4 h5g5 g7h8 g5f6",
+    "Rating": 2869,
+    "NbPlays": 318,
+    "Themes": "crushing endgame long",
+    "GameUrl": "https://lichess.org/training/000VW"
+  },
+  {
+    "PuzzleId": "000Vc",
+    "FEN": "8/8/4k1p1/2KpP2p/5PP1/8/8/8 w - - 0 53",
+    "Moves": "g4h5 g6h5 f4f5 e6e5 f5f6 e5f6",
+    "Rating": 1569,
+    "NbPlays": 115,
+    "Themes": "crushing endgame long pawnEndgame",
+    "GameUrl": "https://lichess.org/training/000Vc"
+  },
+  {
+    "PuzzleId": "000Zo",
+    "FEN": "4r3/1k6/pp3r2/1b2P2p/3R1p2/P1R2P2/1P4PP/6K1 w - - 0 35",
+    "Moves": "e5f6 e8e1 g1f2 e1f1",
+    "Rating": 1363,
+    "NbPlays": 655,
+    "Themes": "endgame mate mateIn2 operaMate short",
+    "GameUrl": "https://lichess.org/training/000Zo"
+  },
+  {
+    "PuzzleId": "000aY",
+    "FEN": "r4rk1/pp3ppp/2n1b3/q1pp2B1/8/P1Q2NP1/1PP1PP1P/2KR3R w - - 0 15",
+    "Moves": "g5e7 a5c3 b2c3 c6e7",
+    "Rating": 1412,
+    "NbPlays": 529,
+    "Themes": "advantage master middlegame short",
+    "GameUrl": "https://lichess.org/training/000aY"
+  },
+  {
+    "PuzzleId": "000h0",
+    "FEN": "5rk1/p5p1/3bpr1p/1Pp4q/3pR3/1P1Q1N2/P4PPP/4R1K1 w - - 4 22",
+    "Moves": "e4e6 f6f3 g2f3 h5h2 g1f1 h2h3 f1e2 h3e6",
+    "Rating": 2067,
+    "NbPlays": 195,
+    "Themes": "advantage interference kingsideAttack middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/000h0"
+  },
+  {
+    "PuzzleId": "000hf",
+    "FEN": "r1bqk2r/pp1nbNp1/2p1p2p/8/2BP4/1PN3P1/P3QP1P/3R1RK1 b kq - 0 19",
+    "Moves": "e8f7 e2e6 f7f8 e6f7",
+    "Rating": 1530,
+    "NbPlays": 749,
+    "Themes": "mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/000hf"
+  },
+  {
+    "PuzzleId": "000jr",
+    "FEN": "5k2/1p4pp/p5n1/5Q2/3BpP2/1P2PP1K/P1q4P/7r b - - 1 33",
+    "Moves": "f8g8 f5d5 g8f8 d4c5 c2c5 d5c5",
+    "Rating": 2152,
+    "NbPlays": 91,
+    "Themes": "crushing endgame long",
+    "GameUrl": "https://lichess.org/training/000jr"
+  },
+  {
+    "PuzzleId": "000lC",
+    "FEN": "3r3r/pQNk1ppp/1qnb1n2/1B6/8/8/PPP3PP/3R1R1K w - - 5 19",
+    "Moves": "d1d6 d7d6 b7b6 a7b6",
+    "Rating": 1349,
+    "NbPlays": 4662,
+    "Themes": "advantage hangingPiece middlegame short",
+    "GameUrl": "https://lichess.org/training/000lC"
+  },
+  {
+    "PuzzleId": "000mr",
+    "FEN": "5r1k/5rp1/p7/1b2B2p/1P1P1Pq1/2R1Q3/P3p1P1/2R3K1 w - - 0 41",
+    "Moves": "e3g3 f7f4 e5f4 f8f4",
+    "Rating": 1957,
+    "NbPlays": 114,
+    "Themes": "crushing middlegame short",
+    "GameUrl": "https://lichess.org/training/000mr"
+  },
+  {
+    "PuzzleId": "000o3",
+    "FEN": "8/2p1k3/6p1/1p1P1p2/1P3P2/3K2Pp/7P/8 b - - 1 43",
+    "Moves": "e7d6 d3d4 g6g5 f4g5",
+    "Rating": 944,
+    "NbPlays": 189,
+    "Themes": "crushing endgame pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/000o3"
+  },
+  {
+    "PuzzleId": "000qP",
+    "FEN": "8/7R/8/5p2/4bk1P/8/2r2K2/6R1 w - - 7 51",
+    "Moves": "f2f1 f4f3 f1e1 c2c1 e1d2 c1g1",
+    "Rating": 2104,
+    "NbPlays": 1686,
+    "Themes": "crushing endgame exposedKing long skewer",
+    "GameUrl": "https://lichess.org/training/000qP"
+  },
+  {
+    "PuzzleId": "000rO",
+    "FEN": "3R4/8/K7/pB2b3/1p6/1P2k3/3p4/8 w - - 4 58",
+    "Moves": "a6a5 e5c7 a5b4 c7d8",
+    "Rating": 1110,
+    "NbPlays": 73,
+    "Themes": "crushing endgame fork master short",
+    "GameUrl": "https://lichess.org/training/000rO"
+  },
+  {
+    "PuzzleId": "000rZ",
+    "FEN": "2kr1b1r/p1p2pp1/2pqb3/7p/3N2n1/2NPB3/PPP2PPP/R2Q1RK1 w - - 2 13",
+    "Moves": "d4e6 d6h2",
+    "Rating": 633,
+    "NbPlays": 616,
+    "Themes": "kingsideAttack mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/000rZ"
+  },
+  {
+    "PuzzleId": "00143",
+    "FEN": "r2q1rk1/5ppp/1np5/p1b5/2p1B3/P7/1P3PPP/R1BQ1RK1 b - - 1 17",
+    "Moves": "d8f6 d1h5 h7h6 h5c5",
+    "Rating": 1798,
+    "NbPlays": 2940,
+    "Themes": "advantage middlegame short",
+    "GameUrl": "https://lichess.org/training/00143"
+  },
+  {
+    "PuzzleId": "0017R",
+    "FEN": "r2qk2r/pp2ppbp/1n1p2p1/3Pn3/2P5/2NBBP1P/PP3P2/R2QK2R b KQkq - 0 12",
+    "Moves": "e5c4 d3c4 b6c4 d1a4 d8d7 a4c4",
+    "Rating": 1610,
+    "NbPlays": 6028,
+    "Themes": "advantage fork long middlegame",
+    "GameUrl": "https://lichess.org/training/0017R"
+  },
+  {
+    "PuzzleId": "0018P",
+    "FEN": "5R2/1p6/p1p5/2P1rk2/2K3p1/2P1p1P1/1P5P/8 b - - 1 44",
+    "Moves": "f5e6 f8e8 e6f5 e8e5 f5e5 c4d3 e5d5 d3e3 a6a5 e3f4 d5c4 f4g4",
+    "Rating": 1910,
+    "NbPlays": 244,
+    "Themes": "crushing endgame exposedKing rookEndgame veryLong",
+    "GameUrl": "https://lichess.org/training/0018P"
+  },
+  {
+    "PuzzleId": "0018S",
+    "FEN": "2kr3r/pp3p2/4p2p/1N1p2p1/3Q4/1P1P4/2q2PPP/5RK1 b - - 1 20",
+    "Moves": "b7b6 d4a1 a7a5 f1c1",
+    "Rating": 2624,
+    "NbPlays": 1869,
+    "Themes": "advantage endgame pin short",
+    "GameUrl": "https://lichess.org/training/0018S"
+  },
+  {
+    "PuzzleId": "001Fg",
+    "FEN": "2R2r1k/pQ4pp/5rp1/3B4/q2n4/7P/P4PP1/5RK1 w - - 3 30",
+    "Moves": "c8c7 d4e2 g1h2 a4f4 h2h1 e2g3 f2g3 f4f1",
+    "Rating": 1286,
+    "NbPlays": 3053,
+    "Themes": "advantage middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/001Fg"
+  },
+  {
+    "PuzzleId": "001Hi",
+    "FEN": "6k1/pp1r1pp1/1qp1p2p/4P2P/5Q2/1P4R1/P1Pr1PP1/R5K1 b - - 4 23",
+    "Moves": "b6d4 f4f6 d4f2 f6f2 d2f2 g1f2",
+    "Rating": 2391,
+    "NbPlays": 32,
+    "Themes": "advantage endgame long pin",
+    "GameUrl": "https://lichess.org/training/001Hi"
+  },
+  {
+    "PuzzleId": "001KR",
+    "FEN": "6Qk/p1p3pp/4N3/1p6/2q1r1n1/2B5/PP4PP/3R1R1K b - - 0 28",
+    "Moves": "h8g8 f1f8",
+    "Rating": 588,
+    "NbPlays": 177,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/001KR"
+  },
+  {
+    "PuzzleId": "001Oo",
+    "FEN": "6k1/4p1bp/6p1/1p1pP3/1PpPp3/2P1P3/Q2B1KPP/3q4 b - - 2 23",
+    "Moves": "d1a4 a2a4 b5a4 b4b5 g8f7 b5b6",
+    "Rating": 2078,
+    "NbPlays": 62,
+    "Themes": "crushing endgame long quietMove",
+    "GameUrl": "https://lichess.org/training/001Oo"
+  },
+  {
+    "PuzzleId": "001Wz",
+    "FEN": "4r1k1/5ppp/r1p5/p1n1RP2/8/2P2N1P/2P3P1/3R2K1 b - - 0 21",
+    "Moves": "e8e5 d1d8 e5e8 d8e8",
+    "Rating": 1118,
+    "NbPlays": 86,
+    "Themes": "backRankMate endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/001Wz"
+  },
+  {
+    "PuzzleId": "001XA",
+    "FEN": "1qr2rk1/pb2bppp/8/8/2p1N3/P1Bn2P1/2Q2PBP/1R3RK1 b - - 3 23",
+    "Moves": "b8c7 b1b7 c7b7 e4f6 e7f6 g2b7",
+    "Rating": 1687,
+    "NbPlays": 1350,
+    "Themes": "crushing discoveredAttack long master middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/001XA"
+  },
+  {
+    "PuzzleId": "001aK",
+    "FEN": "6k1/5p2/4p3/P1B5/2P4P/4Pnp1/Rb1rN3/5K2 b - - 1 33",
+    "Moves": "d2e2 f1e2 g3g2 e3e4 f3d4 e2f2",
+    "Rating": 2082,
+    "NbPlays": 774,
+    "Themes": "crushing endgame hangingPiece long quietMove",
+    "GameUrl": "https://lichess.org/training/001aK"
+  },
+  {
+    "PuzzleId": "001cr",
+    "FEN": "8/3B2pp/p5k1/2p3P1/1p1p1K2/8/1P6/8 b - - 0 38",
+    "Moves": "c5c4 d7e8",
+    "Rating": 1582,
+    "NbPlays": 3218,
+    "Themes": "bishopEndgame endgame mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/001cr"
+  },
+  {
+    "PuzzleId": "001gi",
+    "FEN": "r6r/1pNk1ppp/2np4/b3p3/4P1b1/N1Q5/P4PPP/R3KB1R w KQ - 3 18",
+    "Moves": "c7a8 a5c3",
+    "Rating": 819,
+    "NbPlays": 273,
+    "Themes": "bodenMate hangingPiece mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/001gi"
+  },
+  {
+    "PuzzleId": "001h8",
+    "FEN": "2r3k1/2r4p/4p1p1/1p1q1pP1/p1bP1P1Q/P6R/5B2/2R3K1 b - - 5 34",
+    "Moves": "c4e2 h4h7 c7h7 c1c8 g8g7 c8c7",
+    "Rating": 1780,
+    "NbPlays": 620,
+    "Themes": "crushing deflection kingsideAttack long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/001h8"
+  },
+  {
+    "PuzzleId": "001kG",
+    "FEN": "rnbq3r/1p2bkpp/p4n2/8/2pNP3/2N5/PPP3PP/R1BQ1RK1 b - - 1 11",
+    "Moves": "e7c5 d1h5 f7g8 h5c5",
+    "Rating": 1963,
+    "NbPlays": 1158,
+    "Themes": "advantage opening pin short",
+    "GameUrl": "https://lichess.org/training/001kG"
+  },
+  {
+    "PuzzleId": "001m3",
+    "FEN": "7r/6k1/2b1pp2/8/P1N3p1/5nP1/4RP2/Q4K2 w - - 2 38",
+    "Moves": "e2e6 h8h1 f1e2 h1a1",
+    "Rating": 1455,
+    "NbPlays": 281,
+    "Themes": "advantage endgame short skewer",
+    "GameUrl": "https://lichess.org/training/001m3"
+  },
+  {
+    "PuzzleId": "001om",
+    "FEN": "5r1k/pp4pp/5p2/1BbQp1r1/6K1/7P/1PP3P1/3R3R w - - 2 26",
+    "Moves": "g4h4 c5f2 g2g3 f2g3",
+    "Rating": 1018,
+    "NbPlays": 226,
+    "Themes": "mate mateIn2 middlegame morphysMate short",
+    "GameUrl": "https://lichess.org/training/001om"
+  },
+  {
+    "PuzzleId": "001pC",
+    "FEN": "r4rk1/pp3ppp/3b4/2p1pPB1/7N/2PP3n/PP4PP/R2Q1RqK w - - 5 18",
+    "Moves": "f1g1 h3f2",
+    "Rating": 870,
+    "NbPlays": 433,
+    "Themes": "mate mateIn1 middlegame oneMove smotheredMate",
+    "GameUrl": "https://lichess.org/training/001pC"
+  },
+  {
+    "PuzzleId": "001u3",
+    "FEN": "2r3k1/p1q2pp1/Q3p2p/b1Np4/2nP1P2/4P1P1/5K1P/2B1N3 b - - 3 33",
+    "Moves": "c7b6 a6c8 g8h7 c8b7",
+    "Rating": 2190,
+    "NbPlays": 82,
+    "Themes": "advantage hangingPiece middlegame short",
+    "GameUrl": "https://lichess.org/training/001u3"
+  },
+  {
+    "PuzzleId": "001uD",
+    "FEN": "6k1/1p3pp1/1p5p/2r1p3/2n5/r3PN2/2RnNPPP/2R3K1 b - - 1 32",
+    "Moves": "f7f6 f3d2 c4d2 c2d2 c5c1 e2c1",
+    "Rating": 1877,
+    "NbPlays": 980,
+    "Themes": "advantage long middlegame",
+    "GameUrl": "https://lichess.org/training/001uD"
+  },
+  {
+    "PuzzleId": "001w5",
+    "FEN": "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29",
+    "Moves": "f8f7 c2h7 g8h7 g7g8q",
+    "Rating": 1034,
+    "NbPlays": 220,
+    "Themes": "advancedPawn attraction mate mateIn2 middlegame promotion short",
+    "GameUrl": "https://lichess.org/training/001w5"
+  },
+  {
+    "PuzzleId": "001wR",
+    "FEN": "6nr/pp3p1p/k1p5/8/1QN5/2P1P3/4KPqP/8 b - - 5 26",
+    "Moves": "b7b5 b4a5 a6b7 c4d6 b7b8 a5d8",
+    "Rating": 1152,
+    "NbPlays": 2632,
+    "Themes": "endgame long mate mateIn3",
+    "GameUrl": "https://lichess.org/training/001wR"
+  },
+  {
+    "PuzzleId": "001wb",
+    "FEN": "r3k2r/pb1p1ppp/1b4q1/1Q2P3/8/2NP1Pn1/PP4PP/R1B2R1K w kq - 1 17",
+    "Moves": "h2g3 g6h5",
+    "Rating": 1071,
+    "NbPlays": 275,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/001wb"
+  },
+  {
+    "PuzzleId": "001wr",
+    "FEN": "r4rk1/p3ppbp/Pp1q1np1/3PpbB1/2B5/2N5/1PPQ1PPP/3RR1K1 w - - 4 18",
+    "Moves": "f2f3 d6c5 g1h1 c5c4",
+    "Rating": 1068,
+    "NbPlays": 2484,
+    "Themes": "advantage fork master masterVsMaster middlegame short",
+    "GameUrl": "https://lichess.org/training/001wr"
+  },
+  {
+    "PuzzleId": "001xO",
+    "FEN": "k1r1b3/p1r1nppp/1p1qpn2/2Np4/1P1P4/PQRBPN2/5PPP/2R3K1 w - - 0 19",
+    "Moves": "d3a6 b6c5 a6c8 c5c4",
+    "Rating": 1847,
+    "NbPlays": 1387,
+    "Themes": "crushing master masterVsMaster middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/001xO"
+  },
+  {
+    "PuzzleId": "001xl",
+    "FEN": "8/4R1k1/p5pp/3B4/5q2/8/5P1P/6K1 b - - 5 40",
+    "Moves": "g7f6 e7f7 f6e5 f7f4",
+    "Rating": 1131,
+    "NbPlays": 11868,
+    "Themes": "advantage endgame master masterVsMaster short skewer superGM",
+    "GameUrl": "https://lichess.org/training/001xl"
+  },
+  {
+    "PuzzleId": "002CP",
+    "FEN": "r5k1/pp4pp/4p1q1/4p3/3n4/P5P1/1PP2Q1P/2KR1R2 w - - 4 24",
+    "Moves": "f2e3 g6c2",
+    "Rating": 925,
+    "NbPlays": 90,
+    "Themes": "endgame mate mateIn1 oneMove queensideAttack",
+    "GameUrl": "https://lichess.org/training/002CP"
+  },
+  {
+    "PuzzleId": "002Ds",
+    "FEN": "8/1pp5/p2p4/P2Pk2p/1PP1p2P/2n1K2P/3N4/8 b - - 0 45",
+    "Moves": "b7b6 b4b5 c3d1 e3e2 a6b5 a5a6",
+    "Rating": 1992,
+    "NbPlays": 118,
+    "Themes": "crushing endgame knightEndgame long",
+    "GameUrl": "https://lichess.org/training/002Ds"
+  },
+  {
+    "PuzzleId": "002GQ",
+    "FEN": "5rk1/5ppp/4p3/4N3/8/1Pn5/5PPP/5RK1 w - - 0 28",
+    "Moves": "f1c1 c3e2 g1f1 e2c1",
+    "Rating": 654,
+    "NbPlays": 136,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/002GQ"
+  },
+  {
+    "PuzzleId": "002HE",
+    "FEN": "1qr2rk1/1p1p1ppp/pB2p1n1/7n/2P1P3/1Q2NP1P/PP2B1Pb/3R1RK1 w - - 1 20",
+    "Moves": "g1f2 b8g3",
+    "Rating": 1116,
+    "NbPlays": 508,
+    "Themes": "master mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/002HE"
+  },
+  {
+    "PuzzleId": "002Hv",
+    "FEN": "8/8/8/3N2p1/5b2/3p3P/5kP1/3K4 w - - 16 56",
+    "Moves": "d5f4 g5f4 h3h4 f2g2 h4h5 f4f3 d1d2 f3f2",
+    "Rating": 1621,
+    "NbPlays": 28,
+    "Themes": "advancedPawn crushing endgame veryLong",
+    "GameUrl": "https://lichess.org/training/002Hv"
+  },
+  {
+    "PuzzleId": "002IE",
+    "FEN": "r3brk1/5pp1/p1nqpn1p/P2pN3/2pP4/2P1PN2/5PPP/RB1QK2R b KQ - 4 16",
+    "Moves": "c6e5 d4e5 d6e7 e5f6",
+    "Rating": 1229,
+    "NbPlays": 38,
+    "Themes": "advantage fork middlegame short",
+    "GameUrl": "https://lichess.org/training/002IE"
+  },
+  {
+    "PuzzleId": "002KJ",
+    "FEN": "r3kb1r/ppq2ppp/4pn2/2Ppn3/1P4bP/2P2N2/P3BPP1/RNBQ1RK1 b kq - 2 10",
+    "Moves": "f8e7 f3e5 c7e5 e2g4",
+    "Rating": 1615,
+    "NbPlays": 1729,
+    "Themes": "crushing discoveredAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/002KJ"
+  },
+  {
+    "PuzzleId": "002LF",
+    "FEN": "7r/p2q1pk1/1pp3p1/8/6P1/4Q3/PP1R1P1r/5KN1 b - - 0 38",
+    "Moves": "d7g4 e3e5 f7f6 e5c7 g7h6 c7h2",
+    "Rating": 2128,
+    "NbPlays": 599,
+    "Themes": "advantage endgame interference long",
+    "GameUrl": "https://lichess.org/training/002LF"
+  },
+  {
+    "PuzzleId": "002LW",
+    "FEN": "3r1rk1/1b1n1pp1/3p4/p4PPQ/4P3/3q1BN1/8/2R2RK1 b - - 1 28",
+    "Moves": "d7e5 f5f6 e5f3 f1f3",
+    "Rating": 2464,
+    "NbPlays": 115,
+    "Themes": "advantage middlegame short",
+    "GameUrl": "https://lichess.org/training/002LW"
+  },
+  {
+    "PuzzleId": "002Mm",
+    "FEN": "rn1qr1k1/ppp3pQ/3p1pP1/3Pp3/2P1P3/8/PP3PP1/R1B1K3 b Q - 2 16",
+    "Moves": "g8f8 h7h8 f8e7 h8g7",
+    "Rating": 921,
+    "NbPlays": 242,
+    "Themes": "deflection mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/002Mm"
+  },
+  {
+    "PuzzleId": "002O7",
+    "FEN": "r3qrk1/2p2pp1/p2bpn1p/2ppNb2/3P1P2/1PP1P1B1/P2N2PP/R2Q1RK1 b - - 0 14",
+    "Moves": "f5g4 e5g4 f6g4 d1g4",
+    "Rating": 1008,
+    "NbPlays": 357,
+    "Themes": "crushing middlegame short",
+    "GameUrl": "https://lichess.org/training/002O7"
+  },
+  {
+    "PuzzleId": "002Q2",
+    "FEN": "7k/p4R1p/3p3r/2pN1n2/2PbBBb1/3P2P1/P3r3/5R1K w - - 1 28",
+    "Moves": "f4h6 f5g3",
+    "Rating": 911,
+    "NbPlays": 428,
+    "Themes": "cornerMate mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/002Q2"
+  },
+  {
+    "PuzzleId": "002Tf",
+    "FEN": "r3kbnr/ppp1qppp/2n5/3pP3/5B2/4PQ2/PPP2PPP/RN2KB1R w KQkq - 1 7",
+    "Moves": "f1b5 e7b4 b1c3 b4b2",
+    "Rating": 1561,
+    "NbPlays": 181,
+    "Themes": "advantage fork opening short",
+    "GameUrl": "https://lichess.org/training/002Tf"
+  },
+  {
+    "PuzzleId": "002Ua",
+    "FEN": "r4rk1/pp3ppp/3p1q2/P1P1p3/2B5/2B2n2/2P2P1P/R2Q1RK1 w - - 0 16",
+    "Moves": "g1h1 f6f4 d1f3 f4f3",
+    "Rating": 1646,
+    "NbPlays": 8401,
+    "Themes": "crushing kingsideAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/002Ua"
+  },
+  {
+    "PuzzleId": "002Uy",
+    "FEN": "8/8/1p6/k7/P1R5/1K5r/8/8 w - - 26 64",
+    "Moves": "c4c3 h3c3 b3c3 a5a4 c3b2 a4b4",
+    "Rating": 1682,
+    "NbPlays": 6791,
+    "Themes": "crushing defensiveMove endgame long rookEndgame",
+    "GameUrl": "https://lichess.org/training/002Uy"
+  },
+  {
+    "PuzzleId": "002VP",
+    "FEN": "8/6p1/2B1bn2/6k1/3B4/6K1/4P3/8 b - - 4 44",
+    "Moves": "e6d5 d4f6 g5f5 c6d5",
+    "Rating": 1466,
+    "NbPlays": 144,
+    "Themes": "crushing endgame short",
+    "GameUrl": "https://lichess.org/training/002VP"
+  },
+  {
+    "PuzzleId": "002X3",
+    "FEN": "6k1/2q2p1p/4pPp1/4P3/p1pP1P2/RrP5/6QP/4B1K1 b - - 0 33",
+    "Moves": "b3a3 g2a8 c7b8 a8b8",
+    "Rating": 970,
+    "NbPlays": 10,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/002X3"
+  },
+  {
+    "PuzzleId": "002Z9",
+    "FEN": "4r1k1/1p2R1p1/p2p2Pp/P1pP4/5q2/1R3p2/1P1Q3P/5B1K b - - 0 34",
+    "Moves": "f4d2 e7e8",
+    "Rating": 1231,
+    "NbPlays": 52,
+    "Themes": "endgame hangingPiece master mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/002Z9"
+  },
+  {
+    "PuzzleId": "002bK",
+    "FEN": "8/7p/2b1k3/p2p1pPB/1n1P3P/N1p1P3/4K3/8 b - - 1 42",
+    "Moves": "c6b5 a3b5 c3c2 e2d2",
+    "Rating": 1113,
+    "NbPlays": 821,
+    "Themes": "advantage endgame hangingPiece short",
+    "GameUrl": "https://lichess.org/training/002bK"
+  },
+  {
+    "PuzzleId": "002e5",
+    "FEN": "r2q4/pp1n1kbp/3P2b1/6N1/6Q1/P3P3/6P1/4K2R b K - 1 21",
+    "Moves": "f7g8 g4c4 g8h8 h1h7 g6h7 g5f7",
+    "Rating": 2632,
+    "NbPlays": 387,
+    "Themes": "crushing long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/002e5"
+  },
+  {
+    "PuzzleId": "002e8",
+    "FEN": "r3nrk1/1b3pp1/4pb2/p3q3/1p1N4/3B2R1/PPPQN2P/1K4R1 b - - 1 23",
+    "Moves": "a8d8 d2h6 g7g6 g3h3",
+    "Rating": 2504,
+    "NbPlays": 572,
+    "Themes": "crushing defensiveMove master middlegame pin short",
+    "GameUrl": "https://lichess.org/training/002e8"
+  },
+  {
+    "PuzzleId": "002mG",
+    "FEN": "5r1k/B1p3pp/2Qb1p2/3Pq3/P6P/8/2P3K1/3R1R2 w - - 1 36",
+    "Moves": "g2f2 f8e8 c6e8 e5e8",
+    "Rating": 2372,
+    "NbPlays": 204,
+    "Themes": "advantage middlegame quietMove short",
+    "GameUrl": "https://lichess.org/training/002mG"
+  },
+  {
+    "PuzzleId": "002p5",
+    "FEN": "r1bqr1k1/pp1nbpp1/2p2n2/6P1/2BP4/P7/1PQNNPP1/R3K2R b KQ - 0 13",
+    "Moves": "f6d5 c2h7 g8f8 h7h8",
+    "Rating": 908,
+    "NbPlays": 182,
+    "Themes": "kingsideAttack mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/002p5"
+  },
+  {
+    "PuzzleId": "002rd",
+    "FEN": "r6k/q1pb1p1p/1b3Pr1/p1ppP2Q/3P2p1/4B3/PP2NRPP/3R2K1 b - - 1 25",
+    "Moves": "d7e6 e2f4 c5d4 f4g6 f7g6 h5h6",
+    "Rating": 1795,
+    "NbPlays": 129,
+    "Themes": "crushing kingsideAttack long middlegame pin",
+    "GameUrl": "https://lichess.org/training/002rd"
+  },
+  {
+    "PuzzleId": "002uV",
+    "FEN": "r2r2k1/1p2qppp/2n1p3/5n2/p2P4/P2Q1N2/BP3PPP/2R1R1K1 w - - 4 20",
+    "Moves": "d3f5 e6f5 e1e7 c6e7",
+    "Rating": 1558,
+    "NbPlays": 81,
+    "Themes": "advantage middlegame short",
+    "GameUrl": "https://lichess.org/training/002uV"
+  },
+  {
+    "PuzzleId": "002vV",
+    "FEN": "8/6k1/2R4p/5p1P/5P1K/6P1/8/r7 w - - 2 58",
+    "Moves": "c6b6 a1h1",
+    "Rating": 564,
+    "NbPlays": 601,
+    "Themes": "endgame master mate mateIn1 oneMove rookEndgame",
+    "GameUrl": "https://lichess.org/training/002vV"
+  },
+  {
+    "PuzzleId": "002xh",
+    "FEN": "2nk4/8/2PBp1n1/1pK1P1p1/1P4P1/8/8/8 b - - 2 42",
+    "Moves": "g6h4 c5b5 h4g2 b5a6 g2e3 a6b7",
+    "Rating": 2065,
+    "NbPlays": 34,
+    "Themes": "crushing endgame long",
+    "GameUrl": "https://lichess.org/training/002xh"
+  },
+  {
+    "PuzzleId": "0030b",
+    "FEN": "6k1/5ppp/5nb1/pp6/6rP/5N1Q/Pq2r1P1/3R2RK b - - 4 32",
+    "Moves": "g6e4 d1d8 f6e8 d8e8",
+    "Rating": 538,
+    "NbPlays": 195,
+    "Themes": "backRankMate mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/0030b"
+  },
+  {
+    "PuzzleId": "00347",
+    "FEN": "8/2p5/8/2pPk2p/8/4K2P/6P1/8 w - - 1 42",
+    "Moves": "e3d3 h5h4 d3c4 e5d6",
+    "Rating": 2264,
+    "NbPlays": 123,
+    "Themes": "crushing endgame pawnEndgame quietMove short",
+    "GameUrl": "https://lichess.org/training/00347"
+  },
+  {
+    "PuzzleId": "0039T",
+    "FEN": "1r5r/p3kp2/4p2p/4P3/3R1Pp1/6P1/P1P4P/4K2R w K - 1 25",
+    "Moves": "d4a4 b8b1 e1f2 b1h1 a4a7 e7f8",
+    "Rating": 1127,
+    "NbPlays": 835,
+    "Themes": "crushing defensiveMove endgame long rookEndgame skewer",
+    "GameUrl": "https://lichess.org/training/0039T"
+  },
+  {
+    "PuzzleId": "003AX",
+    "FEN": "2r2rk1/5ppp/bq2p3/p1ppP1N1/Pb1P2P1/1P2P2P/2QN4/2R1K2R b K - 1 18",
+    "Moves": "c5d4 c2h7",
+    "Rating": 1001,
+    "NbPlays": 669,
+    "Themes": "kingsideAttack mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/003AX"
+  },
+  {
+    "PuzzleId": "003Ec",
+    "FEN": "3r4/p4R2/1pb2Pp1/n1p1Q1kp/8/P2q4/1P4PP/6RK b - - 2 32",
+    "Moves": "d3f5 e5e3 f5f4 h2h4 g5f5 e3h3",
+    "Rating": 2245,
+    "NbPlays": 310,
+    "Themes": "crushing long middlegame pin",
+    "GameUrl": "https://lichess.org/training/003Ec"
+  },
+  {
+    "PuzzleId": "003IM",
+    "FEN": "8/5kp1/p3pb2/8/6Pp/1P4qP/P2RQ3/7K w - - 2 34",
+    "Moves": "e2g2 g3e1 g2g1 e1d2",
+    "Rating": 1096,
+    "NbPlays": 55,
+    "Themes": "crushing deflection endgame master short",
+    "GameUrl": "https://lichess.org/training/003IM"
+  },
+  {
+    "PuzzleId": "003IX",
+    "FEN": "8/3pk3/R7/1R2Pp1p/2PPnKr1/8/8/8 w - - 4 43",
+    "Moves": "f4f5 e4g3",
+    "Rating": 1693,
+    "NbPlays": 2205,
+    "Themes": "endgame mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/003IX"
+  },
+  {
+    "PuzzleId": "003Jb",
+    "FEN": "6k1/3bqr1p/2rpp1pR/p7/Pp1QP3/1B3P2/1PP3P1/2KR4 w - - 6 22",
+    "Moves": "d4a7 e7g5 c1b1 g5h6",
+    "Rating": 993,
+    "NbPlays": 392,
+    "Themes": "advantage fork master middlegame short",
+    "GameUrl": "https://lichess.org/training/003Jb"
+  },
+  {
+    "PuzzleId": "003S3",
+    "FEN": "r4k1r/pNqnppb1/6pn/2p3Np/7P/2P2Q2/PP3PP1/R1B1K2R b KQ - 2 15",
+    "Moves": "a8b8 g5e6 f8g8 e6c7",
+    "Rating": 1494,
+    "NbPlays": 14592,
+    "Themes": "advantage middlegame pin short",
+    "GameUrl": "https://lichess.org/training/003S3"
+  },
+  {
+    "PuzzleId": "003Tx",
+    "FEN": "2r5/pR5p/5p1k/4p3/4r3/B4nPP/PP3P2/1K2R3 w - - 0 27",
+    "Moves": "e1e4 f3d2 b1a1 c8c1",
+    "Rating": 1512,
+    "NbPlays": 767,
+    "Themes": "backRankMate endgame fork mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/003Tx"
+  },
+  {
+    "PuzzleId": "003UW",
+    "FEN": "8/6pk/7p/2p5/2qp4/5PP1/P3QK1P/8 b - - 1 40",
+    "Moves": "c4d5 e2e4 d5e4 f3e4",
+    "Rating": 1473,
+    "NbPlays": 977,
+    "Themes": "advantage endgame queenEndgame short",
+    "GameUrl": "https://lichess.org/training/003UW"
+  },
+  {
+    "PuzzleId": "003YF",
+    "FEN": "r4rk1/1pp2ppp/p2p4/2bPp3/2P1Pn1q/P1N2B2/1P3P2/R1BQK1R1 w Q - 1 15",
+    "Moves": "c1f4 h4f2",
+    "Rating": 1061,
+    "NbPlays": 82,
+    "Themes": "attackingF2F7 mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/003YF"
+  },
+  {
+    "PuzzleId": "003aS",
+    "FEN": "8/8/5k1p/6p1/1R4PP/1p2KP2/8/1r6 w - - 0 43",
+    "Moves": "h4h5 b3b2 b4b6 f6e5 f3f4 g5f4",
+    "Rating": 1890,
+    "NbPlays": 249,
+    "Themes": "advancedPawn crushing defensiveMove endgame long rookEndgame",
+    "GameUrl": "https://lichess.org/training/003aS"
+  },
+  {
+    "PuzzleId": "003cs",
+    "FEN": "2r1kbnr/pp4pp/4p3/3pP1N1/3q4/1P2B3/P3Q1PP/nN3RK1 b k - 1 16",
+    "Moves": "d4e5 f1f8 e8f8 e3c5 c8c5 e2e5 c5c1 g1f2",
+    "Rating": 2123,
+    "NbPlays": 98,
+    "Themes": "advantage attraction discoveredAttack exposedKing middlegame sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/003cs"
+  },
+  {
+    "PuzzleId": "003eP",
+    "FEN": "8/r1b1q2k/2p3p1/2Pp4/1P2p1n1/2B1P3/NQ6/2K4R b - - 1 36",
+    "Moves": "h7g8 h1h8 g8f7 h8h7 f7e8 h7e7",
+    "Rating": 1156,
+    "NbPlays": 1756,
+    "Themes": "crushing exposedKing long middlegame skewer",
+    "GameUrl": "https://lichess.org/training/003eP"
+  },
+  {
+    "PuzzleId": "003if",
+    "FEN": "8/3q1kpp/1P2p3/4Q3/5P2/4B2P/2r3PK/8 b - - 0 43",
+    "Moves": "d7b7 e5h5 f7e7 e3c5 c2c5 h5c5",
+    "Rating": 1700,
+    "NbPlays": 27,
+    "Themes": "advantage endgame long",
+    "GameUrl": "https://lichess.org/training/003if"
+  },
+  {
+    "PuzzleId": "003jH",
+    "FEN": "rn3rk1/p5pp/3N4/4np1q/5Q2/1P3K2/PB1P2P1/2R4R w - - 0 25",
+    "Moves": "f3f2 e5d3 f2e3 d3f4 h1h5 f4h5",
+    "Rating": 1058,
+    "NbPlays": 325,
+    "Themes": "crushing fork long middlegame",
+    "GameUrl": "https://lichess.org/training/003jH"
+  },
+  {
+    "PuzzleId": "003jb",
+    "FEN": "r3kb1r/p4ppp/b1p1p3/3q4/3Q4/4BN2/PPP2PPP/R3K2R b KQkq - 0 11",
+    "Moves": "c6c5 d4a4 a6b5 a4b5",
+    "Rating": 961,
+    "NbPlays": 2677,
+    "Themes": "crushing fork master middlegame short",
+    "GameUrl": "https://lichess.org/training/003jb"
+  },
+  {
+    "PuzzleId": "003jv",
+    "FEN": "1R6/1p2k2p/p2n2p1/4K3/8/6P1/P6P/8 w - - 10 37",
+    "Moves": "b8h8 d6f7 e5e4 f7h8",
+    "Rating": 1006,
+    "NbPlays": 343,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/003jv"
+  },
+  {
+    "PuzzleId": "003md",
+    "FEN": "r1b1k2N/ppp3pp/2n5/2bp4/7q/1B4n1/PPPP1P1P/RNBQ1RK1 w q - 0 10",
+    "Moves": "f1e1 g3e4 e1e4 d5e4 d1h5 h4h5 b3f7 h5f7",
+    "Rating": 2171,
+    "NbPlays": 215,
+    "Themes": "crushing defensiveMove middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/003md"
+  },
+  {
+    "PuzzleId": "003mh",
+    "FEN": "r4k1r/1pp2p2/p2p3p/3N4/3P2q1/8/PPP5/1K2Q1NR b - - 1 23",
+    "Moves": "a8e8 e1e8 f8e8 d5f6 e8e7 f6g4",
+    "Rating": 1304,
+    "NbPlays": 457,
+    "Themes": "advantage attraction fork long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/003mh"
+  },
+  {
+    "PuzzleId": "003nQ",
+    "FEN": "6rk/pp6/2n5/3ppn1p/3p4/2P2P1q/PP3QNB/R4R1K w - - 2 29",
+    "Moves": "f1g1 f5g3 f2g3 g8g3",
+    "Rating": 1286,
+    "NbPlays": 34,
+    "Themes": "crushing kingsideAttack master middlegame pin short",
+    "GameUrl": "https://lichess.org/training/003nQ"
+  },
+  {
+    "PuzzleId": "003o0",
+    "FEN": "r1bqk2r/pp1nbppp/3p4/1B1p4/3P1B2/8/PPP2PPP/R2QK1NR w KQkq - 2 9",
+    "Moves": "g1f3 d8a5 d1d2 a5b5",
+    "Rating": 1002,
+    "NbPlays": 682,
+    "Themes": "advantage fork master opening short",
+    "GameUrl": "https://lichess.org/training/003o0"
+  },
+  {
+    "PuzzleId": "003r5",
+    "FEN": "r2qr1k1/ppp2ppp/4b3/3P4/1nP2Q2/2N2N1P/PP3KP1/R4R2 w - - 1 15",
+    "Moves": "d5e6 b4d3 f2g1 d3f4",
+    "Rating": 1107,
+    "NbPlays": 860,
+    "Themes": "crushing fork middlegame short",
+    "GameUrl": "https://lichess.org/training/003r5"
+  },
+  {
+    "PuzzleId": "003wQ",
+    "FEN": "2r2rk1/6pp/3Q1q2/8/3N1B2/6P1/PP1K3P/R4b2 w - - 0 24",
+    "Moves": "a1f1 f6d6 f4d6 f8f1",
+    "Rating": 1814,
+    "NbPlays": 2040,
+    "Themes": "advantage discoveredAttack middlegame pin short",
+    "GameUrl": "https://lichess.org/training/003wQ"
+  },
+  {
+    "PuzzleId": "0040n",
+    "FEN": "r7/p2k1pp1/p1p1pn2/3p4/3P4/P3PQp1/1PP2P1q/2K4R w - - 0 20",
+    "Moves": "h1h2 g3h2 f3h3 f6g4",
+    "Rating": 1325,
+    "NbPlays": 2442,
+    "Themes": "advancedPawn advantage endgame short",
+    "GameUrl": "https://lichess.org/training/0040n"
+  },
+  {
+    "PuzzleId": "0042j",
+    "FEN": "3r2k1/4nppp/pq1p1b2/1p2P3/2r2P2/2P1NR2/PP1Q2BP/3R2K1 b - - 0 24",
+    "Moves": "d6e5 d2d8 b6d8 d1d8",
+    "Rating": 551,
+    "NbPlays": 1451,
+    "Themes": "backRankMate mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/0042j"
+  },
+  {
+    "PuzzleId": "00465",
+    "FEN": "3r1Q1k/pp4pp/2p5/6q1/5R2/2P5/P1P2PPP/3rR1K1 b - - 8 27",
+    "Moves": "d8f8 f4f8",
+    "Rating": 572,
+    "NbPlays": 373,
+    "Themes": "backRankMate endgame mate mateIn1 oneMove queenRookEndgame",
+    "GameUrl": "https://lichess.org/training/00465"
+  },
+  {
+    "PuzzleId": "0047P",
+    "FEN": "8/1N3k2/6p1/8/2P3P1/pr6/R5K1/8 w - - 1 56",
+    "Moves": "g2f1 b3b1 f1e2 b1b2 e2d1 b2a2",
+    "Rating": 1766,
+    "NbPlays": 95,
+    "Themes": "crushing endgame exposedKing fork long master",
+    "GameUrl": "https://lichess.org/training/0047P"
+  },
+  {
+    "PuzzleId": "0048h",
+    "FEN": "4r3/p5k1/2p2R1p/2Pp4/1P1pr1P1/P6P/8/3R3K w - - 1 35",
+    "Moves": "f6c6 e4e1 d1e1 e8e1 h1g2 d4d3",
+    "Rating": 1134,
+    "NbPlays": 1929,
+    "Themes": "crushing endgame exposedKing long rookEndgame",
+    "GameUrl": "https://lichess.org/training/0048h"
+  },
+  {
+    "PuzzleId": "004Ao",
+    "FEN": "4qk2/1b3rR1/p7/1p2Q3/4P2P/P2P3K/2r5/3R4 w - - 5 41",
+    "Moves": "g7f7 e8f7 e5h8 f8e7",
+    "Rating": 1711,
+    "NbPlays": 26,
+    "Themes": "advantage endgame short",
+    "GameUrl": "https://lichess.org/training/004Ao"
+  },
+  {
+    "PuzzleId": "004Ax",
+    "FEN": "8/8/4R1kp/p7/5rPK/8/7P/8 b - - 2 42",
+    "Moves": "g6f7 e6h6 f4f6 h6h7 f7g6 h7a7",
+    "Rating": 2064,
+    "NbPlays": 647,
+    "Themes": "crushing endgame exposedKing long rookEndgame",
+    "GameUrl": "https://lichess.org/training/004Ax"
+  },
+  {
+    "PuzzleId": "004JD",
+    "FEN": "3r4/R7/2p5/p1P2p2/1p4k1/nP6/P2KNP2/8 w - - 3 41",
+    "Moves": "d2e3 a3c2",
+    "Rating": 1296,
+    "NbPlays": 2790,
+    "Themes": "cornerMate endgame mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/004JD"
+  },
+  {
+    "PuzzleId": "004LZ",
+    "FEN": "8/7R/5p2/p7/7P/2p5/3k2r1/1K2N3 w - - 3 48",
+    "Moves": "e1g2 c3c2 b1a2 c2c1q h7d7 d2e2",
+    "Rating": 1197,
+    "NbPlays": 2051,
+    "Themes": "advancedPawn crushing defensiveMove deflection endgame long promotion",
+    "GameUrl": "https://lichess.org/training/004LZ"
+  },
+  {
+    "PuzzleId": "004Lu",
+    "FEN": "8/p1p4p/4Pk2/2PP1p1P/1r3r2/5B2/P3RK2/8 b - - 3 38",
+    "Moves": "f6e7 d5d6 c7d6 c5d6 e7d6 e6e7",
+    "Rating": 1189,
+    "NbPlays": 1788,
+    "Themes": "advancedPawn advantage endgame exposedKing long master",
+    "GameUrl": "https://lichess.org/training/004Lu"
+  },
+  {
+    "PuzzleId": "004Op",
+    "FEN": "2kr2r1/1bp4n/1pq1p2p/p1P5/1P3B2/P6P/5RP1/RB2Q1K1 w - - 3 26",
+    "Moves": "e1f1 d8d1 f1d1 g8g2 g1f1 g2g1 f1e2 g1d1",
+    "Rating": 2261,
+    "NbPlays": 2648,
+    "Themes": "crushing deflection kingsideAttack middlegame pin sacrifice skewer veryLong",
+    "GameUrl": "https://lichess.org/training/004Op"
+  },
+  {
+    "PuzzleId": "004RF",
+    "FEN": "5rk1/5ppp/1p6/1qp2P1Q/3p3P/6R1/6PK/8 b - - 0 30",
+    "Moves": "c5c4 g3g7 g8g7 f5f6 g7f6 h5b5",
+    "Rating": 1750,
+    "NbPlays": 59,
+    "Themes": "attraction crushing discoveredAttack endgame long sacrifice",
+    "GameUrl": "https://lichess.org/training/004RF"
+  },
+  {
+    "PuzzleId": "004WZ",
+    "FEN": "r6k/1b3pp1/p1q1pn1p/2p5/P1B5/1PN4Q/2P1RP1P/R4Kr1 w - - 2 26",
+    "Moves": "f1g1 c6h1",
+    "Rating": 866,
+    "NbPlays": 137,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/004WZ"
+  },
+  {
+    "PuzzleId": "004X6",
+    "FEN": "1r4k1/p4ppp/2Q5/3pq3/8/P6P/2PR1PP1/Rr4K1 w - - 1 26",
+    "Moves": "a1b1 b8b1 d2d1 b1d1",
+    "Rating": 1152,
+    "NbPlays": 14,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/004X6"
+  },
+  {
+    "PuzzleId": "004XI",
+    "FEN": "8/3kqp2/4p3/p2p4/3P1P2/4P1rP/7r/1QR2K2 b - - 1 34",
+    "Moves": "e7a3 b1b7 d7e8 c1c8",
+    "Rating": 982,
+    "NbPlays": 35,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/004XI"
+  },
+  {
+    "PuzzleId": "004b0",
+    "FEN": "5kB1/4b3/4P3/2p2P2/2b5/8/p7/B6K w - - 4 48",
+    "Moves": "g8f7 e7g5 f5f6 g5e3 a1e5 e3f4 e5f4 a2a1q",
+    "Rating": 2368,
+    "NbPlays": 36,
+    "Themes": "advancedPawn bishopEndgame crushing deflection endgame promotion quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/004b0"
+  },
+  {
+    "PuzzleId": "004iZ",
+    "FEN": "r2r2k1/2q1bpp1/3p1n1p/1ppN4/1P1BP3/P5Q1/4RPPP/R5K1 b - - 1 20",
+    "Moves": "f6d5 g3g7",
+    "Rating": 499,
+    "NbPlays": 1033,
+    "Themes": "kingsideAttack mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/004iZ"
+  },
+  {
+    "PuzzleId": "004kB",
+    "FEN": "4rr1k/pQpn2pp/3p1q2/8/8/2P5/PP3PPP/RN3RK1 w - - 1 16",
+    "Moves": "b7c7 f6f2 f1f2 e8e1 f2f1 e1f1",
+    "Rating": 1209,
+    "NbPlays": 195,
+    "Themes": "kingsideAttack long mate mateIn3 middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/004kB"
+  },
+  {
+    "PuzzleId": "004mT",
+    "FEN": "5Q2/8/1b1kp1p1/5p2/3p4/5qPK/7P/8 b - - 1 51",
+    "Moves": "d6c6 f8a8 c6d6 a8f3",
+    "Rating": 1331,
+    "NbPlays": 9176,
+    "Themes": "advantage endgame short skewer",
+    "GameUrl": "https://lichess.org/training/004mT"
+  },
+  {
+    "PuzzleId": "004nd",
+    "FEN": "3q2k1/2r5/pp3p1Q/2b1n3/P3N3/2P5/1P4PP/R6K b - - 0 24",
+    "Moves": "c7d7 e4f6 d8f6 h6f6",
+    "Rating": 898,
+    "NbPlays": 209,
+    "Themes": "crushing fork middlegame short",
+    "GameUrl": "https://lichess.org/training/004nd"
+  },
+  {
+    "PuzzleId": "004yJ",
+    "FEN": "r4rk1/1bp2ppp/p1q1pn2/2P5/8/3B1N2/P1P1QPPP/R4RK1 w - - 0 16",
+    "Moves": "f3e5 c6g2",
+    "Rating": 658,
+    "NbPlays": 116,
+    "Themes": "kingsideAttack mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/004yJ"
+  },
+  {
+    "PuzzleId": "004zI",
+    "FEN": "2q3k1/4br1p/6RQ/1p1n2p1/7P/1P4P1/1B2PP2/6K1 b - - 0 27",
+    "Moves": "h7g6 h6h8",
+    "Rating": 1429,
+    "NbPlays": 396,
+    "Themes": "endgame mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/004zI"
+  },
+  {
+    "PuzzleId": "004zh",
+    "FEN": "4b1k1/4Pr2/3R2pp/1ppBP1q1/8/PP4P1/2P4P/3R3K b - - 2 38",
+    "Moves": "g5h5 d1f1 g8g7 d5f7 e8f7 d6d8 h5e5 f1f7 g7f7 e7e8q e5e8 d8e8",
+    "Rating": 2624,
+    "NbPlays": 118,
+    "Themes": "advancedPawn attraction crushing endgame exposedKing intermezzo pin promotion quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/004zh"
+  },
+  {
+    "PuzzleId": "0050w",
+    "FEN": "5rk1/1p2p1rp/p2p4/2pPb2R/2P1P3/1P1BKP1R/8/8 b - - 4 30",
+    "Moves": "g7g3 h3g3 e5g3 h5g5 g8f7 g5g3",
+    "Rating": 1131,
+    "NbPlays": 1516,
+    "Themes": "crushing endgame fork long",
+    "GameUrl": "https://lichess.org/training/0050w"
+  },
+  {
+    "PuzzleId": "005Bm",
+    "FEN": "4rk2/p1q5/1p3Q1b/8/1p5N/2P1p3/P3P3/2K5 b - - 0 43",
+    "Moves": "c7f7 h4g6 f8g8 f6h8",
+    "Rating": 1327,
+    "NbPlays": 6239,
+    "Themes": "endgame mate mateIn2 pin short",
+    "GameUrl": "https://lichess.org/training/005Bm"
+  },
+  {
+    "PuzzleId": "005Ep",
+    "FEN": "5kr1/ppR3p1/3R3p/8/1r1n4/8/1P3PPP/2K5 b - - 4 31",
+    "Moves": "d4b5 d6d8",
+    "Rating": 752,
+    "NbPlays": 389,
+    "Themes": "endgame mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/005Ep"
+  },
+  {
+    "PuzzleId": "005HG",
+    "FEN": "r2q1rk1/p1p2pp1/3bbn1p/4N3/2Q5/1P4P1/PB1PPP1P/RN2K2R w KQ - 1 12",
+    "Moves": "c4c2 d6e5 b2e5 d8d5 f2f3 d5e5",
+    "Rating": 1788,
+    "NbPlays": 708,
+    "Themes": "advantage clearance fork long opening",
+    "GameUrl": "https://lichess.org/training/005HG"
+  },
+  {
+    "PuzzleId": "005N7",
+    "FEN": "r6k/2q3pp/8/2p1n3/R1Qp4/7P/2PB1PP1/6K1 b - - 0 32",
+    "Moves": "e5c4 a4a8 c7b8 a8b8",
+    "Rating": 684,
+    "NbPlays": 1923,
+    "Themes": "backRankMate endgame hangingPiece mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/005N7"
+  },
+  {
+    "PuzzleId": "005do",
+    "FEN": "7r/pp1k4/4p1b1/3pP1Np/3P1P1K/8/P7/2R5 b - - 7 42",
+    "Moves": "h8f8 c1c7 d7c7 g5e6 c7b6 e6f8",
+    "Rating": 1433,
+    "NbPlays": 48,
+    "Themes": "attraction crushing deflection endgame fork long sacrifice",
+    "GameUrl": "https://lichess.org/training/005do"
+  },
+  {
+    "PuzzleId": "005f3",
+    "FEN": "r5k1/2p1pp2/pp4p1/1q1r4/5P2/2QP2R1/PP6/1K4R1 b - - 0 32",
+    "Moves": "d5h5 g3g6 f7g6 g1g6 g8f7 c3g7 f7e8 g7g8 e8d7 g8e6 d7d8 g6g8",
+    "Rating": 1787,
+    "NbPlays": 16160,
+    "Themes": "crushing endgame sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/005f3"
+  },
+  {
+    "PuzzleId": "005jJ",
+    "FEN": "r1b1qrk1/pp1n1pbp/2pp1np1/4p3/2PP1B2/2NBPN1P/PP3PP1/R2Q1RK1 w - - 0 10",
+    "Moves": "d4e5 d6e5 f4h2 e5e4",
+    "Rating": 1215,
+    "NbPlays": 37,
+    "Themes": "advantage opening short",
+    "GameUrl": "https://lichess.org/training/005jJ"
+  },
+  {
+    "PuzzleId": "005jR",
+    "FEN": "8/5p1k/1P4pp/3Qn3/4BP2/6P1/1p2P2P/2q3K1 w - - 1 34",
+    "Moves": "g1f2 b2b1q e4b1 e5g4 f2f3 c1h1",
+    "Rating": 2794,
+    "NbPlays": 290,
+    "Themes": "advancedPawn crushing endgame long promotion",
+    "GameUrl": "https://lichess.org/training/005jR"
+  },
+  {
+    "PuzzleId": "005nD",
+    "FEN": "3rk2r/2qn1pp1/p1Q1R3/3n3p/8/8/PP4PP/5R1K b k - 0 23",
+    "Moves": "f7e6 c6e6 d5e7 e6f7",
+    "Rating": 1119,
+    "NbPlays": 1388,
+    "Themes": "fork mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/005nD"
+  },
+  {
+    "PuzzleId": "005wJ",
+    "FEN": "r3kb1r/ppqn1ppp/4pn2/1Q2Nb2/3P4/8/PP2PPPP/RNB1KB1R w KQkq - 4 9",
+    "Moves": "e5d7 c7c1",
+    "Rating": 1390,
+    "NbPlays": 1235,
+    "Themes": "hangingPiece mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/005wJ"
+  },
+  {
+    "PuzzleId": "005wy",
+    "FEN": "1r6/pp2kpp1/2n1p1n1/3p2PQ/5P2/2PqP3/PP1N4/2KR3R w - - 3 27",
+    "Moves": "h5h7 c6b4 c3b4 b8c8 d2c4 c8c4",
+    "Rating": 1957,
+    "NbPlays": 7080,
+    "Themes": "long mate mateIn3 middlegame queensideAttack sacrifice",
+    "GameUrl": "https://lichess.org/training/005wy"
+  },
+  {
+    "PuzzleId": "005x9",
+    "FEN": "r1b1kb1Q/ppp4p/6pB/3P4/2pn4/8/PPP1qPPP/RN1K3R w q - 2 13",
+    "Moves": "d1c1 e2c2",
+    "Rating": 838,
+    "NbPlays": 272,
+    "Themes": "mate mateIn1 middlegame oneMove queensideAttack",
+    "GameUrl": "https://lichess.org/training/005x9"
+  },
+  {
+    "PuzzleId": "005xu",
+    "FEN": "8/3k4/1K1P4/2P3r1/R7/5b2/8/8 b - - 0 68",
+    "Moves": "g5g8 a4a7 d7e6 a7e7 e6d5 d6d7",
+    "Rating": 1914,
+    "NbPlays": 36,
+    "Themes": "advancedPawn crushing endgame exposedKing long",
+    "GameUrl": "https://lichess.org/training/005xu"
+  },
+  {
+    "PuzzleId": "0061g",
+    "FEN": "6k1/pp3pp1/2p1q1Pp/3b4/8/6Q1/PB3Pp1/3RrNK1 b - - 2 27",
+    "Moves": "e1d1 g3b8 e6e8 b8e8",
+    "Rating": 801,
+    "NbPlays": 269,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/0061g"
+  },
+  {
+    "PuzzleId": "00656",
+    "FEN": "7r/ppp2kp1/2nb1pp1/3p3r/3P2q1/2PQB2P/PP3PP1/R3R1K1 w - - 0 18",
+    "Moves": "h3g4 h5h1",
+    "Rating": 688,
+    "NbPlays": 203,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/00656"
+  },
+  {
+    "PuzzleId": "0068B",
+    "FEN": "r1q3k1/4bppp/pp2pn2/4B3/8/2N2Q2/PPPR1PPP/6K1 b - - 0 18",
+    "Moves": "f6d7 d2d7 c8d7 f3a8",
+    "Rating": 1419,
+    "NbPlays": 6175,
+    "Themes": "crushing deflection middlegame short",
+    "GameUrl": "https://lichess.org/training/0068B"
+  },
+  {
+    "PuzzleId": "006E1",
+    "FEN": "5rk1/R4pp1/1p5p/3Q4/1PPp2q1/3P2P1/5P2/4nK2 w - - 0 34",
+    "Moves": "f1e1 f8e8 e1f1 g4h3 d5g2 e8e1 f1e1 h3g2",
+    "Rating": 1608,
+    "NbPlays": 20936,
+    "Themes": "crushing deflection endgame veryLong",
+    "GameUrl": "https://lichess.org/training/006E1"
+  },
+  {
+    "PuzzleId": "006GK",
+    "FEN": "2kr1br1/ppBb1ppp/8/3P2Q1/3n2n1/5N2/PP3qPP/RN2R2K b - - 0 16",
+    "Moves": "d4f3 g5d8",
+    "Rating": 1020,
+    "NbPlays": 21,
+    "Themes": "mate mateIn1 oneMove opening queensideAttack",
+    "GameUrl": "https://lichess.org/training/006GK"
+  },
+  {
+    "PuzzleId": "006HV",
+    "FEN": "1r6/5k2/2p1pNp1/p5Pp/1pQ1P2P/2P4R/KP3P2/3q4 w - - 4 31",
+    "Moves": "c4c6 b4b3 a2a3 d1a1",
+    "Rating": 1159,
+    "NbPlays": 1015,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/006HV"
+  },
+  {
+    "PuzzleId": "006NL",
+    "FEN": "1r6/k2qn1b1/p1b1p1p1/2PpPpN1/2nN1P1P/p4B2/1PP2Q2/1K1R3R w - - 0 32",
+    "Moves": "d4c6 e7c6 b2b3 a3a2 b1a1 c4e5 f4e5 g7e5 a1a2 b8b5",
+    "Rating": 2545,
+    "NbPlays": 125,
+    "Themes": "advancedPawn advantage middlegame pin veryLong",
+    "GameUrl": "https://lichess.org/training/006NL"
+  },
+  {
+    "PuzzleId": "006OI",
+    "FEN": "8/p7/5k2/P5R1/6KP/8/8/5r2 w - - 5 53",
+    "Moves": "g5g8 f1g1 g4f4 g1g8",
+    "Rating": 843,
+    "NbPlays": 263,
+    "Themes": "crushing endgame rookEndgame short skewer",
+    "GameUrl": "https://lichess.org/training/006OI"
+  },
+  {
+    "PuzzleId": "006XF",
+    "FEN": "r5kr/pp1qb1p1/2p4p/3pPb1Q/3P4/2P1B3/PP4PP/R4RK1 b - - 1 17",
+    "Moves": "f5e4 h5f7 g8h7 f1f6 e7f6 f7d7",
+    "Rating": 2372,
+    "NbPlays": 1929,
+    "Themes": "advantage long middlegame pin",
+    "GameUrl": "https://lichess.org/training/006XF"
+  },
+  {
+    "PuzzleId": "006fF",
+    "FEN": "r1b4r/pp1k2pp/2nb2q1/1B1p2B1/3p3Q/8/PPP2PPP/3RR1K1 b - - 5 17",
+    "Moves": "h7h6 h4g4 d7c7 g5d8 h8d8 g4g6",
+    "Rating": 1851,
+    "NbPlays": 7823,
+    "Themes": "advantage discoveredAttack exposedKing long middlegame",
+    "GameUrl": "https://lichess.org/training/006fF"
+  },
+  {
+    "PuzzleId": "006om",
+    "FEN": "1r3k2/5p1p/2p1pp2/P2n4/2r1N3/P4PK1/2R2P1P/2R5 b - - 9 29",
+    "Moves": "c4a4 e4c5 a4a5 c5d7 f8g7 d7b8",
+    "Rating": 1937,
+    "NbPlays": 8911,
+    "Themes": "crushing endgame fork long master",
+    "GameUrl": "https://lichess.org/training/006om"
+  },
+  {
+    "PuzzleId": "006pe",
+    "FEN": "r4r2/2q1NN2/4bQpk/2n4p/pp5P/8/1PP2PP1/2KR3R b - - 0 28",
+    "Moves": "e6f7 e7f5 h6h7 f6g7",
+    "Rating": 1741,
+    "NbPlays": 5028,
+    "Themes": "master mate mateIn2 middlegame pin short",
+    "GameUrl": "https://lichess.org/training/006pe"
+  },
+  {
+    "PuzzleId": "006wz",
+    "FEN": "2r5/4ppkp/5bp1/1p6/1P6/P3B3/2r2PPP/1R1R2K1 b - - 2 22",
+    "Moves": "f6b2 b1b2 c2b2 e3d4 f7f6 d4b2",
+    "Rating": 1426,
+    "NbPlays": 545,
+    "Themes": "attraction crushing endgame fork long sacrifice",
+    "GameUrl": "https://lichess.org/training/006wz"
+  },
+  {
+    "PuzzleId": "006yP",
+    "FEN": "6R1/8/Kpk1p3/1p1pP3/6P1/PPP1r3/8/8 b - - 3 40",
+    "Moves": "e3c3 g8c8 c6d7 c8c3",
+    "Rating": 819,
+    "NbPlays": 152,
+    "Themes": "crushing endgame master rookEndgame short skewer",
+    "GameUrl": "https://lichess.org/training/006yP"
+  },
+  {
+    "PuzzleId": "0071N",
+    "FEN": "6k1/p4pp1/1p5p/4b3/4B3/4P1P1/PpR2PKP/3r4 b - - 1 30",
+    "Moves": "b2b1q c2c8 d1d8 c8d8",
+    "Rating": 555,
+    "NbPlays": 281,
+    "Themes": "endgame mate mateIn2 pillsburysMate short",
+    "GameUrl": "https://lichess.org/training/0071N"
+  },
+  {
+    "PuzzleId": "00734",
+    "FEN": "rn3bk1/2rqp2p/2p3p1/3p1p2/3P1P1B/pP1BP3/P1Q2PRP/1KR5 b - - 0 26",
+    "Moves": "b8a6 d3f5 e7e6 f5g6",
+    "Rating": 1692,
+    "NbPlays": 128,
+    "Themes": "crushing middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00734"
+  },
+  {
+    "PuzzleId": "00761",
+    "FEN": "3r2k1/1b3pbR/p2P2P1/3p2N1/2p5/2P2N2/PP6/2K5 b - - 0 28",
+    "Moves": "f7g6 h7g7 g8g7 g5e6 g7g8 e6d8",
+    "Rating": 1401,
+    "NbPlays": 21972,
+    "Themes": "attraction crushing endgame exposedKing fork long sacrifice",
+    "GameUrl": "https://lichess.org/training/00761"
+  },
+  {
+    "PuzzleId": "0078T",
+    "FEN": "rk5r/1b3R2/pp2p2q/4P2p/B2p3B/4R2P/PP4P1/5Q1K b - - 0 27",
+    "Moves": "d4e3 f7b7 b8b7 f1f7 b7b8 h4e7",
+    "Rating": 2248,
+    "NbPlays": 88,
+    "Themes": "attraction crushing defensiveMove exposedKing long middlegame queensideAttack sacrifice",
+    "GameUrl": "https://lichess.org/training/0078T"
+  },
+  {
+    "PuzzleId": "00798",
+    "FEN": "6K1/4k3/4P3/6pp/6rP/4R1P1/8/8 w - - 0 60",
+    "Moves": "g8g7 g5h4 g7h6 h4g3",
+    "Rating": 1917,
+    "NbPlays": 551,
+    "Themes": "crushing discoveredAttack endgame rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00798"
+  },
+  {
+    "PuzzleId": "007AH",
+    "FEN": "3r1n2/1bp1bkpp/p1q2n2/1p6/3P4/P1N3B1/1PP2PPP/R2QR1K1 w - - 5 18",
+    "Moves": "d1e2 c6g2",
+    "Rating": 637,
+    "NbPlays": 153,
+    "Themes": "kingsideAttack master mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/007AH"
+  },
+  {
+    "PuzzleId": "007HB",
+    "FEN": "rn2q1k1/pp3ppp/2pb4/3p1B2/2Pn4/1Q3N2/PP3PPP/R1B4K w - - 0 15",
+    "Moves": "f3d4 e8e1",
+    "Rating": 538,
+    "NbPlays": 185,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/007HB"
+  },
+  {
+    "PuzzleId": "007QU",
+    "FEN": "2rq1rk1/1b3p1p/p3p3/1p1pB1p1/2nP2N1/1RP1PP2/P1Q3PP/3R2K1 b - - 1 22",
+    "Moves": "f7f5 g4h6",
+    "Rating": 1143,
+    "NbPlays": 214,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/007QU"
+  },
+  {
+    "PuzzleId": "007Rn",
+    "FEN": "4r1k1/p4p1p/1p6/6q1/3P2n1/P4Q2/1P1B2P1/7K w - - 0 34",
+    "Moves": "d2g5 e8e1 f3f1 e1f1",
+    "Rating": 990,
+    "NbPlays": 78,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/007Rn"
+  },
+  {
+    "PuzzleId": "007XE",
+    "FEN": "2kr3r/p1p1bpp1/2p2n1p/8/8/1P6/P1P1RPPP/RNB3K1 w - - 1 16",
+    "Moves": "e2e7 d8d1 e7e1 d1e1",
+    "Rating": 607,
+    "NbPlays": 89,
+    "Themes": "backRankMate fork mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/007XE"
+  },
+  {
+    "PuzzleId": "007bH",
+    "FEN": "r2q1rk1/2p2ppn/2pbp2p/p2p4/P4PQ1/1P1PP3/1BPN2PP/4RR1K b - - 4 15",
+    "Moves": "f7f5 g4g7",
+    "Rating": 963,
+    "NbPlays": 25,
+    "Themes": "kingsideAttack mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/007bH"
+  },
+  {
+    "PuzzleId": "007c6",
+    "FEN": "2kr3r/pp1n2pp/2QB1bp1/5q2/2B5/8/PPP2PPP/3R1RK1 b - - 0 17",
+    "Moves": "b7c6 c4a6",
+    "Rating": 721,
+    "NbPlays": 163,
+    "Themes": "bodenMate mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/007c6"
+  },
+  {
+    "PuzzleId": "007en",
+    "FEN": "rn3rk1/4pp1p/3p2pB/2q4P/3bP1b1/Pp2Q3/1P2B3/1K1R2NR w - - 0 20",
+    "Moves": "e3d4 c5c2 b1a1 a8a3 b2a3 c2a2",
+    "Rating": 1795,
+    "NbPlays": 3675,
+    "Themes": "long mate mateIn3 middlegame queensideAttack sacrifice",
+    "GameUrl": "https://lichess.org/training/007en"
+  },
+  {
+    "PuzzleId": "007fJ",
+    "FEN": "8/1P3ppp/8/8/8/2pk3P/3p2P1/3K4 w - - 0 52",
+    "Moves": "b7b8q c3c2",
+    "Rating": 595,
+    "NbPlays": 670,
+    "Themes": "advancedPawn endgame mate mateIn1 oneMove queenEndgame",
+    "GameUrl": "https://lichess.org/training/007fJ"
+  },
+  {
+    "PuzzleId": "007hv",
+    "FEN": "6k1/5p1p/1p4p1/p1bN1p2/2Pq1P2/1P5P/1P1Q2P1/7K w - - 1 32",
+    "Moves": "d2c3 d4g1",
+    "Rating": 1090,
+    "NbPlays": 141,
+    "Themes": "endgame master mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/007hv"
+  },
+  {
+    "PuzzleId": "007ku",
+    "FEN": "r1bq3Q/1np2kp1/p5B1/1p1Pp3/1Pn2BP1/2b2P2/P3K3/R4N2 b - - 5 35",
+    "Moves": "f7g6 h8h5 g6f6 f4g5",
+    "Rating": 1663,
+    "NbPlays": 965,
+    "Themes": "mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/007ku"
+  },
+  {
+    "PuzzleId": "007mr",
+    "FEN": "5k2/p2r3p/1p4pP/3r1q2/3Rp3/2P5/PP3PQ1/K3R3 w - - 0 33",
+    "Moves": "d4e4 d5d1 e1d1 d7d1",
+    "Rating": 661,
+    "NbPlays": 191,
+    "Themes": "backRankMate endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/007mr"
+  },
+  {
+    "PuzzleId": "007tv",
+    "FEN": "r3k1nr/1pp2ppp/1pnp2q1/4p1B1/2B1P3/3P1Q1P/PPP2PP1/R4RK1 b kq - 0 11",
+    "Moves": "g6g5 f3f7 e8d8 f7f8 d8d7 f8a8",
+    "Rating": 1119,
+    "NbPlays": 1322,
+    "Themes": "advantage attackingF2F7 long middlegame skewer",
+    "GameUrl": "https://lichess.org/training/007tv"
+  },
+  {
+    "PuzzleId": "0082f",
+    "FEN": "r4rk1/2q2ppp/3pp3/4Pb1N/pp6/1B4Q1/PPP3PP/1K1RR3 b - - 0 21",
+    "Moves": "a4b3 g3g7",
+    "Rating": 827,
+    "NbPlays": 529,
+    "Themes": "kingsideAttack mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/0082f"
+  },
+  {
+    "PuzzleId": "0088O",
+    "FEN": "7Q/2p5/1p2prp1/p4k1p/P4p1P/8/6RK/3q4 b - - 2 37",
+    "Moves": "d1a4 g2g5 f5e4 h8f6",
+    "Rating": 1133,
+    "NbPlays": 444,
+    "Themes": "crushing deflection endgame short",
+    "GameUrl": "https://lichess.org/training/0088O"
+  },
+  {
+    "PuzzleId": "008D5",
+    "FEN": "r1bqk2r/pp3ppp/4p2n/3pP3/1b1P1P2/2N5/PP4PP/R1BQKB1R b KQkq - 2 9",
+    "Moves": "h6f5 d1a4 c8d7 a4b4",
+    "Rating": 1421,
+    "NbPlays": 1190,
+    "Themes": "advantage fork master opening short",
+    "GameUrl": "https://lichess.org/training/008D5"
+  },
+  {
+    "PuzzleId": "008EC",
+    "FEN": "6k1/4rpp1/p6p/7P/q1pP1R2/2Pb2Q1/P4RP1/6K1 w - - 9 31",
+    "Moves": "f4f7 e7f7 g3b8 g8h7 f2f7 a4d1 g1f2 d1f1 f2g3 f1f7",
+    "Rating": 2268,
+    "NbPlays": 432,
+    "Themes": "advantage endgame skewer veryLong",
+    "GameUrl": "https://lichess.org/training/008EC"
+  },
+  {
+    "PuzzleId": "008GK",
+    "FEN": "1k1r4/ppp3p1/8/1P5p/8/P3n2P/2P1r1P1/B3NRK1 b - - 4 31",
+    "Moves": "d8d1 f1f8 d1d8 f8d8",
+    "Rating": 665,
+    "NbPlays": 1777,
+    "Themes": "backRankMate endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/008GK"
+  },
+  {
+    "PuzzleId": "008LD",
+    "FEN": "8/6pp/4N1k1/5p2/5P2/5rPb/4R2P/6K1 w - - 0 35",
+    "Moves": "e6g5 f3f1",
+    "Rating": 403,
+    "NbPlays": 181,
+    "Themes": "endgame mate mateIn1 oneMove operaMate",
+    "GameUrl": "https://lichess.org/training/008LD"
+  },
+  {
+    "PuzzleId": "008LT",
+    "FEN": "r4rk1/6p1/b3p1nN/p1pp4/1p3P1q/3P1Q1B/PPP2PK1/R6R b - - 0 26",
+    "Moves": "g8h8 h6f7 f8f7 h3e6",
+    "Rating": 2205,
+    "NbPlays": 1376,
+    "Themes": "crushing kingsideAttack middlegame pin sacrifice short",
+    "GameUrl": "https://lichess.org/training/008LT"
+  },
+  {
+    "PuzzleId": "008Nz",
+    "FEN": "6k1/2p2ppp/pnp5/B7/2P3PP/1P1bPPR1/r6r/3R2K1 b - - 1 29",
+    "Moves": "d3e2 d1d8",
+    "Rating": 473,
+    "NbPlays": 892,
+    "Themes": "backRankMate mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/008Nz"
+  },
+  {
+    "PuzzleId": "008P4",
+    "FEN": "8/4k3/1p1p4/rP2p1p1/P2nP1P1/3BK3/8/R7 w - - 0 35",
+    "Moves": "e3d2 d4b3 d2c3 b3a1",
+    "Rating": 713,
+    "NbPlays": 1700,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/008P4"
+  },
+  {
+    "PuzzleId": "008Y3",
+    "FEN": "r5k1/1p1rqpp1/p3pnp1/2PN4/8/1Q5P/PP3PP1/3RR1K1 b - - 0 24",
+    "Moves": "e7c5 d5f6 g7f6 d1d7",
+    "Rating": 1055,
+    "NbPlays": 664,
+    "Themes": "advantage discoveredAttack kingsideAttack master middlegame short",
+    "GameUrl": "https://lichess.org/training/008Y3"
+  },
+  {
+    "PuzzleId": "008aL",
+    "FEN": "7k/6p1/1r5p/5p2/P2Rp3/4P3/5PPP/6K1 w - - 0 39",
+    "Moves": "a4a5 b6b1 d4d1 b1d1",
+    "Rating": 594,
+    "NbPlays": 64,
+    "Themes": "backRankMate endgame mate mateIn2 rookEndgame short",
+    "GameUrl": "https://lichess.org/training/008aL"
+  },
+  {
+    "PuzzleId": "008cl",
+    "FEN": "r3k2r/ppp2p1p/2n1pp2/7q/2PN2b1/2BP1Pb1/PP2B1P1/R2Q1RK1 w kq - 1 16",
+    "Moves": "f3g4 h5h2",
+    "Rating": 908,
+    "NbPlays": 477,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/008cl"
+  },
+  {
+    "PuzzleId": "008lc",
+    "FEN": "7k/pb1qn2n/1p2R2Q/2p2p2/2Pp4/3B4/PP3PrP/4RK2 b - - 1 27",
+    "Moves": "g2g7 h6g7 h8g7 e6e7 d7e7 e1e7",
+    "Rating": 1973,
+    "NbPlays": 2216,
+    "Themes": "attraction crushing exposedKing fork long middlegame",
+    "GameUrl": "https://lichess.org/training/008lc"
+  },
+  {
+    "PuzzleId": "008o6",
+    "FEN": "Q5k1/p1p3p1/5rP1/8/3P4/7P/q3r3/B4RK1 b - - 1 34",
+    "Moves": "f6f8 a8f8",
+    "Rating": 468,
+    "NbPlays": 128,
+    "Themes": "endgame mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/008o6"
+  },
+  {
+    "PuzzleId": "008oX",
+    "FEN": "4r1k1/2R3pp/2p4q/1p1p4/3P4/P7/1PP2R2/1K1N4 b - - 3 32",
+    "Moves": "e8e1 c7c8 e1e8 c8e8",
+    "Rating": 976,
+    "NbPlays": 222,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/008oX"
+  },
+  {
+    "PuzzleId": "008rw",
+    "FEN": "rn2kb1r/pp2pppp/2p2n2/4q3/8/2N4Q/PPPPBPPP/R1B1K2R b KQkq - 2 8",
+    "Moves": "g7g6 h3c8",
+    "Rating": 871,
+    "NbPlays": 468,
+    "Themes": "mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/008rw"
+  },
+  {
+    "PuzzleId": "008tL",
+    "FEN": "8/7k/pR5p/3p4/5r2/2P1p2P/P5P1/6K1 w - - 0 40",
+    "Moves": "b6a6 e3e2 a6e6 f4f1",
+    "Rating": 1165,
+    "NbPlays": 3190,
+    "Themes": "advancedPawn crushing endgame master rookEndgame short",
+    "GameUrl": "https://lichess.org/training/008tL"
+  },
+  {
+    "PuzzleId": "0091A",
+    "FEN": "1r3rk1/q4ppp/p3Pb2/3nN3/P2P4/7Q/1B4PP/1R3RK1 b - - 0 24",
+    "Moves": "b8b2 e6f7 f8f7 h3c8 f7f8 c8e6",
+    "Rating": 2177,
+    "NbPlays": 1127,
+    "Themes": "advancedPawn advantage kingsideAttack long middlegame",
+    "GameUrl": "https://lichess.org/training/0091A"
+  },
+  {
+    "PuzzleId": "0092V",
+    "FEN": "r2qk1nr/ppp3pp/2n5/1B1pp3/1b1P4/5Q1P/PP1B1PP1/RN2K2R b KQkq - 3 11",
+    "Moves": "e5e4 b5c6 b7c6 f3h5 g7g6 h5e5",
+    "Rating": 2252,
+    "NbPlays": 1247,
+    "Themes": "crushing exposedKing long opening",
+    "GameUrl": "https://lichess.org/training/0092V"
+  },
+  {
+    "PuzzleId": "0092z",
+    "FEN": "2r3k1/2qR1ppp/p7/2p2Q2/P7/7P/5PP1/6K1 b - - 3 26",
+    "Moves": "c7c6 f5f7 g8h8 f7g7",
+    "Rating": 991,
+    "NbPlays": 442,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/0092z"
+  },
+  {
+    "PuzzleId": "009BH",
+    "FEN": "3r2k1/6p1/4Q3/4B3/1p3P2/4PKP1/3q4/8 b - - 17 51",
+    "Moves": "g8h8 e6h6 h8g8 h6g7",
+    "Rating": 1413,
+    "NbPlays": 7884,
+    "Themes": "endgame mate mateIn2 pin short",
+    "GameUrl": "https://lichess.org/training/009BH"
+  },
+  {
+    "PuzzleId": "009FP",
+    "FEN": "r1b1k1nr/ppp2pbp/3ppqp1/8/2BnP3/N2P2QP/PPP2PP1/R1B1K2R b KQkq - 4 9",
+    "Moves": "e6e5 c1g5 f6g5 g3g5",
+    "Rating": 1321,
+    "NbPlays": 3672,
+    "Themes": "advantage opening short trappedPiece",
+    "GameUrl": "https://lichess.org/training/009FP"
+  },
+  {
+    "PuzzleId": "009FS",
+    "FEN": "r2qr1k1/p5bp/1pp1b1p1/8/2QN1p2/2P1n2P/PP3PP1/R1B1RNK1 w - - 1 18",
+    "Moves": "d4e6 e3c4 e6d8 e8e1",
+    "Rating": 1715,
+    "NbPlays": 139,
+    "Themes": "crushing discoveredAttack opening short",
+    "GameUrl": "https://lichess.org/training/009FS"
+  },
+  {
+    "PuzzleId": "009IO",
+    "FEN": "3rk3/5p1r/p2Np1p1/3bP3/P2n4/8/1P3RPP/5RK1 b - - 4 25",
+    "Moves": "e8e7 f2f7 h7f7 f1f7",
+    "Rating": 1162,
+    "NbPlays": 547,
+    "Themes": "hookMate mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/009IO"
+  },
+  {
+    "PuzzleId": "009J1",
+    "FEN": "rn2k2r/pp2bp1p/2p1pNp1/6B1/5P2/7P/PPP4P/2K1RR2 b - - 3 17",
+    "Moves": "e8f8 g5h6",
+    "Rating": 1269,
+    "NbPlays": 877,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/009J1"
+  },
+  {
+    "PuzzleId": "009L0",
+    "FEN": "6k1/pb2r1pN/1n4Bp/3p4/1P2pR2/P7/3R1PPP/2r3K1 w - - 2 30",
+    "Moves": "d2d1 c1d1",
+    "Rating": 706,
+    "NbPlays": 26,
+    "Themes": "backRankMate hangingPiece mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/009L0"
+  },
+  {
+    "PuzzleId": "009XT",
+    "FEN": "rn1qk2r/pp3ppp/3bp1b1/3p4/3Pn2N/3BB3/PPP2PPP/RN1Q1RK1 w kq - 4 10",
+    "Moves": "h4g6 d6h2 g1h1 h7g6",
+    "Rating": 2048,
+    "NbPlays": 16437,
+    "Themes": "crushing intermezzo opening short",
+    "GameUrl": "https://lichess.org/training/009XT"
+  },
+  {
+    "PuzzleId": "009YT",
+    "FEN": "rqnr2k1/5ppp/p2p4/4Q3/8/1P5P/PBP2PP1/R2R2K1 b - - 2 23",
+    "Moves": "d6e5 d1d8",
+    "Rating": 687,
+    "NbPlays": 49,
+    "Themes": "backRankMate hangingPiece mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/009YT"
+  },
+  {
+    "PuzzleId": "009bR",
+    "FEN": "4r2k/3q2r1/1p4pQ/p1pP4/2P4P/1N4p1/PP3RK1/8 b - - 1 37",
+    "Moves": "g7h7 f2f8 e8f8 h6f8",
+    "Rating": 1024,
+    "NbPlays": 154,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/009bR"
+  },
+  {
+    "PuzzleId": "009bn",
+    "FEN": "2kr2r1/ppb2ppp/3qbn2/2Np2B1/P7/2P2Q1P/1PB2PP1/R4RK1 w - - 5 18",
+    "Moves": "c5e6 d6h2",
+    "Rating": 578,
+    "NbPlays": 390,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/009bn"
+  },
+  {
+    "PuzzleId": "009eX",
+    "FEN": "2r3k1/7p/6q1/p1Np4/Qp2pr2/P4P2/1PR2P1K/5R2 w - - 0 36",
+    "Moves": "f1g1 f4h4",
+    "Rating": 922,
+    "NbPlays": 302,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/009eX"
+  },
+  {
+    "PuzzleId": "009f8",
+    "FEN": "8/1p4p1/pb2ppkp/3n4/3P4/P3BN1P/1P2KPP1/8 b - - 0 26",
+    "Moves": "g6f5 f3h4 f5e4 f2f3",
+    "Rating": 1149,
+    "NbPlays": 199,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/009f8"
+  },
+  {
+    "PuzzleId": "009fH",
+    "FEN": "rn2kb1r/pp2pppp/2p2n2/8/3q2b1/1Q6/PPP2PPP/RNB1KBNR w KQkq - 0 7",
+    "Moves": "b3b7 d4d1",
+    "Rating": 769,
+    "NbPlays": 167,
+    "Themes": "mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/009fH"
+  },
+  {
+    "PuzzleId": "009lk",
+    "FEN": "1R6/6pk/2p4p/3bP2r/5B1P/2P2qP1/P4P1Q/4R1K1 w - - 2 40",
+    "Moves": "e1e3 f3d1 e3e1 d1e1",
+    "Rating": 917,
+    "NbPlays": 906,
+    "Themes": "mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/009lk"
+  },
+  {
+    "PuzzleId": "009oc",
+    "FEN": "5Q2/pbp3np/1p1pB1pk/1P6/P3q2P/6K1/8/8 b - - 1 32",
+    "Moves": "e4e6 f8f4 g6g5 f4g5",
+    "Rating": 1144,
+    "NbPlays": 769,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/009oc"
+  },
+  {
+    "PuzzleId": "009tE",
+    "FEN": "6k1/6pp/p1N2p2/1pP2bP1/5P2/8/PPP5/3K4 b - - 1 28",
+    "Moves": "f6g5 c6e7 g8f7 e7f5",
+    "Rating": 639,
+    "NbPlays": 840,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/009tE"
+  },
+  {
+    "PuzzleId": "009uB",
+    "FEN": "3br2r/5k1p/4p1pQ/P5P1/1B5P/P6q/5R2/6K1 b - - 1 35",
+    "Moves": "f7g8 f2f8 e8f8 h6f8",
+    "Rating": 1089,
+    "NbPlays": 311,
+    "Themes": "mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/009uB"
+  },
+  {
+    "PuzzleId": "009wR",
+    "FEN": "1R2R3/p7/1p1k3p/1Pb5/P5p1/6P1/5rKP/8 w - - 6 41",
+    "Moves": "g2h1 f2f1 h1g2 f1g1",
+    "Rating": 1239,
+    "NbPlays": 557,
+    "Themes": "endgame mate mateIn2 operaMate short",
+    "GameUrl": "https://lichess.org/training/009wR"
+  },
+  {
+    "PuzzleId": "009zR",
+    "FEN": "3r4/p1p2ppp/4k3/6Q1/5P2/4P3/Prqn2PP/3R1RK1 w - - 3 22",
+    "Moves": "g5d8 d2f3 g1h1 c2g2",
+    "Rating": 1620,
+    "NbPlays": 180,
+    "Themes": "discoveredAttack endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/009zR"
+  },
+  {
+    "PuzzleId": "009zS",
+    "FEN": "r3r1k1/1p3p1p/p1p3p1/8/6bP/Q3b3/PP2B1P1/R3K2R w KQ - 2 20",
+    "Moves": "g2g3 g4e2 e1e2 e3c5 e2f3 c5a3",
+    "Rating": 1405,
+    "NbPlays": 2850,
+    "Themes": "advantage discoveredAttack discoveredCheck exposedKing long middlegame",
+    "GameUrl": "https://lichess.org/training/009zS"
+  },
+  {
+    "PuzzleId": "00A9Q",
+    "FEN": "2rq1rk1/1p3p1p/p1pn2p1/P2p4/1P1PnP2/3NP3/5PBP/R1Q3RK w - - 2 22",
+    "Moves": "d3c5 e4f2",
+    "Rating": 659,
+    "NbPlays": 431,
+    "Themes": "kingsideAttack master mate mateIn1 middlegame oneMove smotheredMate",
+    "GameUrl": "https://lichess.org/training/00A9Q"
+  },
+  {
+    "PuzzleId": "00AB1",
+    "FEN": "8/7Q/3p1kp1/1p6/2b5/2P4P/5PPK/4q3 b - - 8 36",
+    "Moves": "e1c3 h7h8 f6e6 h8c3",
+    "Rating": 1128,
+    "NbPlays": 11406,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/00AB1"
+  },
+  {
+    "PuzzleId": "00AFG",
+    "FEN": "r4rk1/2q2ppp/p3bp2/2P2N1Q/Ppp5/8/1PP2PPP/R2R2K1 b - - 6 21",
+    "Moves": "c7c5 f5h6 g7h6 h5c5",
+    "Rating": 1476,
+    "NbPlays": 1460,
+    "Themes": "advantage discoveredAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/00AFG"
+  },
+  {
+    "PuzzleId": "00AGs",
+    "FEN": "rn2k2Q/5p2/2p1p1r1/1q4p1/8/8/4NPPP/3R1K1R b q - 5 23",
+    "Moves": "e8e7 h8d8",
+    "Rating": 898,
+    "NbPlays": 523,
+    "Themes": "mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/00AGs"
+  },
+  {
+    "PuzzleId": "00AOH",
+    "FEN": "6k1/1R6/1p2p1pp/4P3/p1N2P2/6PK/7P/1r6 w - - 0 48",
+    "Moves": "b7b6 b1b6 c4b6 a4a3 b6d7 a3a2",
+    "Rating": 866,
+    "NbPlays": 725,
+    "Themes": "advancedPawn advantage endgame long",
+    "GameUrl": "https://lichess.org/training/00AOH"
+  },
+  {
+    "PuzzleId": "00AVR",
+    "FEN": "br1qkb1r/p1pp1ppp/4Pn2/6B1/3Qn3/5NP1/P3PPBP/RN1R2K1 b k - 0 15",
+    "Moves": "d7e6 d4a4 d8d7 d1d7",
+    "Rating": 1761,
+    "NbPlays": 121,
+    "Themes": "crushing opening short",
+    "GameUrl": "https://lichess.org/training/00AVR"
+  },
+  {
+    "PuzzleId": "00Aae",
+    "FEN": "1R6/1P6/4pkp1/5p2/3P3p/3KP3/8/1r6 b - - 0 43",
+    "Moves": "h4h3 b8f8 f6e7 b7b8q b1b8 f8b8",
+    "Rating": 1015,
+    "NbPlays": 347,
+    "Themes": "advancedPawn clearance crushing endgame long promotion rookEndgame",
+    "GameUrl": "https://lichess.org/training/00Aae"
+  },
+  {
+    "PuzzleId": "00Aas",
+    "FEN": "3r1rk1/1p2q1pp/5p2/8/1P1n4/6Q1/PPbB1PPP/R2B1RK1 w - - 9 20",
+    "Moves": "d1c2 d4e2 g1h1 e2g3 f2g3 d8d2",
+    "Rating": 1199,
+    "NbPlays": 8478,
+    "Themes": "crushing fork long middlegame",
+    "GameUrl": "https://lichess.org/training/00Aas"
+  },
+  {
+    "PuzzleId": "00Ac7",
+    "FEN": "8/2p1pk1p/Pp4p1/8/p1P2P2/3r2P1/3PR2P/3K4 b - - 1 33",
+    "Moves": "a4a3 a6a7 d3d8 e2e3 a3a2 e3a3",
+    "Rating": 2125,
+    "NbPlays": 2860,
+    "Themes": "advancedPawn advantage endgame long rookEndgame",
+    "GameUrl": "https://lichess.org/training/00Ac7"
+  },
+  {
+    "PuzzleId": "00AdI",
+    "FEN": "3r4/4kp1p/1PQ1p1p1/p3b3/1p2P2P/1P6/6PK/8 w - - 1 36",
+    "Moves": "h2h3 d8d3 g2g3 d3g3 h3h2 g3c3",
+    "Rating": 1254,
+    "NbPlays": 8702,
+    "Themes": "crushing discoveredAttack discoveredCheck endgame long master",
+    "GameUrl": "https://lichess.org/training/00AdI"
+  },
+  {
+    "PuzzleId": "00Af3",
+    "FEN": "8/8/2B2p1p/P4Pp1/3p1kP1/1b1Pb2P/8/4K3 b - - 0 50",
+    "Moves": "f4g3 a5a6 b3c4 a6a7",
+    "Rating": 1144,
+    "NbPlays": 5702,
+    "Themes": "advancedPawn bishopEndgame crushing endgame short",
+    "GameUrl": "https://lichess.org/training/00Af3"
+  },
+  {
+    "PuzzleId": "00AfZ",
+    "FEN": "2r3kR/Q7/5q2/1brpN3/5Pp1/4P1P1/6K1/1B6 b - - 2 43",
+    "Moves": "f6h8 a7f7",
+    "Rating": 946,
+    "NbPlays": 553,
+    "Themes": "master mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/00AfZ"
+  },
+  {
+    "PuzzleId": "00AoZ",
+    "FEN": "8/1R6/p1pk4/6bp/1QP5/P7/KP6/3r2q1 b - - 2 44",
+    "Moves": "g1c5 b7d7 d6d7 b4c5",
+    "Rating": 1090,
+    "NbPlays": 3458,
+    "Themes": "advantage deflection endgame short",
+    "GameUrl": "https://lichess.org/training/00AoZ"
+  },
+  {
+    "PuzzleId": "00Aq4",
+    "FEN": "2k1r3/pppn1pp1/3b2b1/3p2Pp/2B2P2/3P3P/PPPR4/2K3NR w - - 0 18",
+    "Moves": "c4d5 e8e1 d2d1 d6f4 c1b1 e1d1",
+    "Rating": 1511,
+    "NbPlays": 162,
+    "Themes": "backRankMate deflection long mate mateIn3 middlegame",
+    "GameUrl": "https://lichess.org/training/00Aq4"
+  },
+  {
+    "PuzzleId": "00AuR",
+    "FEN": "8/4bkp1/R6P/4p3/Pp2P3/1P1rB3/6P1/6K1 b - - 0 33",
+    "Moves": "d3e3 h6h7 e3e1 g1h2",
+    "Rating": 1675,
+    "NbPlays": 37,
+    "Themes": "advancedPawn crushing endgame short",
+    "GameUrl": "https://lichess.org/training/00AuR"
+  },
+  {
+    "PuzzleId": "00B2k",
+    "FEN": "r4rk1/pbp3pp/1p1pp3/6B1/2PPp2q/3nP2P/PP3P2/R2QKBR1 w Q - 8 16",
+    "Moves": "f1d3 h4f2",
+    "Rating": 828,
+    "NbPlays": 24,
+    "Themes": "attackingF2F7 mate mateIn1 middlegame oneMove",
+    "GameUrl": "https://lichess.org/training/00B2k"
+  },
+  {
+    "PuzzleId": "00BCa",
+    "FEN": "1r6/p2kp1P1/3p4/2pP4/2P2B2/pN6/5PK1/8 b - - 1 41",
+    "Moves": "a3a2 b3c5 d6c5 f4b8 a2a1q g7g8q",
+    "Rating": 1315,
+    "NbPlays": 1741,
+    "Themes": "advancedPawn crushing endgame long master promotion",
+    "GameUrl": "https://lichess.org/training/00BCa"
+  },
+  {
+    "PuzzleId": "00BJm",
+    "FEN": "r2q1rk1/1Q2bppp/p1N1p3/1p6/2pP1n2/2P5/PP3PPP/R4RK1 b - - 1 18",
+    "Moves": "d8d5 c6e7 g8h8 e7d5",
+    "Rating": 1052,
+    "NbPlays": 959,
+    "Themes": "advantage fork hangingPiece middlegame short",
+    "GameUrl": "https://lichess.org/training/00BJm"
+  },
+  {
+    "PuzzleId": "00BNd",
+    "FEN": "1rr3k1/3bppbp/3p1np1/1B1N4/P2BP3/5P2/P2R2PP/R5K1 b - - 0 21",
+    "Moves": "d7b5 d5e7 g8f8 e7c8",
+    "Rating": 881,
+    "NbPlays": 437,
+    "Themes": "advantage fork middlegame short",
+    "GameUrl": "https://lichess.org/training/00BNd"
+  },
+  {
+    "PuzzleId": "00BQD",
+    "FEN": "4r3/3R1pkp/6p1/1P6/1b6/5B2/1P1p1PPP/3R2K1 w - - 0 36",
+    "Moves": "d1d2 e8e1",
+    "Rating": 740,
+    "NbPlays": 340,
+    "Themes": "backRankMate endgame mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/00BQD"
+  },
+  {
+    "PuzzleId": "00Bg0",
+    "FEN": "8/3k4/3P1K2/p2R4/5r2/5P2/8/8 w - - 1 57",
+    "Moves": "d5f5 f4f5 f6f5 a5a4 f5e4 a4a3 e4d3 a3a2",
+    "Rating": 1641,
+    "NbPlays": 791,
+    "Themes": "advancedPawn crushing endgame quietMove rookEndgame veryLong",
+    "GameUrl": "https://lichess.org/training/00Bg0"
+  },
+  {
+    "PuzzleId": "00Bg4",
+    "FEN": "3r2k1/1q3ppp/p2rp3/Qp1B4/7P/P4P2/1PP3P1/1K1R3R b - - 0 21",
+    "Moves": "d6d5 a5d8 d5d8 d1d8",
+    "Rating": 1370,
+    "NbPlays": 314,
+    "Themes": "backRankMate endgame mate mateIn2 short xRayAttack",
+    "GameUrl": "https://lichess.org/training/00Bg4"
+  },
+  {
+    "PuzzleId": "00Bm8",
+    "FEN": "8/6kp/4b1q1/1p6/1PpPp2Q/2P1P3/r2N2P1/5RK1 w - - 7 34",
+    "Moves": "d2e4 g6g2",
+    "Rating": 1126,
+    "NbPlays": 331,
+    "Themes": "endgame master mate mateIn1 oneMove",
+    "GameUrl": "https://lichess.org/training/00Bm8"
+  },
+  {
+    "PuzzleId": "00Bn0",
+    "FEN": "r1bqkb1r/pp1pnppp/2n1p3/1N6/5B2/8/PPP1PPPP/R2QKBNR b KQkq - 4 6",
+    "Moves": "e6e5 b5d6",
+    "Rating": 1029,
+    "NbPlays": 168,
+    "Themes": "mate mateIn1 oneMove opening smotheredMate",
+    "GameUrl": "https://lichess.org/training/00Bn0"
+  },
+  {
+    "PuzzleId": "00Bn4",
+    "FEN": "1k6/pp6/4nNp1/P6p/3pr3/7P/3R1PPK/8 b - - 0 40",
+    "Moves": "e4e5 f6d7 b8c7 d7e5",
+    "Rating": 689,
+    "NbPlays": 724,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/00Bn4"
+  },
+  {
+    "PuzzleId": "00BnG",
+    "FEN": "4Q3/ppkr1pp1/2p3n1/2P4p/1P1P4/4K3/P5P1/8 w - - 2 33",
+    "Moves": "d4d5 d7e7 e8e7 g6e7",
+    "Rating": 1426,
+    "NbPlays": 12,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/00BnG"
+  },
+  {
+    "PuzzleId": "00BrZ",
+    "FEN": "r6r/pp2kb2/3p1p1Q/1N1Pp3/3bP3/P2B2P1/1P4PP/7K w - - 6 28",
+    "Moves": "h6d2 h8h2 h1h2 a8h8 d2h6 h8h6",
+    "Rating": 1380,
+    "NbPlays": 441,
+    "Themes": "attraction kingsideAttack long mate mateIn3 middlegame pillsburysMate sacrifice",
+    "GameUrl": "https://lichess.org/training/00BrZ"
+  },
+  {
+    "PuzzleId": "00Bse",
+    "FEN": "8/5p2/1R4k1/6p1/8/3r2PP/5K2/8 b - - 3 40",
+    "Moves": "g6h5 g3g4 h5h4 b6h6",
+    "Rating": 830,
+    "NbPlays": 98,
+    "Themes": "endgame mate mateIn2 rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00Bse"
+  },
+  {
+    "PuzzleId": "00Bul",
+    "FEN": "rnbqk2r/pp3ppp/5n2/3pN3/2B5/2P5/P1PPQPPP/R1B1K2R b KQkq - 1 8",
+    "Moves": "d5c4 e5c6 c8e6 c6d8",
+    "Rating": 1401,
+    "NbPlays": 1860,
+    "Themes": "advantage discoveredAttack discoveredCheck opening short",
+    "GameUrl": "https://lichess.org/training/00Bul"
+  },
+  {
+    "PuzzleId": "00C3O",
+    "FEN": "r2qkbnr/pp4pp/2p2p2/4n2b/2B1P3/2N2N2/PPP3PP/R1BQ1RK1 w kq - 0 10",
+    "Moves": "d1e2 h5f3 g2f3 d8d4",
+    "Rating": 2037,
+    "NbPlays": 1648,
+    "Themes": "crushing kingsideAttack opening short",
+    "GameUrl": "https://lichess.org/training/00C3O"
+  },
+  {
+    "PuzzleId": "00C8e",
+    "FEN": "8/5p1k/5Ppb/2p3P1/1p6/8/KB5Q/3q4 b - - 4 58",
+    "Moves": "d1a4 a2b1 a4d1 b2c1",
+    "Rating": 1532,
+    "NbPlays": 71,
+    "Themes": "endgame equality pin short",
+    "GameUrl": "https://lichess.org/training/00C8e"
+  },
+  {
+    "PuzzleId": "00CBU",
+    "FEN": "8/2pR2kp/pb4p1/8/5p1P/B6K/P1r5/6r1 b - - 3 39",
+    "Moves": "g7h6 a3f8 h6h5 d7h7",
+    "Rating": 1814,
+    "NbPlays": 63,
+    "Themes": "deflection endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/00CBU"
+  },
+  {
+    "PuzzleId": "00CFp",
+    "FEN": "rn1q3k/pp4pp/1b2B3/4N3/5r2/2p5/PP4PP/RN3Q1K w - - 0 16",
+    "Moves": "f1f4 d8d1 f4f1 d1f1",
+    "Rating": 478,
+    "NbPlays": 443,
+    "Themes": "kingsideAttack mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/00CFp"
+  },
+  {
+    "PuzzleId": "00CNA",
+    "FEN": "rnbq1r2/pp1n2bk/3pB1p1/4P1N1/5P2/2p5/PPP3P1/R1BQK3 b Q - 1 13",
+    "Moves": "h7h8 d1d3 d8g5 f4g5",
+    "Rating": 2589,
+    "NbPlays": 989,
+    "Themes": "crushing opening short",
+    "GameUrl": "https://lichess.org/training/00CNA"
+  },
+  {
+    "PuzzleId": "00CXr",
+    "FEN": "r2k2nr/pp2qBb1/3p3p/Q5p1/3n1B2/2N2R2/PPP3P1/R5K1 b - - 1 18",
+    "Moves": "b7b6 a5d5 d4f3 g2f3 a8c8 f4d6",
+    "Rating": 1908,
+    "NbPlays": 1782,
+    "Themes": "advantage long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00CXr"
+  },
+  {
+    "PuzzleId": "00Cfq",
+    "FEN": "6k1/ppR2pp1/4p1p1/4P1N1/3r2P1/1P4K1/P6r/8 b - - 5 30",
+    "Moves": "h2e2 c7c8 d4d8 c8d8",
+    "Rating": 631,
+    "NbPlays": 511,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/00Cfq"
+  },
+  {
+    "PuzzleId": "00CpR",
+    "FEN": "4r1k1/B7/2p2pK1/3n3p/8/1Q3PP1/P6r/8 b - - 0 31",
+    "Moves": "e8e5 b3b8 e5e8 b8e8",
+    "Rating": 632,
+    "NbPlays": 319,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/00CpR"
+  },
+  {
+    "PuzzleId": "00CtS",
+    "FEN": "Q5k1/5q2/p2p4/b1p1pr2/P7/6P1/4KP1R/8 b - - 3 38",
+    "Moves": "g8g7 a8h8 g7g6 h8h6",
+    "Rating": 970,
+    "NbPlays": 3148,
+    "Themes": "endgame mate mateIn2 short swallowstailMate",
+    "GameUrl": "https://lichess.org/training/00CtS"
+  },
+  {
+    "PuzzleId": "00Cwz",
+    "FEN": "1r5r/5pk1/4p3/2Np2PP/p1nP4/n1P5/P3B3/K1R4R w - - 2 34",
+    "Moves": "c5a4 b8b1 c1b1 a3c2",
+    "Rating": 1475,
+    "NbPlays": 116,
+    "Themes": "mate mateIn2 middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00Cwz"
+  },
+  {
+    "PuzzleId": "00DEc",
+    "FEN": "8/p5pk/1p3b1p/3r3P/6P1/3nBN2/P4PK1/4R3 w - - 3 30",
+    "Moves": "e1d1 d3f4 e3f4 d5d1",
+    "Rating": 1091,
+    "NbPlays": 171,
+    "Themes": "crushing discoveredAttack endgame short",
+    "GameUrl": "https://lichess.org/training/00DEc"
+  },
+  {
+    "PuzzleId": "00DPI",
+    "FEN": "3r2k1/1B3p1p/6p1/3N4/3p2P1/6r1/5KP1/3R4 b - - 5 35",
+    "Moves": "g3g4 d5f6 g8g7 f6g4",
+    "Rating": 953,
+    "NbPlays": 805,
+    "Themes": "advantage endgame fork short",
+    "GameUrl": "https://lichess.org/training/00DPI"
+  },
+  {
+    "PuzzleId": "00DYf",
+    "FEN": "1R6/6kp/3p1pp1/2r1p3/P7/1P6/2r2PPP/1R4K1 w - - 4 30",
+    "Moves": "b3b4 c2c1 b1c1 c5c1",
+    "Rating": 466,
+    "NbPlays": 431,
+    "Themes": "backRankMate endgame mate mateIn2 rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00DYf"
+  },
+  {
+    "PuzzleId": "00DZe",
+    "FEN": "8/5k2/7p/p1P1bPpP/Pp2P3/1P1pBK2/8/8 w - - 1 47",
+    "Moves": "e3f2 g5g4 f3e3 e5d4 e3d3 d4f2",
+    "Rating": 2374,
+    "NbPlays": 6111,
+    "Themes": "bishopEndgame crushing deflection endgame long master skewer",
+    "GameUrl": "https://lichess.org/training/00DZe"
+  },
+  {
+    "PuzzleId": "00DcC",
+    "FEN": "5k2/6pp/p1b3P1/2N2P1r/p7/8/1KP5/5R2 b - - 0 36",
+    "Moves": "h7h6 c5e6 f8e7 e6g7",
+    "Rating": 1400,
+    "NbPlays": 193,
+    "Themes": "crushing deflection endgame master short",
+    "GameUrl": "https://lichess.org/training/00DcC"
+  },
+  {
+    "PuzzleId": "00DkJ",
+    "FEN": "3r1bnr/2p2ppp/2b5/R1k5/5P2/2N5/4N1PP/1R4K1 b - - 3 21",
+    "Moves": "c5d6 b1d1 d6e7 a5e5 e7f6 d1d8",
+    "Rating": 1575,
+    "NbPlays": 3060,
+    "Themes": "crushing deflection exposedKing long middlegame",
+    "GameUrl": "https://lichess.org/training/00DkJ"
+  },
+  {
+    "PuzzleId": "00Dke",
+    "FEN": "5bk1/2Q2p1p/5qp1/p7/P1Bp4/1Pr4P/5PP1/3R2K1 b - - 5 27",
+    "Moves": "c3c2 c4f7 g8g7 c7c2",
+    "Rating": 1498,
+    "NbPlays": 185,
+    "Themes": "crushing discoveredAttack endgame master short",
+    "GameUrl": "https://lichess.org/training/00Dke"
+  },
+  {
+    "PuzzleId": "00Dlt",
+    "FEN": "r3kb1r/p4pp1/b1p4p/n3p3/4N3/2Nq1Q2/PP1P1PPP/R1B2RK1 w kq - 0 14",
+    "Moves": "f3f5 d3f1",
+    "Rating": 510,
+    "NbPlays": 200,
+    "Themes": "kingsideAttack mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00Dlt"
+  },
+  {
+    "PuzzleId": "00Dt6",
+    "FEN": "5rk1/p4p1p/4p1p1/5nq1/8/5QPP/5PK1/2RR4 w - - 6 35",
+    "Moves": "c1b1 f5h4 g2f1 h4f3",
+    "Rating": 1204,
+    "NbPlays": 49,
+    "Themes": "crushing endgame pin short",
+    "GameUrl": "https://lichess.org/training/00Dt6"
+  },
+  {
+    "PuzzleId": "00Dxh",
+    "FEN": "8/8/8/6R1/2pk2P1/1r3K1P/8/8 w - - 0 48",
+    "Moves": "f3g2 c4c3 g5g7 c3c2",
+    "Rating": 1349,
+    "NbPlays": 46,
+    "Themes": "advancedPawn crushing endgame master masterVsMaster rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00Dxh"
+  },
+  {
+    "PuzzleId": "00E29",
+    "FEN": "r1bq1rk1/4bppp/p1n5/3P4/Pp6/3B1N2/1B3PPP/R2Q1RK1 b - - 0 17",
+    "Moves": "d8d5 d3h7 g8h7 d1d5",
+    "Rating": 953,
+    "NbPlays": 350,
+    "Themes": "crushing discoveredAttack kingsideAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/00E29"
+  },
+  {
+    "PuzzleId": "00EBZ",
+    "FEN": "3rr1k1/p4pp1/1pp4p/3pPQ2/1P3P2/2P3qP/P2R2P1/5RK1 w - - 1 24",
+    "Moves": "f1f3 g3e1 g1h2 e1d2",
+    "Rating": 818,
+    "NbPlays": 1386,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/00EBZ"
+  },
+  {
+    "PuzzleId": "00EDa",
+    "FEN": "r1bk3r/ppp1np1p/3p2pP/1N2P1q1/2BP1n2/8/PPP3P1/R1BQ2KR w - - 1 14",
+    "Moves": "e5d6 g5g2",
+    "Rating": 860,
+    "NbPlays": 605,
+    "Themes": "kingsideAttack mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00EDa"
+  },
+  {
+    "PuzzleId": "00EEp",
+    "FEN": "3k2q1/pb1p3p/1p1P4/2p5/2P2Q1K/8/P7/5R2 b - - 2 36",
+    "Moves": "b7g2 f4f8 g8f8 f1f8",
+    "Rating": 1665,
+    "NbPlays": 96,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/00EEp"
+  },
+  {
+    "PuzzleId": "00EJb",
+    "FEN": "6k1/5pp1/2R1p2p/8/P1B5/1P4P1/1q3Q1P/3r2K1 w - - 1 35",
+    "Moves": "g1g2 d1d2 c6c8 g8h7 c4d3 f7f5 c8c2 d2f2",
+    "Rating": 2288,
+    "NbPlays": 450,
+    "Themes": "advantage endgame pin veryLong",
+    "GameUrl": "https://lichess.org/training/00EJb"
+  },
+  {
+    "PuzzleId": "00EXM",
+    "FEN": "r1n1r1k1/3R1ppp/2p5/5P2/8/1P2B3/P7/5RK1 b - - 6 33",
+    "Moves": "e8e3 d7d8 e3e8 d8e8",
+    "Rating": 620,
+    "NbPlays": 72,
+    "Themes": "backRankMate endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/00EXM"
+  },
+  {
+    "PuzzleId": "00EXP",
+    "FEN": "2n3k1/p4ppp/2p1p3/P1NrP3/1n1r4/3N4/5PPP/1R1R2K1 w - - 0 29",
+    "Moves": "d3b4 d4d1 b1d1 d5d1",
+    "Rating": 543,
+    "NbPlays": 123,
+    "Themes": "backRankMate mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/00EXP"
+  },
+  {
+    "PuzzleId": "00EXS",
+    "FEN": "r3r1k1/p2Q1p1p/1p2p1p1/8/1P1P4/P3P3/1B2Nb1q/2KR1R2 w - - 0 19",
+    "Moves": "f1h1 f2e3 c1b1 h2e2",
+    "Rating": 1548,
+    "NbPlays": 45,
+    "Themes": "advantage discoveredAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/00EXS"
+  },
+  {
+    "PuzzleId": "00Ea3",
+    "FEN": "3r4/p5k1/1p1qprnp/1Q1pN1p1/3P1pP1/1PP5/P5PP/4RRK1 b - - 3 29",
+    "Moves": "g6e5 d4e5 d6c5 b5c5 b6c5 e5f6",
+    "Rating": 1316,
+    "NbPlays": 389,
+    "Themes": "crushing fork long middlegame",
+    "GameUrl": "https://lichess.org/training/00Ea3"
+  },
+  {
+    "PuzzleId": "00EbJ",
+    "FEN": "r2q1rk1/ppp2ppp/2nbb3/8/6n1/2NPBN2/PPP1BPPP/R2QK2R w KQ - 5 9",
+    "Moves": "f3g5 g4e3 f2e3 d8g5",
+    "Rating": 1201,
+    "NbPlays": 80,
+    "Themes": "capturingDefender crushing opening short",
+    "GameUrl": "https://lichess.org/training/00EbJ"
+  },
+  {
+    "PuzzleId": "00EoE",
+    "FEN": "r1b1k3/ppr4p/5p2/5p2/8/2P3P1/P4PP1/4RK1R b q - 1 23",
+    "Moves": "e8f7 h1h7 f7g6 h7c7",
+    "Rating": 974,
+    "NbPlays": 65,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/00EoE"
+  },
+  {
+    "PuzzleId": "00Evs",
+    "FEN": "5qk1/pQ3pp1/7p/b2N1b2/P3r3/5K2/7P/R4B2 b - - 1 24",
+    "Moves": "g7g5 d5f6 g8h8 f6e4",
+    "Rating": 1059,
+    "NbPlays": 1019,
+    "Themes": "advantage fork middlegame short",
+    "GameUrl": "https://lichess.org/training/00Evs"
+  },
+  {
+    "PuzzleId": "00F1l",
+    "FEN": "8/2k1b3/5p2/RBpK1Pp1/Pp1p2P1/3P4/2r5/8 b - - 2 45",
+    "Moves": "b4b3 a5a7 c7b8 a7e7",
+    "Rating": 836,
+    "NbPlays": 189,
+    "Themes": "crushing endgame master short skewer",
+    "GameUrl": "https://lichess.org/training/00F1l"
+  },
+  {
+    "PuzzleId": "00F2o",
+    "FEN": "6k1/4qpp1/3p3p/8/2BP4/1Pn5/2Qn1PPP/6K1 w - - 0 29",
+    "Moves": "c2c3 e7e1 c4f1 e1f1",
+    "Rating": 978,
+    "NbPlays": 125,
+    "Themes": "endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/00F2o"
+  },
+  {
+    "PuzzleId": "00F5G",
+    "FEN": "2rqrbk1/pp3ppp/4n3/3p1N2/3NnBQ1/2P4P/PP3PP1/R4RK1 b - - 14 22",
+    "Moves": "e6f4 f5h6 g8h8 h6f7",
+    "Rating": 1522,
+    "NbPlays": 63,
+    "Themes": "crushing deflection kingsideAttack middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00F5G"
+  },
+  {
+    "PuzzleId": "00F6y",
+    "FEN": "2k3r1/ppp2prp/1q2b3/8/Q7/2P1R1P1/P4P1P/4R1K1 b - - 3 23",
+    "Moves": "e6d7 e3e8 d7e8 e1e8 g8e8 a4e8",
+    "Rating": 938,
+    "NbPlays": 827,
+    "Themes": "long mate mateIn3 middlegame queensideAttack sacrifice",
+    "GameUrl": "https://lichess.org/training/00F6y"
+  },
+  {
+    "PuzzleId": "00FGc",
+    "FEN": "1r4k1/5p2/2q3bp/4R3/p1r5/P1N5/1PP1Q2P/1KR5 w - - 2 33",
+    "Moves": "b1a2 c4c3 b2c3 f7f6",
+    "Rating": 2438,
+    "NbPlays": 137,
+    "Themes": "advantage middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00FGc"
+  },
+  {
+    "PuzzleId": "00FND",
+    "FEN": "8/1P6/8/7p/3P4/3k1p1P/4p3/3K4 w - - 0 49",
+    "Moves": "d1e1 d3e3 h3h4 f3f2",
+    "Rating": 1828,
+    "NbPlays": 3413,
+    "Themes": "advancedPawn endgame mate mateIn2 pawnEndgame short",
+    "GameUrl": "https://lichess.org/training/00FND"
+  },
+  {
+    "PuzzleId": "00Feu",
+    "FEN": "4R1k1/p4r1p/1pp2rp1/8/5B1q/4QP1P/P1P2PK1/8 b - - 2 28",
+    "Moves": "f7f8 f4g5 h4g5 e3g5",
+    "Rating": 2003,
+    "NbPlays": 294,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/00Feu"
+  },
+  {
+    "PuzzleId": "00GBX",
+    "FEN": "r6k/pp2n1pp/2nN4/4p1Br/1PB5/2P4b/P3Nb1P/R2R3K b - - 1 22",
+    "Moves": "h5g5 d6f7 h8g8 f7g5",
+    "Rating": 911,
+    "NbPlays": 792,
+    "Themes": "advantage discoveredAttack discoveredCheck fork middlegame short",
+    "GameUrl": "https://lichess.org/training/00GBX"
+  },
+  {
+    "PuzzleId": "00GVf",
+    "FEN": "2b2k2/6q1/pn4p1/1rp2p2/8/8/1P2Q1P1/1K2R2R b - - 3 32",
+    "Moves": "c8d7 h1h8 g7h8 e2e7 f8g8 e7d8",
+    "Rating": 1548,
+    "NbPlays": 8015,
+    "Themes": "crushing exposedKing long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00GVf"
+  },
+  {
+    "PuzzleId": "00Gc5",
+    "FEN": "8/p1r2p2/4r3/2P1PK2/1P1R4/3R2pk/8/8 w - - 2 46",
+    "Moves": "d4g4 e6e5 f5e5 h3g4",
+    "Rating": 1600,
+    "NbPlays": 76,
+    "Themes": "advantage deflection endgame rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00Gc5"
+  },
+  {
+    "PuzzleId": "00GiQ",
+    "FEN": "5r2/1p3p1k/6pp/p1qp1P2/7Q/5N2/6PP/5N1K b - - 4 31",
+    "Moves": "b7b5 f3g5 h7g7 f5f6 g7f6 g5e4",
+    "Rating": 1851,
+    "NbPlays": 888,
+    "Themes": "attraction crushing discoveredCheck doubleCheck endgame long pin",
+    "GameUrl": "https://lichess.org/training/00GiQ"
+  },
+  {
+    "PuzzleId": "00Gt0",
+    "FEN": "R7/4k3/5p2/3p2p1/4b2p/2K1P2P/5PP1/8 w - - 2 47",
+    "Moves": "f2f3 d5d4 c3d4 e4a8",
+    "Rating": 1052,
+    "NbPlays": 108,
+    "Themes": "crushing discoveredAttack endgame master short",
+    "GameUrl": "https://lichess.org/training/00Gt0"
+  },
+  {
+    "PuzzleId": "00GuD",
+    "FEN": "1n5k/4r1p1/p2q1rPp/1ppB4/8/3P4/PPP1RPQ1/2K4R b - - 4 25",
+    "Moves": "e7e2 h1h6 g7h6 g6g7 h8h7 g7g8q",
+    "Rating": 1152,
+    "NbPlays": 562,
+    "Themes": "advancedPawn kingsideAttack long mate mateIn3 middlegame promotion sacrifice",
+    "GameUrl": "https://lichess.org/training/00GuD"
+  },
+  {
+    "PuzzleId": "00Gvp",
+    "FEN": "8/2kn1p2/8/3P4/R7/2P1N3/1r2K3/8 w - - 13 70",
+    "Moves": "e2d3 d7c5 d3d4 c5a4",
+    "Rating": 994,
+    "NbPlays": 326,
+    "Themes": "advantage endgame fork short",
+    "GameUrl": "https://lichess.org/training/00Gvp"
+  },
+  {
+    "PuzzleId": "00Gz6",
+    "FEN": "r7/p3qkp1/1p4p1/3Nn3/Q7/4PP2/PP3K2/6R1 b - - 0 25",
+    "Moves": "e7c5 a4f4 f7e6 f4e4 a8f8 g1g6",
+    "Rating": 2264,
+    "NbPlays": 1185,
+    "Themes": "crushing endgame fork long pin",
+    "GameUrl": "https://lichess.org/training/00Gz6"
+  },
+  {
+    "PuzzleId": "00H2I",
+    "FEN": "4rrk1/ppp2pp1/7p/3n4/3P3q/1P2p2P/P5P1/R1BQRBK1 w - - 2 23",
+    "Moves": "c1b2 h4f2 g1h2 f2b2",
+    "Rating": 2033,
+    "NbPlays": 45,
+    "Themes": "crushing fork middlegame short",
+    "GameUrl": "https://lichess.org/training/00H2I"
+  },
+  {
+    "PuzzleId": "00H5n",
+    "FEN": "8/5Rpk/3p3p/p1qPp3/P3n3/5N1P/1Q3PPK/2r5 b - - 0 35",
+    "Moves": "e4f2 b2b7 c1h1 h2g3 f2e4 g3g4 e4f6 f7f6 c5b4 b7b4",
+    "Rating": 2498,
+    "NbPlays": 555,
+    "Themes": "advantage endgame pin quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/00H5n"
+  },
+  {
+    "PuzzleId": "00H87",
+    "FEN": "6k1/2q1pp2/p5pB/2p4n/3pP1Q1/P2P3P/1r4P1/5RK1 b - - 1 30",
+    "Moves": "c7g3 g4c8 g8h7 f1f7 h5g7 f7g7 h7h6 c8h8 h6g5 g7g6 g5g6 h8g8 g6f6 g8g3",
+    "Rating": 1912,
+    "NbPlays": 420,
+    "Themes": "attraction crushing deflection endgame sacrifice skewer veryLong",
+    "GameUrl": "https://lichess.org/training/00H87"
+  },
+  {
+    "PuzzleId": "00HDS",
+    "FEN": "6k1/pp2R3/6pp/8/3r4/P4BbP/1P4P1/6K1 b - - 3 38",
+    "Moves": "d4c4 f3d5 g8f8 e7f7 f8e8 d5c4",
+    "Rating": 1501,
+    "NbPlays": 32,
+    "Themes": "crushing endgame exposedKing fork long",
+    "GameUrl": "https://lichess.org/training/00HDS"
+  },
+  {
+    "PuzzleId": "00HEh",
+    "FEN": "3R1rk1/pp3ppp/2p3b1/2n3P1/2B2q1P/5N2/PPP1QP2/4R1K1 b - - 0 23",
+    "Moves": "f8d8 e2e8 d8e8 e1e8",
+    "Rating": 812,
+    "NbPlays": 467,
+    "Themes": "kingsideAttack mate mateIn2 middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00HEh"
+  },
+  {
+    "PuzzleId": "00HEx",
+    "FEN": "b7/5pk1/R3pn1p/8/3NP3/5P2/6PP/2rB2K1 w - - 1 31",
+    "Moves": "a6a8 c1d1 g1f2 d1d4",
+    "Rating": 920,
+    "NbPlays": 1215,
+    "Themes": "crushing endgame fork hangingPiece master short",
+    "GameUrl": "https://lichess.org/training/00HEx"
+  },
+  {
+    "PuzzleId": "00HJd",
+    "FEN": "r1bqkb1r/pp2pppp/2p2n2/2PnN3/2BP1B2/8/PP3PPP/RN1QR1K1 b kq - 2 12",
+    "Moves": "d5f4 c4f7",
+    "Rating": 1242,
+    "NbPlays": 47,
+    "Themes": "attackingF2F7 mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00HJd"
+  },
+  {
+    "PuzzleId": "00HLP",
+    "FEN": "r4rk1/3nqpp1/4p2p/1p2P3/2pn1Q2/P2B3N/1P3PPP/3R1RK1 w - - 0 24",
+    "Moves": "d3b1 d4e2 g1h1 e2f4",
+    "Rating": 821,
+    "NbPlays": 74,
+    "Themes": "crushing fork middlegame short",
+    "GameUrl": "https://lichess.org/training/00HLP"
+  },
+  {
+    "PuzzleId": "00HZa",
+    "FEN": "6k1/6pp/1p6/p1n5/4qp2/1P2PN2/P4PPP/3Q2K1 b - - 0 28",
+    "Moves": "f4e3 d1d8 g8f7 f3g5 f7g6 g5e4",
+    "Rating": 937,
+    "NbPlays": 341,
+    "Themes": "crushing endgame fork long master",
+    "GameUrl": "https://lichess.org/training/00HZa"
+  },
+  {
+    "PuzzleId": "00Hpe",
+    "FEN": "1rr3k1/4Qppp/qp2p3/P2pn3/3N4/4P2P/5PP1/RR4K1 b - - 3 29",
+    "Moves": "b6a5 b1b8 c8b8 e7c7 b8c8 c7e5",
+    "Rating": 1768,
+    "NbPlays": 192,
+    "Themes": "advantage fork long middlegame",
+    "GameUrl": "https://lichess.org/training/00Hpe"
+  },
+  {
+    "PuzzleId": "00HqY",
+    "FEN": "8/6p1/8/6k1/4P3/5KpP/8/8 b - - 3 46",
+    "Moves": "g5h4 f3g2 h4g5 g2g3",
+    "Rating": 1793,
+    "NbPlays": 1341,
+    "Themes": "crushing endgame master pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/00HqY"
+  },
+  {
+    "PuzzleId": "00Htd",
+    "FEN": "rnbqk2r/1p3ppp/p4b2/2Pp4/8/2N2N2/PP2PPPP/R2QKB1R w KQkq - 0 9",
+    "Moves": "d1d5 f6c3 b2c3 d8d5",
+    "Rating": 968,
+    "NbPlays": 1194,
+    "Themes": "crushing intermezzo opening short",
+    "GameUrl": "https://lichess.org/training/00Htd"
+  },
+  {
+    "PuzzleId": "00HzX",
+    "FEN": "4r1k1/5pp1/2R4p/1p6/8/1PP3QP/2q2PP1/6K1 w - - 0 29",
+    "Moves": "c6h6 c2c1 g1h2 c1h6",
+    "Rating": 1572,
+    "NbPlays": 1446,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/00HzX"
+  },
+  {
+    "PuzzleId": "00ICz",
+    "FEN": "2k2rr1/1p1q3p/1p2p3/1NbpQ3/P1p2P2/6P1/6KP/R4R2 b - - 0 31",
+    "Moves": "f8f5 b5a7 c8d8 e5b8 d8e7 b8g8",
+    "Rating": 1298,
+    "NbPlays": 5679,
+    "Themes": "crushing long middlegame skewer",
+    "GameUrl": "https://lichess.org/training/00ICz"
+  },
+  {
+    "PuzzleId": "00IEW",
+    "FEN": "6k1/6p1/R6p/3P1N2/8/3K4/2r2b2/8 b - - 5 57",
+    "Moves": "c2c8 f5e7 g8f7 e7c8",
+    "Rating": 814,
+    "NbPlays": 262,
+    "Themes": "crushing endgame fork short",
+    "GameUrl": "https://lichess.org/training/00IEW"
+  },
+  {
+    "PuzzleId": "00IHi",
+    "FEN": "8/4R3/1k6/8/p7/1p1N2P1/5KP1/r7 w - - 0 55",
+    "Moves": "e7e1 a1e1 f2e1 a4a3 e1d2 a3a2 d2c3 a2a1q",
+    "Rating": 1659,
+    "NbPlays": 5113,
+    "Themes": "advancedPawn crushing endgame promotion veryLong",
+    "GameUrl": "https://lichess.org/training/00IHi"
+  },
+  {
+    "PuzzleId": "00IKw",
+    "FEN": "3r2k1/pp1P1p1p/6p1/2R1P2r/3Q1P2/6Pq/7P/3R2K1 w - - 1 33",
+    "Moves": "d4d2 d8d7 d2d7 h3h2 g1f1 h2g3 d7d8 g8g7 d8f6 g7h6 f6g5 h5g5",
+    "Rating": 2738,
+    "NbPlays": 213,
+    "Themes": "advantage deflection endgame sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/00IKw"
+  },
+  {
+    "PuzzleId": "00IUW",
+    "FEN": "8/Q1p1r1kp/5pp1/3P3r/4P3/2N2bPq/PPP2R1P/5RK1 w - - 3 23",
+    "Moves": "a7e3 h3g3 h2g3 h5h1",
+    "Rating": 1653,
+    "NbPlays": 2851,
+    "Themes": "clearance kingsideAttack mate mateIn2 middlegame operaMate sacrifice short",
+    "GameUrl": "https://lichess.org/training/00IUW"
+  },
+  {
+    "PuzzleId": "00IYg",
+    "FEN": "r1b2r2/pp2npp1/1qn1p1k1/3pP1N1/3P3P/P7/1P1Q1PP1/RN2K2R b KQ - 0 13",
+    "Moves": "f7f6 h4h5 g6h6 g5e6 h6h7 e6f8",
+    "Rating": 1885,
+    "NbPlays": 1919,
+    "Themes": "advantage discoveredAttack discoveredCheck long middlegame",
+    "GameUrl": "https://lichess.org/training/00IYg"
+  },
+  {
+    "PuzzleId": "00IqI",
+    "FEN": "r5k1/pp3ppp/2p5/4pb2/2B2q2/P1P1nP2/1P1Q3P/3R1R1K b - - 1 22",
+    "Moves": "e3c4 d2d8 a8d8 d1d8",
+    "Rating": 1427,
+    "NbPlays": 66,
+    "Themes": "backRankMate master mate mateIn2 middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00IqI"
+  },
+  {
+    "PuzzleId": "00J1Y",
+    "FEN": "1q3r2/p5k1/1p2pbpp/2p2p2/2P1N3/2P2PQP/PP3P2/6RK b - - 2 29",
+    "Moves": "f5e4 g3g6 g7h8 g6h6",
+    "Rating": 1141,
+    "NbPlays": 817,
+    "Themes": "deflection endgame mate mateIn2 short",
+    "GameUrl": "https://lichess.org/training/00J1Y"
+  },
+  {
+    "PuzzleId": "00JAo",
+    "FEN": "8/5r2/6pk/7p/7P/5PK1/R7/8 b - - 2 58",
+    "Moves": "g6g5 a2a6 h6g7 h4g5",
+    "Rating": 1167,
+    "NbPlays": 141,
+    "Themes": "crushing deflection endgame master rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00JAo"
+  },
+  {
+    "PuzzleId": "00JFF",
+    "FEN": "4r1k1/ppqb3p/6B1/3pb2Q/8/2P5/PP1B2PP/5RK1 b - - 0 20",
+    "Moves": "h7g6 h5g6 e5g7 f1f7 c7c5 g1h1 c5f8 f7f8",
+    "Rating": 2037,
+    "NbPlays": 52,
+    "Themes": "crushing middlegame pin veryLong",
+    "GameUrl": "https://lichess.org/training/00JFF"
+  },
+  {
+    "PuzzleId": "00JYV",
+    "FEN": "r2q1rk1/p1p1bppp/2pp1nb1/4p3/4P1PN/2NP3P/PPP2PK1/R1BQ1R2 b - - 4 11",
+    "Moves": "f6e4 h4g6 e4c3 g6e7 d8e7 b2c3",
+    "Rating": 1761,
+    "NbPlays": 18594,
+    "Themes": "advantage kingsideAttack long opening",
+    "GameUrl": "https://lichess.org/training/00JYV"
+  },
+  {
+    "PuzzleId": "00JqT",
+    "FEN": "2r2rk1/pp2R3/5p2/3p1q2/3P4/4QPPp/PP3R1P/6K1 w - - 2 30",
+    "Moves": "g3g4 f5b1 f2f1 b1b2 e3e6 g8h8",
+    "Rating": 1897,
+    "NbPlays": 751,
+    "Themes": "crushing deflection endgame long",
+    "GameUrl": "https://lichess.org/training/00JqT"
+  },
+  {
+    "PuzzleId": "00K8j",
+    "FEN": "r2q2kr/p4pp1/4b2p/n1Qn4/5B2/4P3/PP3PPP/2KR1BNR w - - 1 14",
+    "Moves": "f4c7 d8c7 c5c7 d5c7",
+    "Rating": 1345,
+    "NbPlays": 230,
+    "Themes": "advantage opening short",
+    "GameUrl": "https://lichess.org/training/00K8j"
+  },
+  {
+    "PuzzleId": "00KMV",
+    "FEN": "1r3k2/1p1q1p2/p2p1np1/2pP2bp/2P1P1n1/1PQ3P1/P3N1K1/3N1R1R b - - 11 28",
+    "Moves": "f6e4 c3h8 f8e7 h8b8",
+    "Rating": 943,
+    "NbPlays": 2641,
+    "Themes": "crushing middlegame short skewer",
+    "GameUrl": "https://lichess.org/training/00KMV"
+  },
+  {
+    "PuzzleId": "00KNB",
+    "FEN": "2rr2k1/5p2/4p2p/4N1pQ/1p3P2/4P3/np3P1P/2q2BRK b - - 1 32",
+    "Moves": "c8c7 h5h6 b2b1q h6g5",
+    "Rating": 2499,
+    "NbPlays": 531,
+    "Themes": "crushing kingsideAttack master middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00KNB"
+  },
+  {
+    "PuzzleId": "00KNK",
+    "FEN": "r3r1k1/p1p4p/3b4/4p1qN/8/1P1b1Q2/P2P1PP1/B5KR b - - 2 22",
+    "Moves": "e5e4 h5f6 g8f8 f6h7 f8e7 a1f6 g5f6 f3f6",
+    "Rating": 2001,
+    "NbPlays": 734,
+    "Themes": "advantage deflection discoveredCheck doubleCheck fork middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/00KNK"
+  },
+  {
+    "PuzzleId": "00KOz",
+    "FEN": "8/r4k2/7R/5PK1/1n6/8/8/8 b - - 3 56",
+    "Moves": "b4d5 h6h7 f7f8 h7a7",
+    "Rating": 960,
+    "NbPlays": 1099,
+    "Themes": "crushing endgame master short skewer",
+    "GameUrl": "https://lichess.org/training/00KOz"
+  },
+  {
+    "PuzzleId": "00KYC",
+    "FEN": "5rk1/p6p/2r1pBp1/4P3/2b5/3p4/P4PPP/1R2R1K1 w - - 0 27",
+    "Moves": "b1b7 f8f6 e5f6 d3d2 e1d1 c4e2",
+    "Rating": 2272,
+    "NbPlays": 58,
+    "Themes": "advancedPawn clearance crushing endgame long master sacrifice",
+    "GameUrl": "https://lichess.org/training/00KYC"
+  },
+  {
+    "PuzzleId": "00KgF",
+    "FEN": "4r3/p5k1/1p5P/1P2P1K1/8/5N2/8/8 b - - 0 42",
+    "Moves": "g7h7 g5h5 h7g8 f3g5 e8e5 h5g6 e5b5 h6h7",
+    "Rating": 2397,
+    "NbPlays": 35,
+    "Themes": "advancedPawn crushing endgame quietMove sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/00KgF"
+  },
+  {
+    "PuzzleId": "00KhM",
+    "FEN": "5rk1/5ppp/1R6/3Qp3/2B1P3/2q3P1/3R1PKP/1r6 b - - 0 27",
+    "Moves": "b1b6 d5f7 f8f7 d2d8",
+    "Rating": 1331,
+    "NbPlays": 46,
+    "Themes": "clearance endgame mate mateIn2 pin sacrifice short",
+    "GameUrl": "https://lichess.org/training/00KhM"
+  },
+  {
+    "PuzzleId": "00Kia",
+    "FEN": "5r1k/4n1pp/1p6/pP5Q/P2pB2K/6P1/2P4P/4q3 b - - 4 37",
+    "Moves": "g7g6 h5e5 h8g8 e4d5 e7d5 e5e1",
+    "Rating": 1591,
+    "NbPlays": 4119,
+    "Themes": "advantage discoveredAttack endgame fork long",
+    "GameUrl": "https://lichess.org/training/00Kia"
+  },
+  {
+    "PuzzleId": "00Knu",
+    "FEN": "r2q1rk1/p3bpp1/2pp1nb1/4p1Q1/8/1B3N1P/PPP3P1/R1B2RK1 b - - 0 18",
+    "Moves": "f6e4 g5g6 d8b6 g1h2",
+    "Rating": 1873,
+    "NbPlays": 118,
+    "Themes": "advantage defensiveMove opening pin short",
+    "GameUrl": "https://lichess.org/training/00Knu"
+  },
+  {
+    "PuzzleId": "00Kq4",
+    "FEN": "r2qk3/5p1r/p1p1p3/1p1pP1p1/P1nP2Pn/2P2NB1/2P2P2/R1QR2K1 w q - 1 21",
+    "Moves": "f3g5 d8g5 c1g5 h4f3 g1g2 f3g5",
+    "Rating": 1417,
+    "NbPlays": 563,
+    "Themes": "advantage attraction fork long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00Kq4"
+  },
+  {
+    "PuzzleId": "00L4x",
+    "FEN": "1r4k1/4Ppbp/p5p1/2q5/p2n4/P2Q2B1/r2N1PPP/3KR2R b - - 0 27",
+    "Moves": "g7h6 e7e8q b8e8 e1e8",
+    "Rating": 1260,
+    "NbPlays": 2736,
+    "Themes": "advancedPawn crushing kingsideAttack middlegame promotion short",
+    "GameUrl": "https://lichess.org/training/00L4x"
+  },
+  {
+    "PuzzleId": "00L76",
+    "FEN": "5rk1/5pp1/4p3/7R/2P5/2n2N2/5r2/2K4R b - - 2 37",
+    "Moves": "g7g6 h5h8 g8g7 h1h7 g7f6 h8f8",
+    "Rating": 1138,
+    "NbPlays": 187,
+    "Themes": "crushing deflection endgame long",
+    "GameUrl": "https://lichess.org/training/00L76"
+  },
+  {
+    "PuzzleId": "00L84",
+    "FEN": "6k1/5pp1/7p/2p5/2P5/2rp2PP/PR3P2/5K2 w - - 0 37",
+    "Moves": "b2b3 c3c1 f1g2 d3d2",
+    "Rating": 1141,
+    "NbPlays": 660,
+    "Themes": "advancedPawn crushing endgame master rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00L84"
+  },
+  {
+    "PuzzleId": "00LMb",
+    "FEN": "8/8/1n4kP/1P3p2/3P1K2/2p1N3/8/8 w - - 4 49",
+    "Moves": "f4e5 b6c4 e3c4 c3c2",
+    "Rating": 1777,
+    "NbPlays": 57,
+    "Themes": "advancedPawn crushing endgame knightEndgame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00LMb"
+  },
+  {
+    "PuzzleId": "00LNB",
+    "FEN": "kr6/1pR4p/p4R2/n2r4/P3p3/4B3/6PP/6K1 b - - 0 38",
+    "Moves": "d5d3 f6a6 b7a6 c7a7",
+    "Rating": 1081,
+    "NbPlays": 3004,
+    "Themes": "endgame mate mateIn2 operaMate sacrifice short",
+    "GameUrl": "https://lichess.org/training/00LNB"
+  },
+  {
+    "PuzzleId": "00LNH",
+    "FEN": "1k2r3/pp2r2p/2pqbpp1/3n4/2BP1p2/5N1P/PPQB1PP1/1K1RR3 w - - 2 22",
+    "Moves": "c4b3 e6f5 c2f5 g6f5",
+    "Rating": 1590,
+    "NbPlays": 1638,
+    "Themes": "advantage middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00LNH"
+  },
+  {
+    "PuzzleId": "00LRq",
+    "FEN": "1k6/1p1q4/P2p3p/1NpPpn1Q/5b2/2P3r1/1P2B1P1/R6K b - - 3 28",
+    "Moves": "g3g7 a6a7 b8a8 b5c7 d7c7 h5e8 c7b8 a7b8q",
+    "Rating": 2111,
+    "NbPlays": 2084,
+    "Themes": "advancedPawn discoveredCheck doubleCheck mate mateIn4 middlegame promotion queensideAttack sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/00LRq"
+  },
+  {
+    "PuzzleId": "00LUZ",
+    "FEN": "rnb1k1nr/1ppp1ppp/8/p1bPp3/4P2q/2PB4/PP3PPP/RNBQK1NR w KQkq - 3 6",
+    "Moves": "g1f3 h4f2",
+    "Rating": 710,
+    "NbPlays": 328,
+    "Themes": "attackingF2F7 mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00LUZ"
+  },
+  {
+    "PuzzleId": "00LZf",
+    "FEN": "r1b1kb1r/pppp1ppp/2n1p3/3nN3/3P2q1/4B3/PPP1BPPP/RN1Q1RK1 b kq - 9 8",
+    "Moves": "d5e3 f2e3 g4g5 e5f7 g5e3 g1h1",
+    "Rating": 2185,
+    "NbPlays": 38,
+    "Themes": "advantage attackingF2F7 fork long opening",
+    "GameUrl": "https://lichess.org/training/00LZf"
+  },
+  {
+    "PuzzleId": "00LZl",
+    "FEN": "r2qkb1r/ppp2ppp/2n5/3pPb2/3n1B2/2NB1N2/PP3PPP/R2QK2R b KQkq - 3 9",
+    "Moves": "f8b4 f3d4 c6d4 d1a4 d4c6 d3f5",
+    "Rating": 2180,
+    "NbPlays": 7908,
+    "Themes": "advantage deflection fork long opening",
+    "GameUrl": "https://lichess.org/training/00LZl"
+  },
+  {
+    "PuzzleId": "00Lh9",
+    "FEN": "4r3/7P/1p4Q1/1b4B1/1k4n1/8/1P2n1PK/4R3 w - - 2 41",
+    "Moves": "h2h1 e2g3 h1g1 e8e1",
+    "Rating": 1316,
+    "NbPlays": 24,
+    "Themes": "discoveredAttack mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/00Lh9"
+  },
+  {
+    "PuzzleId": "00Lhb",
+    "FEN": "2n4k/p3b2p/Pp6/1PpPp3/2B1PpP1/1P6/5BK1/8 b - - 0 33",
+    "Moves": "c8d6 f2c5 b6c5 b5b6 a7b6 a6a7",
+    "Rating": 1783,
+    "NbPlays": 46,
+    "Themes": "advancedPawn advantage endgame long master masterVsMaster sacrifice",
+    "GameUrl": "https://lichess.org/training/00Lhb"
+  },
+  {
+    "PuzzleId": "00Lt1",
+    "FEN": "r4k2/pp3p2/2pNR2p/5Qp1/1P3n2/3P4/P1PK1qPP/8 w - - 6 31",
+    "Moves": "d2c3 f4d5 c3b3 f2f5 d6f5 f7e6",
+    "Rating": 1616,
+    "NbPlays": 1154,
+    "Themes": "advantage discoveredAttack endgame long",
+    "GameUrl": "https://lichess.org/training/00Lt1"
+  },
+  {
+    "PuzzleId": "00M1q",
+    "FEN": "2r3k1/2r1q1p1/p3p1Q1/1p1p4/nP1P4/2P4R/P4PPP/2R3K1 b - - 0 30",
+    "Moves": "e7f6 g6h7 g8f7 h3f3 f6f3 g2f3",
+    "Rating": 1434,
+    "NbPlays": 3161,
+    "Themes": "advantage long middlegame pin",
+    "GameUrl": "https://lichess.org/training/00M1q"
+  },
+  {
+    "PuzzleId": "00M7w",
+    "FEN": "r1b1k2r/ppp2ppp/2n5/2bBp3/2Pq4/3P1QP1/P2B1P1P/1R2K1NR b Kkq - 2 12",
+    "Moves": "f7f6 g1e2 d4f2 f3f2 c5f2 e1f2",
+    "Rating": 2341,
+    "NbPlays": 2050,
+    "Themes": "crushing long opening",
+    "GameUrl": "https://lichess.org/training/00M7w"
+  },
+  {
+    "PuzzleId": "00M92",
+    "FEN": "3q1r1k/p3r1pp/1p1b1p2/2p1n3/3pR2N/1QPP2P1/PP1B1P1P/R5K1 b - - 3 21",
+    "Moves": "e5d3 h4g6 h7g6 e4h4",
+    "Rating": 1103,
+    "NbPlays": 329,
+    "Themes": "clearance kingsideAttack mate mateIn2 middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00M92"
+  },
+  {
+    "PuzzleId": "00MDG",
+    "FEN": "3r2k1/4ppnp/pp2q1p1/2p5/4N3/3rP3/P2P1QPP/3R1RK1 b - - 1 28",
+    "Moves": "e6e4 f2f7 g8h8 f7f8 d8f8 f1f8",
+    "Rating": 1054,
+    "NbPlays": 53,
+    "Themes": "backRankMate long mate mateIn3 middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00MDG"
+  },
+  {
+    "PuzzleId": "00MHi",
+    "FEN": "8/8/5pp1/5k1p/5P1P/4R1P1/2r5/5K2 w - - 0 43",
+    "Moves": "e3e2 c2e2 f1e2 f5g4 e2f2 g4h3",
+    "Rating": 2225,
+    "NbPlays": 219,
+    "Themes": "crushing endgame long rookEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/00MHi"
+  },
+  {
+    "PuzzleId": "00MQl",
+    "FEN": "r1b2k1r/pp3ppp/2p5/2bp4/3N1Pnq/1B2B3/PPP3PP/RN1QR2K w - - 4 15",
+    "Moves": "d4f3 c5e3 f3h4 g4f2 h1g1 f2d1",
+    "Rating": 1868,
+    "NbPlays": 278,
+    "Themes": "advantage discoveredAttack fork long opening sacrifice",
+    "GameUrl": "https://lichess.org/training/00MQl"
+  },
+  {
+    "PuzzleId": "00MZC",
+    "FEN": "5r1k/p5p1/1pb4p/3pR3/1Q6/P1P4P/1P3qP1/R5K1 w - - 0 24",
+    "Moves": "g1h1 d5d4 e5e2 c6g2",
+    "Rating": 1872,
+    "NbPlays": 77,
+    "Themes": "advantage discoveredAttack endgame short",
+    "GameUrl": "https://lichess.org/training/00MZC"
+  },
+  {
+    "PuzzleId": "00MwU",
+    "FEN": "3r1b1R/ppq3p1/2k3P1/3p4/1P1Q4/4PP2/P1P5/2K5 b - - 0 26",
+    "Moves": "a7a6 h8f8 d8f8 d4c5 c6d7 c5f8",
+    "Rating": 1709,
+    "NbPlays": 347,
+    "Themes": "advantage attraction endgame fork long sacrifice",
+    "GameUrl": "https://lichess.org/training/00MwU"
+  },
+  {
+    "PuzzleId": "00NEO",
+    "FEN": "4qr2/pR1b2pk/5p1p/4pPP1/3bB3/3P3Q/P1r4P/4BR1K b - - 0 24",
+    "Moves": "d7c6 h3h6 h7g8 h6g7",
+    "Rating": 1874,
+    "NbPlays": 1783,
+    "Themes": "mate mateIn2 middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00NEO"
+  },
+  {
+    "PuzzleId": "00NHK",
+    "FEN": "r1b2rk1/1p2b1p1/pqn1p1P1/3pP3/1P1P4/P1N1P3/6P1/R2QK2R b KQ - 0 17",
+    "Moves": "c6e5 h1h8 g8h8 d1h5 h8g8 h5h7",
+    "Rating": 1790,
+    "NbPlays": 4102,
+    "Themes": "attraction fork long mate mateIn3 middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00NHK"
+  },
+  {
+    "PuzzleId": "00NUc",
+    "FEN": "6k1/6pp/1PP5/4b3/3p4/Br5P/4prP1/R5RK w - - 1 30",
+    "Moves": "c6c7 b3h3 g2h3 f2h2",
+    "Rating": 1514,
+    "NbPlays": 59,
+    "Themes": "endgame mate mateIn2 operaMate sacrifice short",
+    "GameUrl": "https://lichess.org/training/00NUc"
+  },
+  {
+    "PuzzleId": "00Nay",
+    "FEN": "r2q1r2/ppp2pk1/3p1n2/4p1p1/2B1P3/2NP2Q1/PPP5/2K4R b - - 0 19",
+    "Moves": "g7g6 g3h3 f8h8 h3f5 g6g7 f5g5",
+    "Rating": 1798,
+    "NbPlays": 7094,
+    "Themes": "crushing deflection long middlegame quietMove",
+    "GameUrl": "https://lichess.org/training/00Nay"
+  },
+  {
+    "PuzzleId": "00Nf5",
+    "FEN": "r1bq1rk1/pp2bppp/2pp1n2/8/5P2/5N2/PBPPB1PP/RN1Q1RK1 w - - 5 11",
+    "Moves": "b1c3 d8b6 g1h1 b6b2 a1b1 b2a3",
+    "Rating": 1541,
+    "NbPlays": 13871,
+    "Themes": "advantage fork long opening",
+    "GameUrl": "https://lichess.org/training/00Nf5"
+  },
+  {
+    "PuzzleId": "00NpT",
+    "FEN": "r4rk1/1ppq2p1/p3Rp1p/3P4/2P2Q2/3B3P/PP4PK/8 b - - 1 25",
+    "Moves": "a8e8 f4f5 e8e6 f5h7",
+    "Rating": 1699,
+    "NbPlays": 13,
+    "Themes": "crushing endgame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00NpT"
+  },
+  {
+    "PuzzleId": "00Nqd",
+    "FEN": "8/p7/5P2/PP1bp3/4N3/K2p4/2k5/8 b - - 0 48",
+    "Moves": "d3d2 e4d2 c2d2 b5b6 a7b6 a5b6",
+    "Rating": 1747,
+    "NbPlays": 879,
+    "Themes": "crushing endgame long sacrifice",
+    "GameUrl": "https://lichess.org/training/00Nqd"
+  },
+  {
+    "PuzzleId": "00O37",
+    "FEN": "r1q1r1k1/1p3pp1/n1p4p/p1bpp2P/P3P3/2P2P2/1P1QBP2/R1BK3R b - - 3 23",
+    "Moves": "c5f2 e2a6 b7a6 d2f2",
+    "Rating": 1300,
+    "NbPlays": 62,
+    "Themes": "advantage discoveredAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/00O37"
+  },
+  {
+    "PuzzleId": "00O9Z",
+    "FEN": "5QR1/5p1p/1b3qp1/p6k/P2P4/8/1P2rPPP/5RK1 w - - 7 32",
+    "Moves": "g8h8 f6f2 f1f2 e2e1 f2f1 b6d4 g1h1 e1f1",
+    "Rating": 1616,
+    "NbPlays": 943,
+    "Themes": "backRankMate deflection endgame fork master mate mateIn4 pin sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/00O9Z"
+  },
+  {
+    "PuzzleId": "00O9a",
+    "FEN": "1k3r2/q5r1/2Qp3p/N2Bp3/4P1p1/P7/1PP2PPP/R5K1 w - - 12 35",
+    "Moves": "a5c4 a7f2 g1h1 f2f1 a1f1 f8f1",
+    "Rating": 985,
+    "NbPlays": 729,
+    "Themes": "backRankMate long mate mateIn3 middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00O9a"
+  },
+  {
+    "PuzzleId": "00OCQ",
+    "FEN": "1rr3k1/5p1p/p5pQ/4p3/4q3/B3P3/PPPR1PPP/2KR4 w - - 6 27",
+    "Moves": "c2c3 c8c3 b2c3 b8b1",
+    "Rating": 1090,
+    "NbPlays": 1172,
+    "Themes": "mate mateIn2 middlegame queensideAttack sacrifice short",
+    "GameUrl": "https://lichess.org/training/00OCQ"
+  },
+  {
+    "PuzzleId": "00OKo",
+    "FEN": "r3r1k1/pbq5/1p2pp1p/2p1N3/2PP2Q1/1P1B4/P5PP/R5K1 b - - 1 24",
+    "Moves": "g8f8 a1f1 c7g7 f1f6 g7f6 e5d7",
+    "Rating": 2331,
+    "NbPlays": 79,
+    "Themes": "advantage exposedKing long middlegame pin sacrifice",
+    "GameUrl": "https://lichess.org/training/00OKo"
+  },
+  {
+    "PuzzleId": "00OLF",
+    "FEN": "k1r5/n1p3p1/Q2pN3/P2Pp2p/q3Pp1P/2RK4/5PP1/8 w - - 4 36",
+    "Moves": "e6c7 c8c7 c3c7 a4d1 d3c3 d1c1 c3b3 c1c7",
+    "Rating": 2075,
+    "NbPlays": 587,
+    "Themes": "crushing endgame sacrifice skewer veryLong",
+    "GameUrl": "https://lichess.org/training/00OLF"
+  },
+  {
+    "PuzzleId": "00ON5",
+    "FEN": "8/k1p5/P7/3N4/3P2pp/3K2n1/6P1/8 w - - 1 47",
+    "Moves": "d3e3 h4h3 e3f2 h3h2 f2g3 h2h1q",
+    "Rating": 1825,
+    "NbPlays": 142,
+    "Themes": "advancedPawn crushing endgame knightEndgame long promotion",
+    "GameUrl": "https://lichess.org/training/00ON5"
+  },
+  {
+    "PuzzleId": "00OQt",
+    "FEN": "8/8/8/p3b3/P1B2pKp/1Pk1p2P/6P1/8 w - - 8 50",
+    "Moves": "g4h4 c3d2 h4g4 e3e2 c4e2 d2e2",
+    "Rating": 1690,
+    "NbPlays": 362,
+    "Themes": "advancedPawn bishopEndgame crushing endgame long",
+    "GameUrl": "https://lichess.org/training/00OQt"
+  },
+  {
+    "PuzzleId": "00Oim",
+    "FEN": "1r3rk1/q5pp/2R5/3P4/8/1p2NpPb/1P3P1P/2QR2K1 w - - 0 32",
+    "Moves": "c1c4 a7e3 f2e3 f3f2",
+    "Rating": 1228,
+    "NbPlays": 731,
+    "Themes": "advancedPawn advantage middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00Oim"
+  },
+  {
+    "PuzzleId": "00Or5",
+    "FEN": "r2qkbnr/pp5p/8/4Nb2/3p4/1QN5/PP2PPPP/R3KB1R b KQkq - 1 12",
+    "Moves": "d4c3 b3f7",
+    "Rating": 1443,
+    "NbPlays": 261,
+    "Themes": "mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00Or5"
+  },
+  {
+    "PuzzleId": "00Oyf",
+    "FEN": "8/1p6/7p/3k1pp1/1P5P/3K1P2/6P1/8 w - - 0 39",
+    "Moves": "h4g5 h6g5 d3c3 d5e5 c3c4 e5f4 c4c5 f4g3",
+    "Rating": 2696,
+    "NbPlays": 196,
+    "Themes": "crushing endgame pawnEndgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/00Oyf"
+  },
+  {
+    "PuzzleId": "00P81",
+    "FEN": "6k1/5p2/4p2p/3pPP2/1R5P/7r/2B5/2b2K2 b - - 0 46",
+    "Moves": "h3c3 b4b8 g8h7 f5e6 c3c2 e6e7",
+    "Rating": 2244,
+    "NbPlays": 7733,
+    "Themes": "advancedPawn crushing discoveredAttack discoveredCheck endgame long sacrifice",
+    "GameUrl": "https://lichess.org/training/00P81"
+  },
+  {
+    "PuzzleId": "00PHg",
+    "FEN": "R7/P4p2/5k1p/q5n1/5R2/7P/5PK1/8 b - - 2 46",
+    "Moves": "f6e5 a8e8 e5f4 a7a8q a5a8 e8a8",
+    "Rating": 1374,
+    "NbPlays": 2159,
+    "Themes": "advancedPawn advantage clearance endgame long promotion",
+    "GameUrl": "https://lichess.org/training/00PHg"
+  },
+  {
+    "PuzzleId": "00PZo",
+    "FEN": "7r/8/3b4/3p4/5PR1/2kN4/4KP2/8 w - - 1 67",
+    "Moves": "f4f5 h8e8 e2f3 c3d3",
+    "Rating": 1110,
+    "NbPlays": 468,
+    "Themes": "advantage deflection endgame short",
+    "GameUrl": "https://lichess.org/training/00PZo"
+  },
+  {
+    "PuzzleId": "00PgQ",
+    "FEN": "3r4/P1R5/7P/4p3/8/4p3/2p1K3/1k6 w - - 1 55",
+    "Moves": "e2e3 c2c1q c7c1 b1c1 e3e4 d8e8",
+    "Rating": 2208,
+    "NbPlays": 173,
+    "Themes": "advancedPawn crushing defensiveMove endgame long master promotion",
+    "GameUrl": "https://lichess.org/training/00PgQ"
+  },
+  {
+    "PuzzleId": "00Pms",
+    "FEN": "r1b1kr2/p1p2pQp/1p2pP2/8/8/1P4P1/P2KNP1P/R1B4q b q - 0 17",
+    "Moves": "c8a6 g7f8 e8f8 c1a3 f8e8 a1h1",
+    "Rating": 2155,
+    "NbPlays": 34,
+    "Themes": "advantage attraction discoveredAttack long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00Pms"
+  },
+  {
+    "PuzzleId": "00PrK",
+    "FEN": "r7/7R/P3k3/4p2p/3b2p1/3K4/8/5R2 b - - 7 55",
+    "Moves": "a8a6 h7h6 e6d5 h6a6",
+    "Rating": 968,
+    "NbPlays": 185,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/00PrK"
+  },
+  {
+    "PuzzleId": "00PvP",
+    "FEN": "8/6B1/7p/1p4p1/1Pp3P1/5P1k/4K2b/8 b - - 18 51",
+    "Moves": "h6h5 g4h5 h3h4 h5h6 h4h5 h6h7",
+    "Rating": 823,
+    "NbPlays": 118,
+    "Themes": "advancedPawn bishopEndgame crushing endgame long",
+    "GameUrl": "https://lichess.org/training/00PvP"
+  },
+  {
+    "PuzzleId": "00Q4v",
+    "FEN": "8/2p1b3/q1Pp2k1/3Pp3/4Pr2/1Q3PK1/3N2P1/7R w - - 1 47",
+    "Moves": "h1e1 e7h4 g3h2 h4e1",
+    "Rating": 1228,
+    "NbPlays": 65,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/00Q4v"
+  },
+  {
+    "PuzzleId": "00QBx",
+    "FEN": "rn1qk2r/pb3ppp/5n2/2b5/7N/2N1p1P1/PP1PPP1P/R1BQKB1R w KQkq - 0 9",
+    "Moves": "h4g2 e3f2",
+    "Rating": 1163,
+    "NbPlays": 443,
+    "Themes": "advancedPawn attackingF2F7 mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00QBx"
+  },
+  {
+    "PuzzleId": "00QZ3",
+    "FEN": "r1bq3r/ppppnkpp/2n5/b5N1/4P3/B1P5/P4PPP/RN1QK2R b KQ - 1 9",
+    "Moves": "f7f8 d1f3 f8e8 f3f7",
+    "Rating": 1232,
+    "NbPlays": 1668,
+    "Themes": "mate mateIn2 opening short",
+    "GameUrl": "https://lichess.org/training/00QZ3"
+  },
+  {
+    "PuzzleId": "00QjF",
+    "FEN": "8/8/1pr1p1kp/pbPp2pN/3Pp1P1/1P2K3/P6P/2R5 b - - 0 29",
+    "Moves": "e6e5 c5b6 c6c1 b6b7 c1e1 e3d2",
+    "Rating": 2097,
+    "NbPlays": 705,
+    "Themes": "advancedPawn crushing endgame long master sacrifice",
+    "GameUrl": "https://lichess.org/training/00QjF"
+  },
+  {
+    "PuzzleId": "00QyM",
+    "FEN": "8/3k4/1pp3p1/4Pp1p/2PK1P1P/pP6/P7/8 b - - 1 35",
+    "Moves": "d7e6 b3b4 e6e7 b4b5 c6b5 c4b5",
+    "Rating": 2181,
+    "NbPlays": 1554,
+    "Themes": "crushing endgame long pawnEndgame quietMove zugzwang",
+    "GameUrl": "https://lichess.org/training/00QyM"
+  },
+  {
+    "PuzzleId": "00R0l",
+    "FEN": "rnbqkb1r/pp3p1p/6pP/P1ppp3/6n1/3P1P2/1PP1P1P1/RNBQKBNR b KQkq - 0 7",
+    "Moves": "g4h6 c1h6 f8h6 h1h6",
+    "Rating": 1232,
+    "NbPlays": 1541,
+    "Themes": "advantage opening short",
+    "GameUrl": "https://lichess.org/training/00R0l"
+  },
+  {
+    "PuzzleId": "00R2A",
+    "FEN": "2kr1b1R/p5p1/8/3P1p2/8/4B3/PPPK1P2/8 w - - 1 25",
+    "Moves": "c2c4 f8b4 d2d3 d8h8",
+    "Rating": 912,
+    "NbPlays": 1594,
+    "Themes": "crushing discoveredAttack endgame short",
+    "GameUrl": "https://lichess.org/training/00R2A"
+  },
+  {
+    "PuzzleId": "00R9D",
+    "FEN": "8/1k6/1pn1R3/8/Pp4p1/4P3/5PK1/8 w - - 0 51",
+    "Moves": "e6e4 b4b3 e4g4 b3b2",
+    "Rating": 1098,
+    "NbPlays": 10,
+    "Themes": "advancedPawn crushing endgame short",
+    "GameUrl": "https://lichess.org/training/00R9D"
+  },
+  {
+    "PuzzleId": "00RWr",
+    "FEN": "6k1/5pp1/n3p2p/1q1pN3/8/4PB1P/Q4PPK/2r5 b - - 3 36",
+    "Moves": "a6c5 a2a8 g8h7 e5f7 b5b2 a8h8 h7g6 h8g8 g6f6 f3h5",
+    "Rating": 2961,
+    "NbPlays": 675,
+    "Themes": "crushing defensiveMove deflection endgame veryLong",
+    "GameUrl": "https://lichess.org/training/00RWr"
+  },
+  {
+    "PuzzleId": "00Rep",
+    "FEN": "8/8/b1k5/p1N5/2p5/1P4P1/P6P/6K1 w - - 1 51",
+    "Moves": "c5a6 c4c3 b3b4 c3c2",
+    "Rating": 1565,
+    "NbPlays": 679,
+    "Themes": "advancedPawn crushing endgame knightEndgame short",
+    "GameUrl": "https://lichess.org/training/00Rep"
+  },
+  {
+    "PuzzleId": "00RoG",
+    "FEN": "2kr2nr/pp2nppp/2pp4/2b2PP1/4NPq1/3B1R2/PPP4P/R2QB2K w - - 5 18",
+    "Moves": "h2h3 g4g1",
+    "Rating": 1017,
+    "NbPlays": 701,
+    "Themes": "mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00RoG"
+  },
+  {
+    "PuzzleId": "00RtC",
+    "FEN": "r4k2/ppp3p1/3p3r/2q5/2NnP3/2Q2PBp/PP3R1P/5RK1 w - - 4 25",
+    "Moves": "b2b4 d4e2 g1h1 c5f2 c3g7 f8g7",
+    "Rating": 1948,
+    "NbPlays": 55,
+    "Themes": "advantage deflection discoveredAttack long middlegame pin",
+    "GameUrl": "https://lichess.org/training/00RtC"
+  },
+  {
+    "PuzzleId": "00Rue",
+    "FEN": "r2qkb1r/pp1nppp1/2p2n1p/3p1b2/3P4/BP2PN2/P1P2PPP/RN1QKB1R w KQkq - 2 7",
+    "Moves": "c2c4 f5b1 a1b1 d8a5 b3b4 a5a3",
+    "Rating": 1832,
+    "NbPlays": 18501,
+    "Themes": "advantage fork long opening",
+    "GameUrl": "https://lichess.org/training/00Rue"
+  },
+  {
+    "PuzzleId": "00SLR",
+    "FEN": "rnbqk1nr/ppppbppp/4p3/8/5P2/5N2/PPPPP1PP/RNBQKB1R w KQkq - 2 3",
+    "Moves": "g2g4 e7h4 f3h4 d8h4",
+    "Rating": 678,
+    "NbPlays": 592,
+    "Themes": "mate mateIn2 opening short",
+    "GameUrl": "https://lichess.org/training/00SLR"
+  },
+  {
+    "PuzzleId": "00Se9",
+    "FEN": "5rk1/pp1n2r1/3p2N1/2pQ4/2P5/4P1P1/qP2KPP1/7R b - - 1 24",
+    "Moves": "g7f7 g6e7 g8g7 d5g5",
+    "Rating": 1835,
+    "NbPlays": 5156,
+    "Themes": "mate mateIn2 middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00Se9"
+  },
+  {
+    "PuzzleId": "00SiY",
+    "FEN": "8/8/3p2N1/3Pp1n1/4Pp1p/3k1P1P/6K1/8 w - - 8 57",
+    "Moves": "g6h4 d3e2 h4f5 g5f3",
+    "Rating": 2111,
+    "NbPlays": 2580,
+    "Themes": "crushing endgame knightEndgame master short zugzwang",
+    "GameUrl": "https://lichess.org/training/00SiY"
+  },
+  {
+    "PuzzleId": "00SlL",
+    "FEN": "r5k1/2p1qp1p/2b1p1pQ/pp5P/3P2P1/3P1r2/PP2N3/2KR3R b - - 0 23",
+    "Moves": "f3d3 d1d3 c6h1 h5g6 f7g6 h6h1",
+    "Rating": 2297,
+    "NbPlays": 719,
+    "Themes": "advantage discoveredAttack long middlegame",
+    "GameUrl": "https://lichess.org/training/00SlL"
+  },
+  {
+    "PuzzleId": "00Svg",
+    "FEN": "8/p7/1p4k1/2pN2p1/4Pp2/P1P4r/1P3KR1/8 w - - 6 50",
+    "Moves": "f2e2 f4f3 e2f2 f3g2",
+    "Rating": 1182,
+    "NbPlays": 102,
+    "Themes": "advancedPawn advantage endgame fork master short",
+    "GameUrl": "https://lichess.org/training/00Svg"
+  },
+  {
+    "PuzzleId": "00SyL",
+    "FEN": "1rb2rk1/4bppp/p1n1p3/1p1qP3/7N/P5P1/1PQ2PBP/R1B2RK1 b - - 1 15",
+    "Moves": "d5c5 c2c5 e7c5 g2c6",
+    "Rating": 1221,
+    "NbPlays": 6075,
+    "Themes": "capturingDefender crushing opening short",
+    "GameUrl": "https://lichess.org/training/00SyL"
+  },
+  {
+    "PuzzleId": "00T4i",
+    "FEN": "2r4k/q2b1Q1p/2p2P2/1p2p3/4P3/p2P3R/4N1rK/R7 w - - 0 38",
+    "Moves": "h2g2 d7h3 g2h3 a7f7",
+    "Rating": 1532,
+    "NbPlays": 343,
+    "Themes": "crushing discoveredAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/00T4i"
+  },
+  {
+    "PuzzleId": "00TFd",
+    "FEN": "1R6/8/p1P3k1/6pp/1P6/6PK/r6P/8 w - - 1 40",
+    "Moves": "c6c7 g5g4 h3h4 a2h2",
+    "Rating": 1031,
+    "NbPlays": 182,
+    "Themes": "deflection endgame mate mateIn2 rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00TFd"
+  },
+  {
+    "PuzzleId": "00TLz",
+    "FEN": "8/p3Q2p/6p1/4p1k1/5q2/8/Pr4PP/6K1 b - - 1 36",
+    "Moves": "f4f6 h2h4 g5f5 g2g4 f5g4 e7f6",
+    "Rating": 1467,
+    "NbPlays": 548,
+    "Themes": "advantage deflection endgame long",
+    "GameUrl": "https://lichess.org/training/00TLz"
+  },
+  {
+    "PuzzleId": "00Tdk",
+    "FEN": "r6r/4kppp/2pNpnq1/p1P1n3/8/B3P3/PP2QPPP/3R1RK1 w - - 7 20",
+    "Moves": "e2d2 e5f3 g1h1 f3d2",
+    "Rating": 1028,
+    "NbPlays": 1817,
+    "Themes": "crushing middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00Tdk"
+  },
+  {
+    "PuzzleId": "00TiV",
+    "FEN": "8/1kp5/4n3/3pN3/r2P3R/2K4P/8/8 w - - 5 48",
+    "Moves": "e5f3 a4a3 c3c2 a3f3",
+    "Rating": 1135,
+    "NbPlays": 1204,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/00TiV"
+  },
+  {
+    "PuzzleId": "00UEs",
+    "FEN": "8/3R3p/5kp1/8/2Bnp3/1P5P/P6r/4K3 b - - 1 40",
+    "Moves": "f6e5 d7d5 e5f4 d5d4",
+    "Rating": 1513,
+    "NbPlays": 890,
+    "Themes": "advantage deflection endgame master short",
+    "GameUrl": "https://lichess.org/training/00UEs"
+  },
+  {
+    "PuzzleId": "00UGu",
+    "FEN": "7R/6rP/8/8/8/5p2/7K/5k2 w - - 5 67",
+    "Moves": "h2h3 f3f2 h3h4 g7e7",
+    "Rating": 2580,
+    "NbPlays": 129,
+    "Themes": "advancedPawn crushing endgame master rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00UGu"
+  },
+  {
+    "PuzzleId": "00UHZ",
+    "FEN": "3n2k1/6p1/pp3p1p/8/2r1NR1P/6P1/1PP5/1K6 b - - 1 32",
+    "Moves": "d8e6 e4f6 g7f6 f4c4",
+    "Rating": 1071,
+    "NbPlays": 3457,
+    "Themes": "advantage discoveredAttack endgame short",
+    "GameUrl": "https://lichess.org/training/00UHZ"
+  },
+  {
+    "PuzzleId": "00UQj",
+    "FEN": "6r1/pp1qbpk1/8/2pPp1r1/2P1Pp2/P1N2Qp1/3B2K1/R6R w - - 0 31",
+    "Moves": "h1h3 d7h3 g2h3 g3g2",
+    "Rating": 2363,
+    "NbPlays": 1624,
+    "Themes": "advancedPawn crushing master middlegame sacrifice short",
+    "GameUrl": "https://lichess.org/training/00UQj"
+  },
+  {
+    "PuzzleId": "00Ueq",
+    "FEN": "r1b2rk1/pp4b1/n1pqp1Q1/4p3/2P2PP1/P2B4/1P6/R1B1K2R b KQ - 1 19",
+    "Moves": "f8f6 h1h8 g8h8 g6h7",
+    "Rating": 1671,
+    "NbPlays": 1599,
+    "Themes": "attraction kingsideAttack master mate mateIn2 middlegame pin sacrifice short",
+    "GameUrl": "https://lichess.org/training/00Ueq"
+  },
+  {
+    "PuzzleId": "00Uo9",
+    "FEN": "4Q3/5ppk/2p2b1p/1pq1pP2/2r1B3/5P1P/6P1/5R1K b - - 3 33",
+    "Moves": "c5e7 e8e7 f6e7 f5f6 c4e4 f6e7",
+    "Rating": 1203,
+    "NbPlays": 742,
+    "Themes": "advancedPawn crushing discoveredAttack discoveredCheck endgame long",
+    "GameUrl": "https://lichess.org/training/00Uo9"
+  },
+  {
+    "PuzzleId": "00V59",
+    "FEN": "rnb2rk1/5ppp/p2q4/1p1P4/2p3n1/2N2N2/PP2BPPP/R2Q1RK1 w - - 0 14",
+    "Moves": "f3d4 d6h2",
+    "Rating": 523,
+    "NbPlays": 212,
+    "Themes": "kingsideAttack mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00V59"
+  },
+  {
+    "PuzzleId": "00VDN",
+    "FEN": "3r4/3r2k1/p7/3p2p1/3R2Pp/1P2PK2/P2R4/8 w - - 0 38",
+    "Moves": "e3e4 d5e4 f3e3 d7d4",
+    "Rating": 1524,
+    "NbPlays": 58,
+    "Themes": "crushing discoveredAttack endgame master rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00VDN"
+  },
+  {
+    "PuzzleId": "00Vdx",
+    "FEN": "2k3rr/ppp2p1p/2np1B2/8/4P3/2NB1b2/PPP2PPP/R4RK1 w - - 1 13",
+    "Moves": "f6h8 g8g2 g1h1 g2g4",
+    "Rating": 1456,
+    "NbPlays": 594,
+    "Themes": "discoveredAttack discoveredCheck kingsideAttack mate mateIn2 middlegame morphysMate short",
+    "GameUrl": "https://lichess.org/training/00Vdx"
+  },
+  {
+    "PuzzleId": "00VhV",
+    "FEN": "5k2/5P2/4K3/4p3/ppp1P3/2P1P3/PP4P1/8 w - - 2 50",
+    "Moves": "g2g4 a4a3 c3b4 a3b2",
+    "Rating": 1636,
+    "NbPlays": 457,
+    "Themes": "advancedPawn crushing endgame pawnEndgame short",
+    "GameUrl": "https://lichess.org/training/00VhV"
+  },
+  {
+    "PuzzleId": "00VlM",
+    "FEN": "1k6/1p2rp1p/1p4b1/1N1B4/2P2p2/3p3P/P2Rr3/2K2R2 w - - 4 34",
+    "Moves": "f1f4 e2e1 c1b2 e7e2 b2c3 e1c1 c3d4 e2d2",
+    "Rating": 2318,
+    "NbPlays": 1194,
+    "Themes": "advantage clearance deflection exposedKing middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/00VlM"
+  },
+  {
+    "PuzzleId": "00Voj",
+    "FEN": "r1bk1b1r/2q5/p1n1p1Bp/1p1pP3/3p4/P3B3/1PP2QPP/R4RK1 b - - 1 17",
+    "Moves": "d4e3 f2f6 d8d7 f6h8 c8b7 f1f8 a8f8 h8f8",
+    "Rating": 2166,
+    "NbPlays": 31,
+    "Themes": "advantage discoveredAttack fork middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/00Voj"
+  },
+  {
+    "PuzzleId": "00W5B",
+    "FEN": "1r4k1/p5pp/5p2/2Rb4/1P4P1/P2r4/3P3P/3B1RK1 b - - 3 34",
+    "Moves": "d3d2 c5d5 d2d5 d1b3 g8f8 b3d5",
+    "Rating": 1402,
+    "NbPlays": 271,
+    "Themes": "advantage attraction endgame long pin sacrifice",
+    "GameUrl": "https://lichess.org/training/00W5B"
+  },
+  {
+    "PuzzleId": "00WG3",
+    "FEN": "8/pk1r1Rp1/1p2p2p/4P1bP/3rN3/8/PP6/1K3R2 b - - 4 33",
+    "Moves": "d4d1 f1d1 d7f7 e4d6 b7c7 d6f7",
+    "Rating": 1044,
+    "NbPlays": 226,
+    "Themes": "crushing endgame fork long pin",
+    "GameUrl": "https://lichess.org/training/00WG3"
+  },
+  {
+    "PuzzleId": "00WJN",
+    "FEN": "5Q2/7K/8/8/4p2P/3kq3/8/8 b - - 1 53",
+    "Moves": "e3g3 f8a3 d3d2 a3g3",
+    "Rating": 1324,
+    "NbPlays": 656,
+    "Themes": "crushing endgame queenEndgame short skewer",
+    "GameUrl": "https://lichess.org/training/00WJN"
+  },
+  {
+    "PuzzleId": "00WNb",
+    "FEN": "8/8/1KpB4/Pb6/1P5p/5k2/8/8 b - - 3 55",
+    "Moves": "f3g2 a5a6 g2f3 a6a7",
+    "Rating": 1051,
+    "NbPlays": 240,
+    "Themes": "advancedPawn bishopEndgame crushing endgame master short",
+    "GameUrl": "https://lichess.org/training/00WNb"
+  },
+  {
+    "PuzzleId": "00WUu",
+    "FEN": "r3k1nr/pp3ppp/1q2b3/8/1n1p4/6P1/PB1QPPBP/R3K1NR w KQkq - 0 13",
+    "Moves": "b2d4 b6d4 d2d4 b4c2 e1f1 c2d4",
+    "Rating": 1520,
+    "NbPlays": 1110,
+    "Themes": "attraction crushing fork long opening sacrifice",
+    "GameUrl": "https://lichess.org/training/00WUu"
+  },
+  {
+    "PuzzleId": "00WVK",
+    "FEN": "k7/7R/p1P5/4K3/1P6/r6p/8/8 b - - 2 51",
+    "Moves": "a3b3 h7h8 a8a7 c6c7",
+    "Rating": 1949,
+    "NbPlays": 373,
+    "Themes": "advancedPawn crushing endgame master rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00WVK"
+  },
+  {
+    "PuzzleId": "00WZO",
+    "FEN": "8/1R2B3/5p2/1k2bP1p/p6r/5K2/8/8 b - - 7 45",
+    "Moves": "b5c4 b7b4 c4d5 b4h4",
+    "Rating": 1129,
+    "NbPlays": 808,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/00WZO"
+  },
+  {
+    "PuzzleId": "00Wfu",
+    "FEN": "3qr1k1/p4p1p/6p1/3pQ3/8/1P3P2/P5PP/3R2K1 w - - 2 26",
+    "Moves": "e5d5 e8e1 d1e1 d8d5",
+    "Rating": 1351,
+    "NbPlays": 34,
+    "Themes": "advantage deflection endgame master short",
+    "GameUrl": "https://lichess.org/training/00Wfu"
+  },
+  {
+    "PuzzleId": "00WsE",
+    "FEN": "r2qkb1r/1Q1npppp/p2pb3/8/4P3/5N2/PPP2PPP/R1B1KB1R w KQkq - 1 9",
+    "Moves": "f1a6 d8a5 b2b4 a5a6 b7a6 a8a6",
+    "Rating": 1464,
+    "NbPlays": 68,
+    "Themes": "advantage long opening",
+    "GameUrl": "https://lichess.org/training/00WsE"
+  },
+  {
+    "PuzzleId": "00WzB",
+    "FEN": "8/8/8/P1K1p3/5k1p/5b1B/5P2/8 w - - 3 46",
+    "Moves": "h3f1 f3a8 c5d6 e5e4 f1g2 f4g4 a5a6 h4h3 g2h1 e4e3 h1a8 e3f2 a8f3 g4g3 a6a7 f2f1q a7a8q f1f3",
+    "Rating": 2718,
+    "NbPlays": 2370,
+    "Themes": "advancedPawn bishopEndgame crushing endgame promotion quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/00WzB"
+  },
+  {
+    "PuzzleId": "00X0Q",
+    "FEN": "6R1/8/8/8/1KP5/3r4/PP3kp1/8 w - - 3 52",
+    "Moves": "c4c5 d3g3 g8g3 f2g3 c5c6 g2g1q",
+    "Rating": 1425,
+    "NbPlays": 1550,
+    "Themes": "advancedPawn crushing endgame long promotion rookEndgame",
+    "GameUrl": "https://lichess.org/training/00X0Q"
+  },
+  {
+    "PuzzleId": "00X2j",
+    "FEN": "8/5KP1/R1k5/8/2pp4/8/8/6r1 b - - 1 50",
+    "Moves": "c6c5 a6g6 g1g6 f7g6 d4d3 g7g8q",
+    "Rating": 1512,
+    "NbPlays": 13684,
+    "Themes": "advancedPawn crushing endgame long promotion rookEndgame",
+    "GameUrl": "https://lichess.org/training/00X2j"
+  },
+  {
+    "PuzzleId": "00XGg",
+    "FEN": "2k4r/ppp2ppr/2n5/3b1N2/3p1bP1/5NP1/PPP1QP2/R3R1K1 w - - 1 20",
+    "Moves": "g1g2 h7h2 g2f1 h2h1 f3g1 h1g1 f1g1 h8h1",
+    "Rating": 1848,
+    "NbPlays": 159,
+    "Themes": "attraction mate mateIn4 middlegame operaMate pin sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/00XGg"
+  },
+  {
+    "PuzzleId": "00XL2",
+    "FEN": "2kr3r/ppp3pp/6q1/3Pnp2/1PP1p3/7P/P2QNPP1/R4RK1 w - - 1 17",
+    "Moves": "d2d4 e5f3 g1h1 f3d4",
+    "Rating": 928,
+    "NbPlays": 595,
+    "Themes": "crushing middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00XL2"
+  },
+  {
+    "PuzzleId": "00XQ8",
+    "FEN": "k4r2/pp6/2p3Q1/3p2P1/4r2P/8/PPP2q2/2KR3R w - - 1 30",
+    "Moves": "h1f1 f2e3 c1b1 f8f1 g6g8 e4e8",
+    "Rating": 1518,
+    "NbPlays": 1173,
+    "Themes": "advantage discoveredAttack endgame long",
+    "GameUrl": "https://lichess.org/training/00XQ8"
+  },
+  {
+    "PuzzleId": "00XXM",
+    "FEN": "3r1br1/Qpqk1p2/p1p1p2p/3nP3/8/2P1NP1N/PP6/1K1R3R b - - 3 25",
+    "Moves": "f8e7 c3c4 b7b6 a7c7 d7c7 c4d5",
+    "Rating": 1754,
+    "NbPlays": 14357,
+    "Themes": "advantage long middlegame pin",
+    "GameUrl": "https://lichess.org/training/00XXM"
+  },
+  {
+    "PuzzleId": "00XZR",
+    "FEN": "8/2p5/p1n5/1pP1p2k/1P1p4/P2P3P/5P2/R4KRq b - - 9 34",
+    "Moves": "h1h3 f1e2 e5e4 g1h1 e4d3 e2d2",
+    "Rating": 1641,
+    "NbPlays": 1197,
+    "Themes": "crushing defensiveMove endgame long pin",
+    "GameUrl": "https://lichess.org/training/00XZR"
+  },
+  {
+    "PuzzleId": "00Xdc",
+    "FEN": "r1br1N1k/ppp2BbQ/2n2n1p/q7/3P4/2N5/PPP2PPP/R1B2RK1 b - - 6 15",
+    "Moves": "f6h7 f8g6",
+    "Rating": 945,
+    "NbPlays": 293,
+    "Themes": "mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00Xdc"
+  },
+  {
+    "PuzzleId": "00XoP",
+    "FEN": "6r1/p6k/1p4rp/3q1Q2/8/P7/4Rp1P/5R1K w - - 0 37",
+    "Moves": "f5d5 g6g1 f1g1 f2g1q",
+    "Rating": 679,
+    "NbPlays": 73,
+    "Themes": "advancedPawn endgame mate mateIn2 promotion queenRookEndgame short",
+    "GameUrl": "https://lichess.org/training/00XoP"
+  },
+  {
+    "PuzzleId": "00Y5Q",
+    "FEN": "rnbq1rk1/pp2b2p/4p2p/3p1p1Q/2pP4/P1N5/1PP1PPPP/2KR1BNR w - - 0 11",
+    "Moves": "h5h6 e7g5 h6g5 d8g5",
+    "Rating": 909,
+    "NbPlays": 1032,
+    "Themes": "crushing fork opening short",
+    "GameUrl": "https://lichess.org/training/00Y5Q"
+  },
+  {
+    "PuzzleId": "00Y6y",
+    "FEN": "5k2/5pp1/8/1p2N3/1P6/7P/3nR1P1/2r3K1 w - - 1 48",
+    "Moves": "g1h2 d2f1 h2g1 f1g3 g1f2 g3e2",
+    "Rating": 1193,
+    "NbPlays": 531,
+    "Themes": "advantage discoveredAttack discoveredCheck endgame long",
+    "GameUrl": "https://lichess.org/training/00Y6y"
+  },
+  {
+    "PuzzleId": "00YbG",
+    "FEN": "8/7p/3k2p1/p5P1/P2K4/8/8/8 b - - 4 47",
+    "Moves": "d6c6 d4c4 c6d6 c4b5",
+    "Rating": 1855,
+    "NbPlays": 76,
+    "Themes": "crushing endgame pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/00YbG"
+  },
+  {
+    "PuzzleId": "00YbZ",
+    "FEN": "b6k/8/6p1/4q2p/1Q3r1P/P1N3R1/1PP3PK/8 w - - 3 35",
+    "Moves": "b4b6 f4h4 h2g1 e5e1",
+    "Rating": 1344,
+    "NbPlays": 5376,
+    "Themes": "endgame mate mateIn2 pin short",
+    "GameUrl": "https://lichess.org/training/00YbZ"
+  },
+  {
+    "PuzzleId": "00Yqw",
+    "FEN": "1Qbk1b1r/4rpp1/p1BP3p/8/3q4/6P1/1PP3PP/1K5R b - - 0 33",
+    "Moves": "e7d7 c6d7 d4c5 d7c8",
+    "Rating": 1880,
+    "NbPlays": 56,
+    "Themes": "crushing middlegame pin short",
+    "GameUrl": "https://lichess.org/training/00Yqw"
+  },
+  {
+    "PuzzleId": "00ZAn",
+    "FEN": "rnbqk1nr/ppp1b1pp/3p4/4p3/2B1P3/5N2/PPPP2PP/RNBQK2R w KQkq - 0 6",
+    "Moves": "f3e5 d6e5 d1h5 g7g6 h5e5 g8f6",
+    "Rating": 1794,
+    "NbPlays": 155,
+    "Themes": "advantage hangingPiece long opening",
+    "GameUrl": "https://lichess.org/training/00ZAn"
+  },
+  {
+    "PuzzleId": "00ZEW",
+    "FEN": "r1b5/pppqNkp1/3p3p/6rn/1PP2p1N/P5P1/4Q2P/4RRK1 b - - 3 22",
+    "Moves": "g5e5 e2h5 e5h5 f1f4 f7e8 e7g6",
+    "Rating": 2201,
+    "NbPlays": 1833,
+    "Themes": "advantage discoveredAttack discoveredCheck long middlegame pin sacrifice",
+    "GameUrl": "https://lichess.org/training/00ZEW"
+  },
+  {
+    "PuzzleId": "00ZK8",
+    "FEN": "r1bq1b1r/pp3kpp/3p1n2/3Q4/2n1P3/5N2/PP3PPP/RNB1K2R b KQ - 1 10",
+    "Moves": "c8e6 f3g5 f7g6 d5e6",
+    "Rating": 2332,
+    "NbPlays": 348,
+    "Themes": "advantage deflection opening short",
+    "GameUrl": "https://lichess.org/training/00ZK8"
+  },
+  {
+    "PuzzleId": "00ZSd",
+    "FEN": "2R5/5pk1/pb4p1/1p1q4/3P1P1p/P3r2P/1PQ3P1/3R2K1 w - - 6 45",
+    "Moves": "g1h1 e3h3 h1g1 b6d4 d1d4 d5d4",
+    "Rating": 1295,
+    "NbPlays": 2353,
+    "Themes": "crushing endgame long pin",
+    "GameUrl": "https://lichess.org/training/00ZSd"
+  },
+  {
+    "PuzzleId": "00ZeT",
+    "FEN": "1Q1k4/4r3/2q4p/2p1pp1P/2Bb4/1P6/P6K/4R3 b - - 4 43",
+    "Moves": "d8d7 c4b5 c6b5 b8b5",
+    "Rating": 1418,
+    "NbPlays": 31693,
+    "Themes": "crushing endgame pin short",
+    "GameUrl": "https://lichess.org/training/00ZeT"
+  },
+  {
+    "PuzzleId": "00Zit",
+    "FEN": "r3kb1r/ppp2pp1/3p4/1P2p3/2P3pn/2N1P2q/PB1P1P1N/R2Q1RK1 w kq - 0 15",
+    "Moves": "d1g4 h4f3 h2f3 h3g4",
+    "Rating": 1196,
+    "NbPlays": 595,
+    "Themes": "deflection kingsideAttack mate mateIn2 middlegame short",
+    "GameUrl": "https://lichess.org/training/00Zit"
+  },
+  {
+    "PuzzleId": "00Zks",
+    "FEN": "8/P1R4p/5pk1/4q1p1/5P2/6KP/5QP1/7r b - - 0 51",
+    "Moves": "e5c7 a7a8q c7c3 a8f3",
+    "Rating": 1800,
+    "NbPlays": 88,
+    "Themes": "advancedPawn advantage defensiveMove endgame promotion short",
+    "GameUrl": "https://lichess.org/training/00Zks"
+  },
+  {
+    "PuzzleId": "00aG8",
+    "FEN": "1r3k2/p4ppp/2rN4/8/P2P4/8/2P2PPP/3Q2K1 w - - 3 23",
+    "Moves": "d6f5 c6b6 g1f1 b6b1 d1b1 b8b1",
+    "Rating": 1631,
+    "NbPlays": 1015,
+    "Themes": "advantage endgame long pin quietMove",
+    "GameUrl": "https://lichess.org/training/00aG8"
+  },
+  {
+    "PuzzleId": "00aZP",
+    "FEN": "r1b1k2r/p1p2ppp/1pN2n2/2n1b3/2B1P3/P1N5/1PP2PPP/R1BR2K1 b kq - 0 13",
+    "Moves": "e5c3 d1d8",
+    "Rating": 874,
+    "NbPlays": 484,
+    "Themes": "mate mateIn1 oneMove opening",
+    "GameUrl": "https://lichess.org/training/00aZP"
+  },
+  {
+    "PuzzleId": "00afi",
+    "FEN": "3r2k1/1p5p/pbbqpr2/3PR3/P5p1/2B2N1P/1PQ2P1P/3R3K b - - 0 26",
+    "Moves": "f6f3 e5g5 g8f8 c2h7 d6h2 h1h2 f3h3 h7h3",
+    "Rating": 1926,
+    "NbPlays": 3048,
+    "Themes": "crushing deflection middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/00afi"
+  },
+  {
+    "PuzzleId": "00bFH",
+    "FEN": "4r1k1/1q3ppp/3B1n2/p2P4/8/Pp3Q1P/5PPN/1R4K1 w - - 0 27",
+    "Moves": "f3b3 e8e1 b1e1 b7b3",
+    "Rating": 1821,
+    "NbPlays": 107,
+    "Themes": "deflection equality middlegame short",
+    "GameUrl": "https://lichess.org/training/00bFH"
+  },
+  {
+    "PuzzleId": "00bPT",
+    "FEN": "2k2Q2/pp2pp2/3p1n2/2pP4/2P1P3/2q2PK1/8/5B2 b - - 1 33",
+    "Moves": "c8d7 f1h3 d7c7 f8e7",
+    "Rating": 1878,
+    "NbPlays": 317,
+    "Themes": "advantage deflection endgame short",
+    "GameUrl": "https://lichess.org/training/00bPT"
+  },
+  {
+    "PuzzleId": "00bQA",
+    "FEN": "r7/6k1/2b1R1n1/1p3nR1/1P1p3p/3P1PpP/2N3P1/6K1 b - - 0 40",
+    "Moves": "f5e7 e6e7 g7f6 g5g6 f6e7 g6c6 e7d7 c6c5",
+    "Rating": 2210,
+    "NbPlays": 604,
+    "Themes": "crushing exposedKing master middlegame pin skewer veryLong",
+    "GameUrl": "https://lichess.org/training/00bQA"
+  },
+  {
+    "PuzzleId": "00baa",
+    "FEN": "1r1qr1k1/p1p2ppp/1p1b1n2/8/3Q4/1PN3P1/PBP1PPKP/R3R3 w - - 1 15",
+    "Moves": "c3d5 d6e5 d5f6 d8f6 d4c4 e5b2",
+    "Rating": 2122,
+    "NbPlays": 704,
+    "Themes": "advantage long middlegame skewer",
+    "GameUrl": "https://lichess.org/training/00baa"
+  },
+  {
+    "PuzzleId": "00coU",
+    "FEN": "6k1/R7/5K2/1r6/5r2/p4N2/8/5R2 w - - 3 50",
+    "Moves": "f6e7 f4f7 e7d6 f7a7",
+    "Rating": 1418,
+    "NbPlays": 780,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/00coU"
+  },
+  {
+    "PuzzleId": "00d9q",
+    "FEN": "1r1q1r2/Q2k3p/2pp1npb/2p2P2/8/2N5/PP3PPP/4RRK1 b - - 0 19",
+    "Moves": "d8c7 e1e7 d7e7 a7c7",
+    "Rating": 1139,
+    "NbPlays": 935,
+    "Themes": "attraction crushing deflection master middlegame short",
+    "GameUrl": "https://lichess.org/training/00d9q"
+  },
+  {
+    "PuzzleId": "00dqP",
+    "FEN": "r1b2rk1/5p1p/p3pP2/1p1p4/5q1n/1P5P/P1P1QPB1/1K1R2R1 b - - 2 21",
+    "Moves": "f4f6 g2d5 h4g6 d5a8",
+    "Rating": 1770,
+    "NbPlays": 6654,
+    "Themes": "advantage discoveredAttack discoveredCheck middlegame short",
+    "GameUrl": "https://lichess.org/training/00dqP"
+  },
+  {
+    "PuzzleId": "00e63",
+    "FEN": "r4r1k/pp4pp/1qpp1b2/4p3/N3P3/3Q4/PPP2PPP/3RR1K1 b - - 3 16",
+    "Moves": "b6d4 d3b3 b7b5 d1d4",
+    "Rating": 1742,
+    "NbPlays": 58,
+    "Themes": "advantage discoveredAttack middlegame short trappedPiece",
+    "GameUrl": "https://lichess.org/training/00e63"
+  },
+  {
+    "PuzzleId": "00e6J",
+    "FEN": "r5k1/pb2r1p1/1p2pQ2/2b1N3/5P2/PP5P/4p2K/3R2R1 w - - 0 33",
+    "Moves": "d1e1 c5g1 e1g1 e2e1q f6e6 e7e6",
+    "Rating": 1623,
+    "NbPlays": 238,
+    "Themes": "advancedPawn advantage long middlegame promotion",
+    "GameUrl": "https://lichess.org/training/00e6J"
+  },
+  {
+    "PuzzleId": "00e7H",
+    "FEN": "8/7p/p1p4k/1p1p4/3Qpq2/2P2NpP/PP4K1/8 w - - 0 44",
+    "Moves": "f3d2 c6c5 d4c5 f4d2",
+    "Rating": 1984,
+    "NbPlays": 14068,
+    "Themes": "advantage deflection endgame master masterVsMaster short",
+    "GameUrl": "https://lichess.org/training/00e7H"
+  },
+  {
+    "PuzzleId": "00eSU",
+    "FEN": "5r2/p2R4/1p3pk1/PQ4p1/4p1q1/4P1P1/6PK/8 w - - 3 34",
+    "Moves": "a5b6 f8h8 h2g1 g4g3",
+    "Rating": 1996,
+    "NbPlays": 172,
+    "Themes": "crushing deflection endgame short",
+    "GameUrl": "https://lichess.org/training/00eSU"
+  },
+  {
+    "PuzzleId": "00f1Y",
+    "FEN": "1r6/p2n1pkp/4p1p1/2Np4/1r6/1P1K1P1P/P3R1P1/2R5 b - - 5 36",
+    "Moves": "b8c8 c5e6 f7e6 c1c8",
+    "Rating": 1197,
+    "NbPlays": 350,
+    "Themes": "advantage discoveredAttack endgame short",
+    "GameUrl": "https://lichess.org/training/00f1Y"
+  },
+  {
+    "PuzzleId": "00g5H",
+    "FEN": "2r3k1/p4pp1/1p5p/1Q6/8/5P2/qP4PP/3R2K1 b - - 3 30",
+    "Moves": "a2c4 d1d8 c8d8 b5c4 d8d1 g1f2",
+    "Rating": 1282,
+    "NbPlays": 3217,
+    "Themes": "advantage deflection endgame long",
+    "GameUrl": "https://lichess.org/training/00g5H"
+  },
+  {
+    "PuzzleId": "00gy1",
+    "FEN": "8/1p6/8/3kp2p/4p1p1/4K1P1/PP4PP/8 w - - 0 36",
+    "Moves": "h2h4 b7b5 a2a3 d5c4 e3e4 c4b3",
+    "Rating": 1993,
+    "NbPlays": 25,
+    "Themes": "crushing endgame long pawnEndgame quietMove zugzwang",
+    "GameUrl": "https://lichess.org/training/00gy1"
+  },
+  {
+    "PuzzleId": "00h8X",
+    "FEN": "r4r1k/pp1q1pb1/2npbn1p/2p1p3/4P3/1BPP1Q2/PP3P1N/RNB2KR1 b - - 9 17",
+    "Moves": "e6b3 c1h6 g7h6 f3f6 h8h7 h2g4 d7e6 a2b3 e6f6 g4f6",
+    "Rating": 2532,
+    "NbPlays": 122,
+    "Themes": "advantage deflection exposedKing fork middlegame veryLong",
+    "GameUrl": "https://lichess.org/training/00h8X"
+  },
+  {
+    "PuzzleId": "00h95",
+    "FEN": "7k/Q1p3p1/5p1p/3q4/3Pr3/4P3/P4P1P/1R4K1 w - - 2 26",
+    "Moves": "a7c5 e4g4 g1f1 d5h1 f1e2 h1b1",
+    "Rating": 1696,
+    "NbPlays": 113,
+    "Themes": "crushing endgame long skewer",
+    "GameUrl": "https://lichess.org/training/00h95"
+  },
+  {
+    "PuzzleId": "00hCU",
+    "FEN": "r1b2r2/1p5k/3p2pp/p1PBb3/2Pp1p2/P2P2Pq/3B1P1P/1R1QR1K1 w - - 0 26",
+    "Moves": "c5c6 f4g3 f2g3 f8f2 g1f2 h3h2",
+    "Rating": 2789,
+    "NbPlays": 417,
+    "Themes": "attraction crushing deflection kingsideAttack long middlegame sacrifice",
+    "GameUrl": "https://lichess.org/training/00hCU"
+  },
+  {
+    "PuzzleId": "00hSW",
+    "FEN": "2R5/4b1pk/1r5p/2pPN3/1p2P3/3P4/4K1PP/8 w - - 1 39",
+    "Moves": "e5d7 b4b3 d5d6 e7d6 d7b6 b3b2 b6c4 b2b1q",
+    "Rating": 1729,
+    "NbPlays": 12248,
+    "Themes": "advancedPawn advantage endgame master promotion sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/00hSW"
+  },
+  {
+    "PuzzleId": "00iQC",
+    "FEN": "1k1r1b1r/4q3/QBpp4/4p3/4P2p/5p2/P5PP/4R1K1 b - - 0 28",
+    "Moves": "d8d7 e1b1 d7b7 b6a7 b8c8 a6c6 e7c7 c6e8",
+    "Rating": 2123,
+    "NbPlays": 1199,
+    "Themes": "crushing discoveredAttack exposedKing middlegame queensideAttack quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/00iQC"
+  },
+  {
+    "PuzzleId": "00iQD",
+    "FEN": "8/8/8/3K2kp/8/2P1P3/8/8 w - - 0 50",
+    "Moves": "c3c4 h5h4 d5e4 g5g4 c4c5 h4h3 e4e5 h3h2 c5c6 h2h1q",
+    "Rating": 1560,
+    "NbPlays": 13835,
+    "Themes": "advancedPawn crushing endgame pawnEndgame promotion quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/00iQD"
+  },
+  {
+    "PuzzleId": "00iWt",
+    "FEN": "8/pk5p/1pp1Q3/8/3R2P1/P1P1K2n/1qP2r2/8 b - - 1 35",
+    "Moves": "b2c2 d4d7 b7a6 e6c4 b6b5 c4c6 a6a5 d7a7",
+    "Rating": 1561,
+    "NbPlays": 210,
+    "Themes": "deflection endgame mate mateIn4 veryLong",
+    "GameUrl": "https://lichess.org/training/00iWt"
+  },
+  {
+    "PuzzleId": "00ik3",
+    "FEN": "8/p3kp2/2pp1nr1/4p1B1/bq2P2Q/bP1P3N/P3N3/1K1R3R w - - 0 30",
+    "Moves": "h1f1 a4b3 d1d2 b3d1 b1a1 d1e2",
+    "Rating": 2377,
+    "NbPlays": 67,
+    "Themes": "advantage discoveredAttack discoveredCheck long middlegame queensideAttack",
+    "GameUrl": "https://lichess.org/training/00ik3"
+  },
+  {
+    "PuzzleId": "00jCD",
+    "FEN": "r4r1k/ppp1b1pp/3qQn2/6B1/8/2N5/PPP2PPP/R4RK1 w - - 3 14",
+    "Moves": "e6b3 f6g4 g2g3 e7g5",
+    "Rating": 1362,
+    "NbPlays": 2012,
+    "Themes": "advantage discoveredAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/00jCD"
+  },
+  {
+    "PuzzleId": "00k9P",
+    "FEN": "7k/pb3Bpp/1p6/2b2p2/3q4/P1Nn3P/1P1Q1PP1/3R2K1 w - - 5 27",
+    "Moves": "c3a4 d4e4 d2g5 c5f2 g1h1 f2h4",
+    "Rating": 2351,
+    "NbPlays": 128,
+    "Themes": "advantage discoveredAttack kingsideAttack long middlegame",
+    "GameUrl": "https://lichess.org/training/00k9P"
+  },
+  {
+    "PuzzleId": "00kZF",
+    "FEN": "r3r3/1p1n2pk/2p1pq1p/2P5/1p2R3/P2Q1N1P/5PP1/R5K1 b - - 1 24",
+    "Moves": "f6a1 e4e1 h7h8 e1a1",
+    "Rating": 1307,
+    "NbPlays": 2518,
+    "Themes": "crushing discoveredAttack discoveredCheck middlegame short",
+    "GameUrl": "https://lichess.org/training/00kZF"
+  },
+  {
+    "PuzzleId": "00l0K",
+    "FEN": "2b5/2p2p2/k7/1qQ1P3/1p6/1N3P2/1PP5/2K5 w - - 3 38",
+    "Moves": "c5c7 b5f1 c1d2 f1f2 d2d3 c8f5 d3c4 f2c2 c4b4 c2c7",
+    "Rating": 1654,
+    "NbPlays": 189,
+    "Themes": "crushing deflection endgame skewer veryLong",
+    "GameUrl": "https://lichess.org/training/00l0K"
+  },
+  {
+    "PuzzleId": "00l7Y",
+    "FEN": "r1b2q2/p3p1bk/2p3p1/3pn2p/8/2NB3P/PPPBQ1P1/5RK1 b - - 1 17",
+    "Moves": "f8d8 e2h5 h7g8 d3g6 e5g6 h5g6",
+    "Rating": 1554,
+    "NbPlays": 9425,
+    "Themes": "advantage deflection long middlegame pin",
+    "GameUrl": "https://lichess.org/training/00l7Y"
+  },
+  {
+    "PuzzleId": "00lIV",
+    "FEN": "r2qr1k1/pb2bppp/2p2n2/3pN1B1/2P5/4P3/PPQ2PPP/3RKB1R w K - 3 13",
+    "Moves": "f1e2 e7b4 e1f1 e8e5",
+    "Rating": 1747,
+    "NbPlays": 4251,
+    "Themes": "crushing discoveredAttack middlegame short",
+    "GameUrl": "https://lichess.org/training/00lIV"
+  },
+  {
+    "PuzzleId": "00lap",
+    "FEN": "8/8/2k3P1/R7/P2p2rp/3K4/8/8 b - - 0 45",
+    "Moves": "g4g6 a5a6 c6d7 a6g6",
+    "Rating": 947,
+    "NbPlays": 287,
+    "Themes": "crushing endgame master rookEndgame short skewer",
+    "GameUrl": "https://lichess.org/training/00lap"
+  },
+  {
+    "PuzzleId": "00lex",
+    "FEN": "8/8/1p6/p1p2kPp/P6P/5K2/8/8 b - - 2 43",
+    "Moves": "b6b5 a4b5 a5a4 b5b6 a4a3 b6b7 a3a2 b7b8q a2a1q b8c8 f5g6 c8g8",
+    "Rating": 2362,
+    "NbPlays": 564,
+    "Themes": "advancedPawn crushing endgame pawnEndgame promotion veryLong",
+    "GameUrl": "https://lichess.org/training/00lex"
+  },
+  {
+    "PuzzleId": "00m6L",
+    "FEN": "8/8/k6p/p4p1P/p1p1pP2/K1P1P3/1P6/8 w - - 1 49",
+    "Moves": "a3a4 a6b6 a4a3 b6b5 a3a2 b5a4",
+    "Rating": 1399,
+    "NbPlays": 4283,
+    "Themes": "crushing defensiveMove endgame long pawnEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/00m6L"
+  },
+  {
+    "PuzzleId": "00nl3",
+    "FEN": "6R1/1p4p1/p1k4p/3p4/PP2p1P1/2b1P3/6K1/8 b - - 2 37",
+    "Moves": "b7b5 g8c8 c6b7 c8c3",
+    "Rating": 820,
+    "NbPlays": 274,
+    "Themes": "advantage endgame master short skewer",
+    "GameUrl": "https://lichess.org/training/00nl3"
+  },
+  {
+    "PuzzleId": "00oYS",
+    "FEN": "4K3/4P1k1/8/8/8/8/2p1R3/2r5 w - - 10 59",
+    "Moves": "e8d7 c1d1 d7e6 c2c1q",
+    "Rating": 1010,
+    "NbPlays": 775,
+    "Themes": "advancedPawn clearance crushing endgame master promotion rookEndgame short",
+    "GameUrl": "https://lichess.org/training/00oYS"
+  },
+  {
+    "PuzzleId": "00ryU",
+    "FEN": "4r1k1/8/2PP1bp1/p7/1p5p/1P2p3/4K2B/8 b - - 0 40",
+    "Moves": "g6g5 d6d7 e8d8 c6c7 d8d7 c7c8q",
+    "Rating": 1393,
+    "NbPlays": 11,
+    "Themes": "advancedPawn advantage endgame long promotion",
+    "GameUrl": "https://lichess.org/training/00ryU"
+  },
+  {
+    "PuzzleId": "00sXv",
+    "FEN": "8/r4pp1/2k1p2p/8/p2PP3/2K2PP1/6P1/1R6 w - - 1 35",
+    "Moves": "c3b4 a7b7 b4a4 b7b1",
+    "Rating": 1121,
+    "NbPlays": 104,
+    "Themes": "crushing endgame rookEndgame short skewer",
+    "GameUrl": "https://lichess.org/training/00sXv"
+  },
+  {
+    "PuzzleId": "00tHm",
+    "FEN": "q7/PP6/K7/8/5k2/8/6p1/8 b - - 0 58",
+    "Moves": "a8e8 b7b8q e8e5 a7a8q g2g1q b8f8",
+    "Rating": 2358,
+    "NbPlays": 403,
+    "Themes": "advancedPawn crushing endgame long promotion queenEndgame",
+    "GameUrl": "https://lichess.org/training/00tHm"
+  },
+  {
+    "PuzzleId": "00ueI",
+    "FEN": "8/5p1k/pp3B2/3bPq2/6R1/2R4P/1P1p2PK/8 w - - 0 47",
+    "Moves": "c3g3 f5g4 g3g4 d2d1q g4g7 h7h6",
+    "Rating": 1667,
+    "NbPlays": 280,
+    "Themes": "advancedPawn advantage endgame long promotion",
+    "GameUrl": "https://lichess.org/training/00ueI"
+  },
+  {
+    "PuzzleId": "00ueM",
+    "FEN": "2kr4/2pR4/2P1K1P1/8/8/p3n3/8/8 b - - 1 49",
+    "Moves": "a3a2 d7d8 c8d8 g6g7 a2a1q g7g8q",
+    "Rating": 1740,
+    "NbPlays": 12279,
+    "Themes": "advancedPawn endgame long mate mateIn3 promotion",
+    "GameUrl": "https://lichess.org/training/00ueM"
+  },
+  {
+    "PuzzleId": "00wL8",
+    "FEN": "R4rk1/2PR1ppp/8/8/7P/8/P3pqPK/8 b - - 0 33",
+    "Moves": "f8a8 d7d8 a8d8 c7d8q",
+    "Rating": 854,
+    "NbPlays": 290,
+    "Themes": "advancedPawn backRankMate endgame mate mateIn2 promotion queenRookEndgame short",
+    "GameUrl": "https://lichess.org/training/00wL8"
+  },
+  {
+    "PuzzleId": "00xxi",
+    "FEN": "6r1/7P/5K2/8/2P2k2/P7/8/8 b - - 0 68",
+    "Moves": "g8f8 f6g7 f8d8 h7h8q d8h8 g7h8 f4e4 a3a4 e4d4 a4a5",
+    "Rating": 1491,
+    "NbPlays": 7622,
+    "Themes": "advancedPawn crushing defensiveMove endgame promotion quietMove rookEndgame veryLong",
+    "GameUrl": "https://lichess.org/training/00xxi"
+  },
+  {
+    "PuzzleId": "00yOA",
+    "FEN": "8/8/8/6KP/p7/8/k7/8 b - - 0 50",
+    "Moves": "a2b3 h5h6 a4a3 h6h7 b3c2 h7h8q",
+    "Rating": 845,
+    "NbPlays": 39,
+    "Themes": "advancedPawn crushing endgame long pawnEndgame promotion",
+    "GameUrl": "https://lichess.org/training/00yOA"
+  },
+  {
+    "PuzzleId": "00z9K",
+    "FEN": "4B3/1b5p/p5k1/3p3R/6P1/1P6/KPrn1r2/7R b - - 2 34",
+    "Moves": "g6g7 h5h7 g7f8 h7b7",
+    "Rating": 2129,
+    "NbPlays": 707,
+    "Themes": "advantage master middlegame short skewer",
+    "GameUrl": "https://lichess.org/training/00z9K"
+  },
+  {
+    "PuzzleId": "00zrq",
+    "FEN": "7R/6P1/p3p2P/1p2k3/4p3/2Pp4/r5r1/3R3K b - - 2 40",
+    "Moves": "e4e3 g7g8q g2g8 h8g8 e3e2 d1e1",
+    "Rating": 2071,
+    "NbPlays": 224,
+    "Themes": "advancedPawn crushing endgame long promotion",
+    "GameUrl": "https://lichess.org/training/00zrq"
+  },
+  {
+    "PuzzleId": "00zu9",
+    "FEN": "8/1p3p2/4p1k1/P2pPpPp/1p1P3K/1P5P/5P2/8 w - - 8 43",
+    "Moves": "f2f3 f5f4 a5a6 f7f6 e5f6 b7a6",
+    "Rating": 2497,
+    "NbPlays": 685,
+    "Themes": "crushing endgame long master pawnEndgame quietMove zugzwang",
+    "GameUrl": "https://lichess.org/training/00zu9"
+  },
+  {
+    "PuzzleId": "0100g",
+    "FEN": "8/8/5k2/R7/2P1K2r/8/P7/8 w - - 1 43",
+    "Moves": "e4d5 h4h5 d5d6 h5a5",
+    "Rating": 873,
+    "NbPlays": 312,
+    "Themes": "crushing endgame rookEndgame short skewer",
+    "GameUrl": "https://lichess.org/training/0100g"
+  },
+  {
+    "PuzzleId": "0109Y",
+    "FEN": "r3r2Q/p3kpn1/5q2/3p4/1p5P/3B1PR1/PPP2nP1/1K2R3 b - - 6 27",
+    "Moves": "e7d7 d3b5 d7d6 b5e8 a8e8 e1e8",
+    "Rating": 2050,
+    "NbPlays": 331,
+    "Themes": "advantage long middlegame skewer",
+    "GameUrl": "https://lichess.org/training/0109Y"
+  },
+  {
+    "PuzzleId": "010Sa",
+    "FEN": "3r2k1/pb2q3/4p3/2p2p1Q/3p4/3R3R/PPP2PrP/5K2 b - - 1 26",
+    "Moves": "g2g7 d3g3 e7f6 g3g7 g8g7 h5h7 g7f8 h7b7",
+    "Rating": 2671,
+    "NbPlays": 87,
+    "Themes": "advantage attraction exposedKing middlegame skewer veryLong",
+    "GameUrl": "https://lichess.org/training/010Sa"
+  },
+  {
+    "PuzzleId": "0112g",
+    "FEN": "7R/8/8/8/3k4/4p3/r7/4K3 b - - 1 57",
+    "Moves": "a2a4 h8h4 d4c3 h4a4",
+    "Rating": 1050,
+    "NbPlays": 184,
+    "Themes": "crushing endgame rookEndgame short skewer",
+    "GameUrl": "https://lichess.org/training/0112g"
+  },
+  {
+    "PuzzleId": "01243",
+    "FEN": "r7/pp1Qp1B1/8/3kb3/4q3/8/PP3PP1/5K2 b - - 4 34",
+    "Moves": "e5d6 d7b7 d5e6 b7e4",
+    "Rating": 1454,
+    "NbPlays": 17799,
+    "Themes": "crushing deflection endgame fork master short skewer",
+    "GameUrl": "https://lichess.org/training/01243"
+  },
+  {
+    "PuzzleId": "012ee",
+    "FEN": "rb4k1/2q3pp/P3pp2/3pN3/1Q1P4/4P3/2P2PPP/R5K1 w - - 2 26",
+    "Moves": "e5d3 c7h2 g1f1 h2h1 f1e2 h1a1",
+    "Rating": 1090,
+    "NbPlays": 1078,
+    "Themes": "advantage endgame kingsideAttack long skewer",
+    "GameUrl": "https://lichess.org/training/012ee"
+  },
+  {
+    "PuzzleId": "012tD",
+    "FEN": "1Q6/5ppk/7p/2pr4/4p3/4P3/2p2PPP/R5K1 w - - 1 36",
+    "Moves": "b8b2 d5d1 a1d1 c2d1q",
+    "Rating": 785,
+    "NbPlays": 412,
+    "Themes": "advancedPawn backRankMate endgame mate mateIn2 promotion queenRookEndgame short",
+    "GameUrl": "https://lichess.org/training/012tD"
+  },
+  {
+    "PuzzleId": "0135c",
+    "FEN": "8/3n1k2/p3p1p1/3p2P1/2pP2N1/PrP1KP2/1P4R1/8 w - - 4 41",
+    "Moves": "e3d2 b3b2 d2e1 b2g2",
+    "Rating": 765,
+    "NbPlays": 586,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/0135c"
+  },
+  {
+    "PuzzleId": "0135i",
+    "FEN": "8/6Rr/7P/3p4/2pk1p2/3b3R/6PK/8 w - - 6 57",
+    "Moves": "h3d3 c4d3 g7h7 d3d2 h7f7 d2d1q",
+    "Rating": 1476,
+    "NbPlays": 868,
+    "Themes": "advancedPawn advantage endgame long master masterVsMaster promotion rookEndgame",
+    "GameUrl": "https://lichess.org/training/0135i"
+  },
+  {
+    "PuzzleId": "015jf",
+    "FEN": "2r1r1k1/1p3p1p/p3p1pQ/3b4/7R/1P1P1P2/2P3PP/q3NK1R b - - 4 24",
+    "Moves": "c8c2 h6h7 g8f8 h7h8 a1h8 h4h8 f8g7 h8e8",
+    "Rating": 1079,
+    "NbPlays": 83,
+    "Themes": "advantage kingsideAttack middlegame skewer veryLong",
+    "GameUrl": "https://lichess.org/training/015jf"
+  },
+  {
+    "PuzzleId": "015pp",
+    "FEN": "8/8/8/3pp3/5P1R/r3k3/6K1/8 b - - 0 51",
+    "Moves": "e5f4 h4h3 e3e2 h3a3 d5d4 a3a2",
+    "Rating": 1600,
+    "NbPlays": 1338,
+    "Themes": "crushing endgame long rookEndgame skewer",
+    "GameUrl": "https://lichess.org/training/015pp"
+  },
+  {
+    "PuzzleId": "016Ym",
+    "FEN": "2k4r/p2p4/8/1ppq1p2/5P2/3P1Q2/PP5P/5R1K b - - 1 32",
+    "Moves": "d5a2 f3a8 c8c7 a8h8 a2d5 h1g1",
+    "Rating": 1080,
+    "NbPlays": 17,
+    "Themes": "advantage endgame long skewer",
+    "GameUrl": "https://lichess.org/training/016Ym"
+  },
+  {
+    "PuzzleId": "017AB",
+    "FEN": "8/5k2/7p/1R4p1/4P1K1/5P1P/1pr5/8 w - - 2 51",
+    "Moves": "g4f5 c2c5 b5c5 b2b1q",
+    "Rating": 1165,
+    "NbPlays": 763,
+    "Themes": "advancedPawn crushing deflection endgame promotion rookEndgame short",
+    "GameUrl": "https://lichess.org/training/017AB"
+  },
+  {
+    "PuzzleId": "017qg",
+    "FEN": "8/5R1P/3k2p1/4p3/4P1P1/8/p4p1K/r7 w - - 0 46",
+    "Moves": "h7h8q a1h1 h2h1 a2a1q h1g2 a1g1",
+    "Rating": 1811,
+    "NbPlays": 1051,
+    "Themes": "advancedPawn attraction crushing endgame exposedKing long promotion queenRookEndgame",
+    "GameUrl": "https://lichess.org/training/017qg"
+  },
+  {
+    "PuzzleId": "017u3",
+    "FEN": "r2qk2r/4bppp/p3bn2/1p2N3/5B2/2N5/PP3PPP/R2QR1K1 b kq - 1 19",
+    "Moves": "e8g8 e5c6 d8e8 c6e7 e8e7 f4d6 e7d8 d6f8",
+    "Rating": 1915,
+    "NbPlays": 10163,
+    "Themes": "advantage kingsideAttack opening skewer veryLong",
+    "GameUrl": "https://lichess.org/training/017u3"
+  },
+  {
+    "PuzzleId": "018Iz",
+    "FEN": "8/3P4/8/1kP2pbP/8/5K2/8/8 b - - 0 51",
+    "Moves": "b5c5 h5h6 c5c6 h6h7 c6d7 h7h8q",
+    "Rating": 1292,
+    "NbPlays": 2631,
+    "Themes": "advancedPawn bishopEndgame crushing endgame long promotion",
+    "GameUrl": "https://lichess.org/training/018Iz"
+  },
+  {
+    "PuzzleId": "019uR",
+    "FEN": "8/4r2k/6p1/8/4qP1p/1P2pR1P/P3Q1PK/8 w - - 0 49",
+    "Moves": "g2g4 e4f3 e2f3 e3e2 f3c3 e2e1q c3e1 e7e1",
+    "Rating": 1904,
+    "NbPlays": 815,
+    "Themes": "advancedPawn crushing endgame promotion sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/019uR"
+  },
+  {
+    "PuzzleId": "019vo",
+    "FEN": "8/5ppp/8/5KPP/5P2/4k3/8/8 b - - 0 41",
+    "Moves": "e3f3 h5h6 g7h6 g5h6 f3g3 f5g5",
+    "Rating": 2478,
+    "NbPlays": 598,
+    "Themes": "crushing defensiveMove endgame long pawnEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/019vo"
+  },
+  {
+    "PuzzleId": "01A3W",
+    "FEN": "4r3/pp5p/5k2/2p1r3/3p4/PP1P4/3KR2P/5R2 b - - 1 31",
+    "Moves": "f6e6 e2e5 e6e5 f1e1 e5d6 e1e8",
+    "Rating": 1010,
+    "NbPlays": 732,
+    "Themes": "attraction crushing endgame exposedKing long rookEndgame skewer",
+    "GameUrl": "https://lichess.org/training/01A3W"
+  },
+  {
+    "PuzzleId": "01BBu",
+    "FEN": "2r5/3R4/2P2p2/1P3P2/7k/6pp/1K6/8 w - - 2 48",
+    "Moves": "d7h7 h4g4 c6c7 c8c7 h7c7 h3h2 b5b6 h2h1q",
+    "Rating": 2603,
+    "NbPlays": 480,
+    "Themes": "advancedPawn crushing endgame promotion rookEndgame sacrifice veryLong",
+    "GameUrl": "https://lichess.org/training/01BBu"
+  },
+  {
+    "PuzzleId": "01BTT",
+    "FEN": "8/7p/6pP/pp1k1p2/3P1P2/PP2K3/8/8 b - - 0 49",
+    "Moves": "b5b4 a3b4 a5b4 e3d3 d5e6 d3c4",
+    "Rating": 1066,
+    "NbPlays": 171,
+    "Themes": "crushing endgame long pawnEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/01BTT"
+  },
+  {
+    "PuzzleId": "01Cds",
+    "FEN": "8/p4k2/b2P4/3N2p1/4p3/2K4P/8/8 b - - 1 45",
+    "Moves": "a6b7 d6d7 b7d5 d7d8q",
+    "Rating": 928,
+    "NbPlays": 232,
+    "Themes": "advancedPawn crushing endgame promotion short",
+    "GameUrl": "https://lichess.org/training/01Cds"
+  },
+  {
+    "PuzzleId": "01CmR",
+    "FEN": "5r1k/2p3p1/p1pp3p/8/Pb1PP3/1Q3P2/1P2RK1q/R1B5 w - - 3 25",
+    "Moves": "f2e3 f8f3 e3f3 h2h3 f3f2 h3b3",
+    "Rating": 2288,
+    "NbPlays": 183,
+    "Themes": "advantage attraction long middlegame sacrifice skewer",
+    "GameUrl": "https://lichess.org/training/01CmR"
+  },
+  {
+    "PuzzleId": "01CvP",
+    "FEN": "1k6/pp5P/2p5/8/5P1b/2P4q/PP6/3R1RK1 b - - 4 38",
+    "Moves": "h4g3 d1d8 b8c7 h7h8q g3h2 g1f2",
+    "Rating": 2278,
+    "NbPlays": 94,
+    "Themes": "advancedPawn crushing endgame long master promotion",
+    "GameUrl": "https://lichess.org/training/01CvP"
+  },
+  {
+    "PuzzleId": "01CxB",
+    "FEN": "4k3/R5R1/5pKp/1Pp3r1/8/6P1/4p2P/8 w - - 3 53",
+    "Moves": "g6f6 g5g7 f6g7 e2e1q",
+    "Rating": 1362,
+    "NbPlays": 21641,
+    "Themes": "advancedPawn crushing endgame master promotion rookEndgame short",
+    "GameUrl": "https://lichess.org/training/01CxB"
+  },
+  {
+    "PuzzleId": "01DXj",
+    "FEN": "8/pR6/8/P7/2Pb1rk1/1P1K4/8/8 b - - 0 39",
+    "Moves": "d4g1 b7g7 g4f5 g7g1",
+    "Rating": 815,
+    "NbPlays": 196,
+    "Themes": "advantage endgame master short skewer",
+    "GameUrl": "https://lichess.org/training/01DXj"
+  },
+  {
+    "PuzzleId": "01Dt6",
+    "FEN": "3r2k1/1bqPn1pp/p3pp2/1pp3PQ/8/8/PPP4P/1K1R1R2 b - - 1 28",
+    "Moves": "f6f5 h5e8 d8e8 d7e8q",
+    "Rating": 1398,
+    "NbPlays": 1934,
+    "Themes": "advancedPawn kingsideAttack mate mateIn2 middlegame promotion short",
+    "GameUrl": "https://lichess.org/training/01Dt6"
+  },
+  {
+    "PuzzleId": "01Epj",
+    "FEN": "5r2/1p2Q3/8/pk3rK1/5P2/3P3P/8/8 w - - 2 46",
+    "Moves": "g5g6 f8f6 e7f6 f5f6 g6f6 a5a4 f4f5 a4a3 f6g6 a3a2 f5f6 a2a1q",
+    "Rating": 1567,
+    "NbPlays": 1266,
+    "Themes": "advancedPawn crushing endgame master masterVsMaster promotion queenRookEndgame quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/01Epj"
+  },
+  {
+    "PuzzleId": "01F65",
+    "FEN": "8/8/8/8/8/3K1p1k/5P2/8 b - - 3 63",
+    "Moves": "h3h2 d3e4 h2g2 e4e3",
+    "Rating": 1883,
+    "NbPlays": 289,
+    "Themes": "crushing endgame pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/01F65"
+  },
+  {
+    "PuzzleId": "01G5k",
+    "FEN": "8/b6p/P1K2k2/2p3p1/6P1/8/1P3P2/8 b - - 1 49",
+    "Moves": "f6e5 c6b7 e5d6 b7a7 d6c7 b2b3 h7h6 f2f3",
+    "Rating": 1916,
+    "NbPlays": 376,
+    "Themes": "bishopEndgame crushing defensiveMove endgame quietMove trappedPiece veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01G5k"
+  },
+  {
+    "PuzzleId": "01GcH",
+    "FEN": "8/KP3k2/8/5p2/8/8/1R2p3/2r5 w - - 0 56",
+    "Moves": "b7b8q c1a1 a7b6 e2e1q b8c7 e1e7 c7e7 f7e7",
+    "Rating": 1628,
+    "NbPlays": 2228,
+    "Themes": "advancedPawn advantage endgame master promotion queenRookEndgame veryLong",
+    "GameUrl": "https://lichess.org/training/01GcH"
+  },
+  {
+    "PuzzleId": "01GnH",
+    "FEN": "1R6/P7/6p1/7p/8/7k/K7/2q5 b - - 1 43",
+    "Moves": "c1c4 b8b3 h3g4 a7a8q",
+    "Rating": 1144,
+    "NbPlays": 525,
+    "Themes": "advancedPawn advantage endgame promotion queenRookEndgame short",
+    "GameUrl": "https://lichess.org/training/01GnH"
+  },
+  {
+    "PuzzleId": "01H66",
+    "FEN": "4r3/6K1/8/5RP1/1PpP4/P1P3k1/8/4b3 w - - 5 52",
+    "Moves": "f5e5 e8e5 d4e5 e1c3 g7g6 c3e5 g6f5 c4c3 f5e5 c3c2 g5g6 c2c1q",
+    "Rating": 1692,
+    "NbPlays": 4020,
+    "Themes": "advancedPawn crushing endgame pin promotion veryLong",
+    "GameUrl": "https://lichess.org/training/01H66"
+  },
+  {
+    "PuzzleId": "01Hzj",
+    "FEN": "8/8/RP6/p1b5/r1k5/8/5PP1/5K2 b - - 0 40",
+    "Moves": "c4b5 b6b7 b5a6 b7b8q a4a1 f1e2",
+    "Rating": 1049,
+    "NbPlays": 54,
+    "Themes": "advancedPawn advantage endgame long master promotion",
+    "GameUrl": "https://lichess.org/training/01Hzj"
+  },
+  {
+    "PuzzleId": "01IKM",
+    "FEN": "8/3Q1pkp/6p1/8/4Pp2/7P/r1p3P1/7K w - - 0 40",
+    "Moves": "d7c7 a2a1 h1h2 c2c1q c7c1 a1c1",
+    "Rating": 919,
+    "NbPlays": 500,
+    "Themes": "advancedPawn crushing endgame long master promotion queenRookEndgame",
+    "GameUrl": "https://lichess.org/training/01IKM"
+  },
+  {
+    "PuzzleId": "01ImN",
+    "FEN": "8/8/p6p/2K2p1P/P3k3/2P5/8/8 w - - 0 43",
+    "Moves": "c5d6 f5f4 c3c4 f4f3 c4c5 f3f2 c5c6 f2f1q",
+    "Rating": 941,
+    "NbPlays": 219,
+    "Themes": "advancedPawn crushing endgame pawnEndgame promotion quietMove veryLong",
+    "GameUrl": "https://lichess.org/training/01ImN"
+  },
+  {
+    "PuzzleId": "01Kjm",
+    "FEN": "8/KP2r1pk/5p2/7p/4b2P/3Q4/8/8 w - - 3 72",
+    "Moves": "d3e4 e7e4 b7b8q e4a4 a7b7 a4b4 b7c8 b4b8",
+    "Rating": 1189,
+    "NbPlays": 396,
+    "Themes": "crushing endgame master skewer veryLong",
+    "GameUrl": "https://lichess.org/training/01Kjm"
+  },
+  {
+    "PuzzleId": "01MNV",
+    "FEN": "8/1p4k1/1p1p4/2p1p2K/P1P1P3/1P1P4/8/8 b - - 0 38",
+    "Moves": "g7f6 h5h6 f6e6 h6g6 e6e7 g6g7",
+    "Rating": 1853,
+    "NbPlays": 1130,
+    "Themes": "crushing defensiveMove endgame long pawnEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/01MNV"
+  },
+  {
+    "PuzzleId": "01Nco",
+    "FEN": "8/3R2p1/2p2pkp/1bB5/pP1K2P1/P4P2/4r2P/8 w - - 7 39",
+    "Moves": "h2h4 e2d2 d4c3 d2d7",
+    "Rating": 775,
+    "NbPlays": 294,
+    "Themes": "crushing endgame short skewer",
+    "GameUrl": "https://lichess.org/training/01Nco"
+  },
+  {
+    "PuzzleId": "01RvJ",
+    "FEN": "8/8/2pp2kb/p3p3/P1P3NK/2P2P2/8/8 w - - 0 51",
+    "Moves": "g4h6 g6h6 f3f4 h6g6 c4c5 d6d5 h4g4 d5d4 c3d4 e5d4",
+    "Rating": 2737,
+    "NbPlays": 199,
+    "Themes": "crushing endgame quietMove veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01RvJ"
+  },
+  {
+    "PuzzleId": "01Tlc",
+    "FEN": "8/1p3k2/p1p3p1/P1P3K1/1P5P/8/8/8 w - - 9 60",
+    "Moves": "g5h6 f7f6 h6h7 g6g5 h4g5 f6g5",
+    "Rating": 1850,
+    "NbPlays": 321,
+    "Themes": "crushing endgame long pawnEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/01Tlc"
+  },
+  {
+    "PuzzleId": "01UwB",
+    "FEN": "8/8/8/4kp1p/7P/4K1P1/8/8 b - - 0 45",
+    "Moves": "e5f6 e3f4 f6e6 f4g5 e6e5 g5h5 e5f6 h5h6 f5f4 g3f4",
+    "Rating": 1548,
+    "NbPlays": 126,
+    "Themes": "crushing endgame pawnEndgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01UwB"
+  },
+  {
+    "PuzzleId": "01VR8",
+    "FEN": "3r4/5p2/1k2p3/pp1BPp1p/5P1P/1P2K1P1/P2R4/8 b - - 2 32",
+    "Moves": "d8d5 d2d5 e6d5 e3d4 b6c6 a2a3",
+    "Rating": 1588,
+    "NbPlays": 2520,
+    "Themes": "crushing defensiveMove endgame long rookEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/01VR8"
+  },
+  {
+    "PuzzleId": "01WIW",
+    "FEN": "8/p7/1p3p2/4pP1p/kP2P2P/P1K5/8/8 w - - 6 45",
+    "Moves": "c3b2 a7a6 b2c3 a4a3",
+    "Rating": 2424,
+    "NbPlays": 46,
+    "Themes": "crushing endgame master pawnEndgame quietMove short zugzwang",
+    "GameUrl": "https://lichess.org/training/01WIW"
+  },
+  {
+    "PuzzleId": "01bWU",
+    "FEN": "8/4kp2/7p/p2Pp1pP/2p3P1/5K2/PP3P2/8 b - - 2 45",
+    "Moves": "e7d6 f3e4 a5a4 a2a3 f7f6 e4f5 d6d5 f5g6 d5d4 g6h6",
+    "Rating": 2726,
+    "NbPlays": 162,
+    "Themes": "advantage endgame pawnEndgame quietMove veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01bWU"
+  },
+  {
+    "PuzzleId": "01e8j",
+    "FEN": "8/6k1/4r1p1/7p/4RP1P/5KP1/8/8 b - - 0 39",
+    "Moves": "e6e4 f3e4 g7f6 f4f5 g6f5 e4f4",
+    "Rating": 2027,
+    "NbPlays": 51,
+    "Themes": "crushing endgame long zugzwang",
+    "GameUrl": "https://lichess.org/training/01e8j"
+  },
+  {
+    "PuzzleId": "01e9g",
+    "FEN": "8/7p/1p4p1/p1kp1pP1/P4P1P/1PPK4/8/8 b - - 0 32",
+    "Moves": "c5c6 d3d4 c6d6 c3c4 d5c4 b3c4 d6c6 d4e5 c6c5 e5f6 c5c4 f6g7",
+    "Rating": 2739,
+    "NbPlays": 390,
+    "Themes": "crushing endgame pawnEndgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01e9g"
+  },
+  {
+    "PuzzleId": "01ghr",
+    "FEN": "8/8/5k2/6p1/r2RK1P1/5P2/8/8 b - - 51 68",
+    "Moves": "a4d4 e4d4 f6e6 d4e4",
+    "Rating": 1079,
+    "NbPlays": 574,
+    "Themes": "crushing defensiveMove endgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/01ghr"
+  },
+  {
+    "PuzzleId": "01iEi",
+    "FEN": "8/8/4pk2/p1p4p/Pp1pKp2/1P1P2PP/2P5/8 w - - 0 38",
+    "Moves": "g3f4 h5h4 f4f5 e6e5 e4d5 f6f5 d5c5 f5f4",
+    "Rating": 2219,
+    "NbPlays": 16,
+    "Themes": "crushing defensiveMove endgame pawnEndgame quietMove veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01iEi"
+  },
+  {
+    "PuzzleId": "01jKd",
+    "FEN": "8/8/2p3p1/p1k4p/P3Pp1P/3K1P2/8/8 b - - 1 41",
+    "Moves": "c5b4 e4e5 b4c5 d3e4",
+    "Rating": 1975,
+    "NbPlays": 171227,
+    "Themes": "advantage endgame pawnEndgame quietMove short zugzwang",
+    "GameUrl": "https://lichess.org/training/01jKd"
+  },
+  {
+    "PuzzleId": "01mBE",
+    "FEN": "8/8/p3p3/3p2p1/1P1Ppk2/2P4P/5P2/5K2 w - - 3 42",
+    "Moves": "f1g2 e6e5 d4e5 f4e5 g2f1 e5f5 f1e1 g5g4 h3h4 f5g6",
+    "Rating": 2874,
+    "NbPlays": 1270,
+    "Themes": "crushing defensiveMove endgame pawnEndgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01mBE"
+  },
+  {
+    "PuzzleId": "01qiV",
+    "FEN": "8/5k1p/5Pp1/5pK1/7P/8/6P1/8 b - - 0 50",
+    "Moves": "h7h6 g5h6 f7f6 g2g3 f6f7 h6h7",
+    "Rating": 2360,
+    "NbPlays": 131,
+    "Themes": "crushing endgame long pawnEndgame quietMove zugzwang",
+    "GameUrl": "https://lichess.org/training/01qiV"
+  },
+  {
+    "PuzzleId": "01qsT",
+    "FEN": "4K3/5p1p/5kp1/8/7P/6P1/5P2/8 b - - 2 55",
+    "Moves": "h7h6 f2f3 f6g7 e8e7",
+    "Rating": 2699,
+    "NbPlays": 600,
+    "Themes": "crushing endgame master masterVsMaster pawnEndgame quietMove short zugzwang",
+    "GameUrl": "https://lichess.org/training/01qsT"
+  },
+  {
+    "PuzzleId": "01rio",
+    "FEN": "8/p7/8/2pp4/4kPp1/1K4P1/P1P5/8 b - - 3 35",
+    "Moves": "a7a5 a2a3 e4f5 b3a4",
+    "Rating": 2612,
+    "NbPlays": 47,
+    "Themes": "crushing endgame pawnEndgame quietMove short zugzwang",
+    "GameUrl": "https://lichess.org/training/01rio"
+  },
+  {
+    "PuzzleId": "01tUB",
+    "FEN": "8/8/p4k2/P2p3p/3P1K1P/8/8/8 w - - 4 48",
+    "Moves": "f4f3 f6f5 f3e3 f5g4",
+    "Rating": 800,
+    "NbPlays": 308,
+    "Themes": "crushing endgame pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/01tUB"
+  },
+  {
+    "PuzzleId": "01vys",
+    "FEN": "8/8/4p1k1/5qp1/8/6QP/5PK1/8 w - - 13 94",
+    "Moves": "g3d6 f5d5 d6d5 e6d5 g2f3 g6f5 f3e3 f5e5 e3d3 d5d4 f2f3 e5d5",
+    "Rating": 2252,
+    "NbPlays": 84,
+    "Themes": "crushing defensiveMove endgame master masterVsMaster queenEndgame quietMove veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/01vys"
+  },
+  {
+    "PuzzleId": "01wap",
+    "FEN": "8/5p2/4k3/6p1/3KP1P1/8/8/8 w - - 5 56",
+    "Moves": "d4d3 e6e5 d3e3 f7f6 e3f3 e5d4",
+    "Rating": 1464,
+    "NbPlays": 261,
+    "Themes": "crushing endgame long master pawnEndgame quietMove zugzwang",
+    "GameUrl": "https://lichess.org/training/01wap"
+  },
+  {
+    "PuzzleId": "01wxe",
+    "FEN": "8/8/4k1p1/1p1p3p/pP3P1P/P1P3K1/8/8 w - - 3 52",
+    "Moves": "g3f3 e6f5 f3e3 f5g4",
+    "Rating": 1053,
+    "NbPlays": 857,
+    "Themes": "crushing endgame pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/01wxe"
+  },
+  {
+    "PuzzleId": "0218S",
+    "FEN": "8/8/8/3B4/5ppk/6p1/6K1/8 w - - 2 55",
+    "Moves": "d5e6 f4f3 g2h1 h4h3 e6d5 g3g2 h1g1 h3g3 d5f3 g3f3",
+    "Rating": 2252,
+    "NbPlays": 144,
+    "Themes": "advancedPawn bishopEndgame crushing endgame exposedKing veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/0218S"
+  },
+  {
+    "PuzzleId": "02BWG",
+    "FEN": "8/8/1p4p1/p2p4/3k4/5PP1/PP1K4/8 w - - 0 36",
+    "Moves": "b2b3 b6b5 a2a3 b5b4 a3a4 g6g5 d2e2 d4c3",
+    "Rating": 2758,
+    "NbPlays": 595,
+    "Themes": "crushing endgame pawnEndgame quietMove veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/02BWG"
+  },
+  {
+    "PuzzleId": "02Ef9",
+    "FEN": "8/8/pp2k2p/4p3/PP2K2P/6P1/8/8 b - - 0 46",
+    "Moves": "a6a5 b4a5 b6a5 g3g4 e6f6 e4d5",
+    "Rating": 2369,
+    "NbPlays": 884,
+    "Themes": "crushing endgame long pawnEndgame quietMove zugzwang",
+    "GameUrl": "https://lichess.org/training/02Ef9"
+  },
+  {
+    "PuzzleId": "02I54",
+    "FEN": "8/8/2p5/3kpP1p/p1p4P/P1P1K3/1P6/8 b - - 1 34",
+    "Moves": "c6c5 e3f3 e5e4 f3f4 e4e3 f4e3 d5e5 f5f6 e5f6 e3f4",
+    "Rating": 2249,
+    "NbPlays": 66,
+    "Themes": "crushing defensiveMove endgame pawnEndgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/02I54"
+  },
+  {
+    "PuzzleId": "02P6P",
+    "FEN": "8/8/p1p5/Pp1p3p/1P1Pk1p1/2P3PP/4K3/8 w - - 0 50",
+    "Moves": "h3g4 h5g4 e2d2 e4f3",
+    "Rating": 794,
+    "NbPlays": 2120,
+    "Themes": "crushing endgame pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/02P6P"
+  },
+  {
+    "PuzzleId": "02Rzn",
+    "FEN": "8/7p/7p/4p2k/4P2P/5KP1/8/8 w - - 1 48",
+    "Moves": "f3g2 h5g4 g2f2 g4h3 f2f3 h6h5 f3f2 h3h2",
+    "Rating": 1957,
+    "NbPlays": 878,
+    "Themes": "crushing endgame pawnEndgame quietMove veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/02Rzn"
+  },
+  {
+    "PuzzleId": "02U1f",
+    "FEN": "8/8/pp1k1pp1/3P1p1p/PP1K1P2/6P1/6P1/8 b - - 1 35",
+    "Moves": "g6g5 d4c4 b6b5 a4b5 a6b5 c4b5",
+    "Rating": 2250,
+    "NbPlays": 46,
+    "Themes": "crushing endgame long pawnEndgame zugzwang",
+    "GameUrl": "https://lichess.org/training/02U1f"
+  },
+  {
+    "PuzzleId": "02U6o",
+    "FEN": "8/6R1/3Pk1p1/3r4/2K5/6P1/8/8 b - - 16 54",
+    "Moves": "d5d6 g7g6 e6e5 g6d6 e5d6 c4d4 d6e6 d4e4 e6f6 e4f4 f6g6 f4g4",
+    "Rating": 1576,
+    "NbPlays": 1820,
+    "Themes": "crushing defensiveMove endgame rookEndgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/02U6o"
+  },
+  {
+    "PuzzleId": "02UN2",
+    "FEN": "8/8/3k4/8/p3R2r/P2K4/1P6/8 b - - 8 56",
+    "Moves": "h4e4 d3e4 d6c5 e4e5 c5c4 e5d6",
+    "Rating": 2398,
+    "NbPlays": 114,
+    "Themes": "crushing defensiveMove endgame long zugzwang",
+    "GameUrl": "https://lichess.org/training/02UN2"
+  },
+  {
+    "PuzzleId": "02Ve6",
+    "FEN": "8/2p3p1/3k1p2/p1p2P2/P3KPP1/1P6/8/8 b - - 0 31",
+    "Moves": "c7c6 e4d3 d6d5 g4g5 c5c4 b3c4 d5c5 d3c3",
+    "Rating": 2732,
+    "NbPlays": 933,
+    "Themes": "crushing defensiveMove endgame pawnEndgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/02Ve6"
+  },
+  {
+    "PuzzleId": "02ZOs",
+    "FEN": "2R5/8/8/1p6/nk6/1p6/1K6/8 w - - 8 55",
+    "Moves": "b2b1 b4a3 c8c6 b3b2 c6a6 a3b3 a6a4 b3a4 b1b2 a4b4",
+    "Rating": 2510,
+    "NbPlays": 2068,
+    "Themes": "advancedPawn crushing defensiveMove endgame veryLong zugzwang",
+    "GameUrl": "https://lichess.org/training/02ZOs"
+  },
+  {
+    "PuzzleId": "02ccm",
+    "FEN": "8/8/r3k2p/4p1p1/4P1P1/RK3P1P/8/8 b - - 0 47",
+    "Moves": "a6a3 b3a3 e6d7 a3b4 d7c6 b4c4",
+    "Rating": 1144,
+    "NbPlays": 620,
+    "Themes": "crushing defensiveMove endgame long zugzwang",
+    "GameUrl": "https://lichess.org/training/02ccm"
+  },
+  {
+    "PuzzleId": "02d1a",
+    "FEN": "8/1p6/p7/P2k1pp1/8/1P2PK1P/8/8 w - - 1 39",
+    "Moves": "f3e2 d5e4 e2f2 e4d3",
+    "Rating": 2104,
+    "NbPlays": 382,
+    "Themes": "crushing endgame master pawnEndgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/02d1a"
+  },
+  {
+    "PuzzleId": "02dWV",
+    "FEN": "8/4k3/r5p1/2NPKp2/2P4P/p7/P7/8 b - - 1 47",
+    "Moves": "a6a5 c5e6 f5f4 e6f4",
+    "Rating": 2409,
+    "NbPlays": 33,
+    "Themes": "crushing endgame quietMove short zugzwang",
+    "GameUrl": "https://lichess.org/training/02dWV"
+  },
+  {
+    "PuzzleId": "02kQm",
+    "FEN": "8/8/8/pp6/4k1p1/P1P3P1/1P3K2/8 w - - 2 53",
+    "Moves": "f2e2 a5a4 b2b3 a4b3",
+    "Rating": 1571,
+    "NbPlays": 5489,
+    "Themes": "crushing endgame pawnEndgame quietMove short zugzwang",
+    "GameUrl": "https://lichess.org/training/02kQm"
+  },
+  {
+    "PuzzleId": "02myt",
+    "FEN": "8/5r2/5P2/1p1pBk2/p1pP4/P1P2K2/1P6/8 b - - 4 46",
+    "Moves": "f7f6 e5f6 f5f6 f3f4",
+    "Rating": 1042,
+    "NbPlays": 378,
+    "Themes": "crushing defensiveMove endgame short zugzwang",
+    "GameUrl": "https://lichess.org/training/02myt"
+  }
+]

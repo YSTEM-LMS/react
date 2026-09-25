@@ -36,7 +36,8 @@
   },
   "scripts": {
     "start": "nodemon src/server.js",
-    "test": "jest --testPathPatterns=tests/"
+    "test": "jest --testPathPatterns=tests/",
+    "seed:puzzles": "node src/scripts/seedPuzzles.js"
   },
   "author": "",
   "license": "ISC",

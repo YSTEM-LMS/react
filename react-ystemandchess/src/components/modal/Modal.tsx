@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-export type ModalType = "success" | "error" | "loading";
+export type ModalType = "success" | "error" | "loading" | "info";
 
 export interface ModalProps {
   type: ModalType;
@@ -33,6 +33,13 @@ const icons: Record<ModalType, React.ReactNode> = {
   ),
   loading: (
     <div className="w-16 h-16 rounded-full border-4 border-soft border-t-primary animate-spin" />
+  ),
+  info: (
+    <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+      <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12a8 8 0 01-11.5 7.2L3 21l1.8-6.5A8 8 0 1121 12z" />
+      </svg>
+    </div>
   ),
 };
 

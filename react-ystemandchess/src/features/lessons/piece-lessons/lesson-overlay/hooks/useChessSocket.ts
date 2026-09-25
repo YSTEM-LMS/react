@@ -6,6 +6,7 @@ interface UseChessSocketOptions {
   student: string;
   mentor?: string;
   role?: "mentor" | "student" | "host" | "guest";
+  credentials?: string;
   serverUrl: string;
   mode?: GameMode;
   trackMouse?: boolean;
@@ -35,12 +36,16 @@ const normalizeFen = (fen: string): string => {
     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; // Default starting position
   }
 
-  const trimmed = fen.trim();
-  const parts = trimmed.split(" ");
+  const trimmed = fen.trim().toLowerCase();
+  if (trimmed === "start") {
+    return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  }
+
+  const parts = fen.trim().split(" ");
 
   // Already a complete 6-field FEN
   if (parts.length === 6) {
-    return trimmed;
+    return fen.trim();
   }
 
   // Board-only FEN (just piece positions)
@@ -63,6 +68,7 @@ export const useChessSocket = ({
   student,
   mentor = "",
   role = "student",
+  credentials = "",
   serverUrl,
   mode = "regular",
   trackMouse = false,
@@ -96,10 +102,11 @@ export const useChessSocket = ({
   const highlightFromRef = useRef<string>("");
   const highlightToRef = useRef<string>("");
 
-  // Store mentor/student/role in refs so they can be updated
+  // Store mentor/student/role/credentials in refs so they can be updated
   const mentorRef = useRef<string>(mentor);
   const studentRef = useRef<string>(student);
   const roleRef = useRef<"mentor" | "student" | "host" | "guest">(role);
+  const credentialsRef = useRef<string>(credentials);
 
   // ======== connect / listeners ========
   useEffect(() => {
@@ -320,7 +327,8 @@ export const useChessSocket = ({
     const data: GameConfig = {
       mentor: mentorRef.current,
       student: studentRef.current,
-      role: roleRef.current
+      role: roleRef.current,
+      credentials: credentialsRef.current
     };
     console.log("Starting new puzzle:", data);
     socketRef.current?.emit("newPuzzle", JSON.stringify(data));
@@ -497,7 +505,8 @@ export const useChessSocket = ({
     mentorRef.current = mentor;
     studentRef.current = student;
     roleRef.current = role;
-  }, [mentor, student, role]);
+    credentialsRef.current = credentials;
+  }, [mentor, student, role, credentials]);
 
   // allow runtime change of mentor/student/role
   const setUserInfo = useCallback(

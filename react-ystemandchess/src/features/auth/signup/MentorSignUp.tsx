@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { environment } from "../../../environments";
@@ -30,12 +30,53 @@ const MentorSignUp = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [termsFlag, setTermsFlag] = useState(false);
 
+  // Optional mentor -> student matching. Backed by the existing endpoints
+  // GET /user/mentorless (search unmatched students) and, after login,
+  // PUT /user/updateMentorship (links both users' mentorshipUsername).
+  const [studentKeyword, setStudentKeyword] = useState("");
+  const [studentResults, setStudentResults] = useState<string[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState("");
+  const [searchingStudents, setSearchingStudents] = useState(false);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Debounced search of unmatched students as the mentor types.
+  useEffect(() => {
+    if (selectedStudent) return;
+    const keyword = studentKeyword.trim();
+    if (keyword === "") {
+      setStudentResults([]);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        setSearchingStudents(true);
+        const res = await fetch(
+          `${environment.urls.middlewareURL}/user/mentorless?keyword=${encodeURIComponent(keyword)}`
+        );
+        if (res.ok && !cancelled) {
+          const list = await res.json();
+          setStudentResults(Array.isArray(list) ? list.slice(0, 8) : []);
+        }
+      } catch {
+        if (!cancelled) setStudentResults([]);
+      } finally {
+        if (!cancelled) setSearchingStudents(false);
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [studentKeyword, selectedStudent]);
 
   const validate = () => {
     const next: Record<string, string> = {};
@@ -119,6 +160,28 @@ const MentorSignUp = () => {
       const expires = new Date();
       expires.setDate(expires.getDate() + 1);
       setCookie("login", loginData.token, { expires, path: "/" });
+
+      // If the mentor picked a student, link them now that we're authenticated.
+      // Best-effort: the account already exists, so a failed match shouldn't
+      // block sign-up (e.g. the student may have just been matched elsewhere).
+      if (selectedStudent) {
+        try {
+          const matchRes = await fetch(
+            `${environment.urls.middlewareURL}/user/updateMentorship?mentorship=${encodeURIComponent(
+              selectedStudent
+            )}`,
+            {
+              method: "PUT",
+              headers: { Authorization: `Bearer ${loginData.token}` },
+            }
+          );
+          if (!matchRes.ok) {
+            console.warn("Student match failed:", await matchRes.text());
+          }
+        } catch (matchErr) {
+          console.warn("Student match request failed:", matchErr);
+        }
+      }
 
       navigate("/");
     } catch (error) {
@@ -291,15 +354,80 @@ const MentorSignUp = () => {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="mentee-search-input" className="text-base font-bold text-muted">Find a Student</label>
-          <input
-            type="text"
-            id="mentee-search-input"
-            placeholder="Available after signup"
-            disabled
-            className="w-full rounded-lg border-2 border-borderLight px-4 py-3.5 text-base bg-soft text-muted cursor-not-allowed"
-          />
-          <span className="text-xs text-muted">Student matching is coming soon.</span>
+          <label htmlFor="mentee-search-input" className="text-base font-bold text-dark">
+            Find a Student <span className="font-normal text-muted">(optional)</span>
+          </label>
+
+          {selectedStudent ? (
+            <div
+              className="flex items-center justify-between rounded-lg border-2 border-primary bg-soft px-4 py-3"
+              data-testid="selected-student"
+            >
+              <span className="text-base text-dark">
+                Matched with <b>{selectedStudent}</b>
+              </span>
+              <button
+                type="button"
+                className="text-sm font-bold text-primary hover:text-dark"
+                onClick={() => {
+                  setSelectedStudent("");
+                  setStudentKeyword("");
+                  setStudentResults([]);
+                }}
+              >
+                Change
+              </button>
+            </div>
+          ) : (
+            <>
+              <input
+                type="text"
+                id="mentee-search-input"
+                placeholder="Search students by username"
+                value={studentKeyword}
+                onChange={(e) => setStudentKeyword(e.target.value)}
+                onKeyDown={(e) => {
+                  // Don't submit the whole form when searching.
+                  if (e.key === "Enter") e.preventDefault();
+                }}
+                autoComplete="off"
+                className={inputClass(false)}
+              />
+
+              {studentKeyword.trim() !== "" && (
+                <div
+                  className="rounded-lg border-2 border-borderLight bg-white divide-y divide-borderLight max-h-48 overflow-y-auto"
+                  data-testid="student-results"
+                >
+                  {searchingStudents ? (
+                    <p className="px-4 py-2 text-sm text-muted">Searching…</p>
+                  ) : studentResults.length === 0 ? (
+                    <p className="px-4 py-2 text-sm text-muted">
+                      No unmatched students found.
+                    </p>
+                  ) : (
+                    studentResults.map((name) => (
+                      <button
+                        type="button"
+                        key={name}
+                        className="block w-full text-left px-4 py-2 text-base text-dark hover:bg-soft"
+                        onClick={() => {
+                          setSelectedStudent(name);
+                          setStudentResults([]);
+                        }}
+                      >
+                        {name}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+
+              <span className="text-xs text-muted">
+                Pick a student to mentor, or skip and match later.
+              </span>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2 text-sm">

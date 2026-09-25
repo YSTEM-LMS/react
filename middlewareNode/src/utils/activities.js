@@ -27,7 +27,9 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  return cachedClient.db("ystem");
+  // Use the database named in MONGO_URI (e.g. "ystem_dev"), matching Mongoose —
+  // not a hardcoded "ystem", which is an empty DB with none of the app's data.
+  return cachedClient.db();
 }
 
 /**
