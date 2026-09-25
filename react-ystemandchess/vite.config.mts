@@ -7,7 +7,6 @@ import svgr from 'vite-plugin-svgr';
 // `process.env` reference and crashes the page on load (`process` is not
 // defined there). CI fails the build if `process.env` survives into build/.
 const APP_ENV_VARS = [
-  'REACT_APP_API_URL',
   'REACT_APP_MIDDLEWARE_URL',
   'REACT_APP_STOCKFISH_SERVER_URL',
   'REACT_APP_CHESS_SERVER_URL',
@@ -44,10 +43,10 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
     },
 
-    // Vite exposes env via import.meta.env, but the environments module and two
-    // components read process.env directly. Defining them here keeps those files
-    // working unchanged under both Vite and Jest (where import.meta would need
-    // extra Babel plumbing and would break reset-password.test.tsx).
+    // Vite exposes env via import.meta.env, but src/environments reads
+    // process.env directly. Defining the values here keeps it working unchanged
+    // under both Vite and Jest (where import.meta would need extra Babel
+    // plumbing).
     define: {
       ...Object.fromEntries(
         APP_ENV_VARS.map((name) => [
