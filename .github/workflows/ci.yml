@@ -67,8 +67,13 @@ jobs:
         run: npm ci
         working-directory: ./react-ystemandchess
 
-      - name: Build react-ystemandchess
-        run: npm run build --if-present
+      # The verify script runs in this step so it sees the exact env the build
+      # used. Jest runs in Node, where `process` exists, so env bugs that blank
+      # the page in the browser would otherwise pass CI.
+      - name: Build react-ystemandchess and verify env was inlined
+        run: |
+          npm run build --if-present
+          node scripts/verify-build-env.mjs
         working-directory: ./react-ystemandchess
         env:
           # These are read by src/environments/environment.prod.js, which is
