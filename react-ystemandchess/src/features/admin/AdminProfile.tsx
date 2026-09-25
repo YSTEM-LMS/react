@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router";
 import { SetPermissionLevel } from "../../globals";
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 import userPortraitImg from "../../assets/images/user-portrait-placeholder.svg";
 
 interface Template {

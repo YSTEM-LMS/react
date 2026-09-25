@@ -3,3 +3,4 @@
 node_modules/
 logs/
 config/default.json
+config/.dev-index-key

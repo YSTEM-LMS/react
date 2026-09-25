@@ -63,6 +63,10 @@ const selectActivities = async () => {
           activity.completed = false;
           activity.taskId = catalogEntry.taskId;
           activity.route = catalogEntry.route;
+          // Catalog is the single source of truth for the user-facing name
+          // (see config/activityCatalog.js) — stored here so the frontend
+          // never needs its own copy of this map to fall out of sync with.
+          activity.displayName = catalogEntry.displayName;
           newActivities.push(activity);
         }
     }

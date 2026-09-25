@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import "./Student.scss";
 import ChessBoard, { ChessBoardRef } from "../../../components/ChessBoard/ChessBoard";
 import { useChessSocket } from "../../lessons/piece-lessons/lesson-overlay/hooks/useChessSocket";
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import { Move } from "../../../core/types/chess";
 import { v4 as uuidv4 } from "uuid";
 import ChatWidget from '../../../components/ChatWidget/ChatWidget';

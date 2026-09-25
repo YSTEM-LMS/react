@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import ChessBoard, { ChessBoardRef } from '../../../../components/ChessBoard/ChessBoard';
 import PromotionPopup from '../../lessons-main/PromotionPopup';
 import MoveTracker from '../move-tracker/MoveTracker';
-import { environment } from "../../../../environments/environment";
+import { environment } from "../../../../environments";
 
 import { Move } from "../../../../core/types/chess";
 import { EvaluationContext, Goal } from '../../../../core/types/goals';
@@ -24,10 +24,6 @@ import BackIcon from '../../../../assets/images/icons/icon_back.svg?react';
 import BackIconInactive from '../../../../assets/images/icons/icon_back_inactive.svg?react';
 import NextIcon from '../../../../assets/images/icons/icon_next.svg?react';
 import NextIconInactive from '../../../../assets/images/icons/icon_next_inactive.svg?react';
-
-import pageStyles from './Lesson-overlay.module.scss';
-import profileStyles from './Lesson-overlay-profile.module.scss';
-
 
 type LessonOverlayProps = {
   propPieceName?: any;
@@ -86,7 +82,6 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
   onChessMove,
   onChessReset,
 }) => {
-  const styles = styleType === 'profile' ? profileStyles : pageStyles;
   const navigate = useNavigate();
   const location = useLocation();
   const [cookies] = useCookies(['login']);
@@ -956,18 +951,18 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
   };
 
   return (
-    <div className={styles.lessonContainer}>
-      <div className={styles.buttonContainer}>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 px-4 md:flex-row md:px-10">
         {!isInfoOnly && (
-          <div className={styles.controlButtonsWrapper}>
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <button
-              className={styles.controlButton}
+              className="min-w-[10rem] rounded-lg border-0 bg-primary px-5 py-3 text-lg font-bold text-dark transition hover:bg-[#63a517] disabled:cursor-not-allowed disabled:opacity-40"
               onClick={() => chessBoardRef.current?.flip()}
             >
               Flip board
             </button>
             <button
-              className={styles.controlButton}
+              className="min-w-[10rem] rounded-lg border-0 bg-primary px-5 py-3 text-lg font-bold text-dark transition hover:bg-[#63a517] disabled:cursor-not-allowed disabled:opacity-40"
               onClick={undoMove}
               disabled={moveHistory.length === 0}
             >
@@ -976,23 +971,22 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
           </div>
         )}
         <div
-          className={styles.switchLesson}
+          className="w-full max-w-[420px] cursor-pointer rounded-lg border border-primary bg-soft/60 px-4 py-3 text-center text-xl font-bold text-primary shadow-sm transition hover:bg-primary/10 hover:text-primary/80 md:w-[30vw] md:min-w-[280px]"
           onClick={() => {
             if (navigateFunc) navigateFunc();
-            else navigate("/lessons-selection");
+            else navigate('/lessons-selection');
           }}
         >
           Switch Lesson
         </div>
       </div>
 
-      <div className={styles.container}>
-        <div className={styles.rightContainer}>
-          {/* Lesson info */}
-          <div className={styles.lessonHeader}>
-            <h1 className={styles.pieceDescription}>{piece}</h1>
+      <div className="flex flex-col gap-6 px-4 pb-4 md:flex-row md:justify-evenly md:px-10">
+        <div className="w-full max-w-[70ch] rounded-[var(--border-radius)] bg-white/85 p-6 shadow-[var(--shadow)] ring-1 ring-black/5 md:min-w-[300px]">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-[clamp(1.5rem,2vw,2.25rem)] font-black text-dark">{piece}</h1>
             <button
-              className={styles.resetLesson}
+              className="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-lg bg-primary p-1 text-[50px] text-dark transition hover:bg-[#63a517]"
               data-testid="reset-button"
               onClick={handleReset}
             >
@@ -1000,15 +994,15 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
             </button>
           </div>
 
-          <h1 className={styles.subheading}>
+          <h1 className="mt-2 text-left text-2xl font-bold text-dark">
             {lessonNum + 1} / {totalLessons}: {name}
           </h1>
 
-          <p className={styles.lessonDescription}>{info}</p>
+          <p data-testid="lesson-description" className="mt-4 max-h-[280px] overflow-y-auto text-lg leading-relaxed text-gray">{info}</p>
 
           {isInfoOnly && (
             <button
-              className={styles.continueButton}
+              className="mt-5 block rounded-md bg-primary px-6 py-3 text-base font-bold text-dark transition hover:bg-[#63a517]"
               onClick={async () => {
                 await updateCompletion();
                 await nextLesson();
@@ -1018,56 +1012,53 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
             </button>
           )}
 
-          {/* Navigation buttons */}
-          <div className={styles.prevNextContainer}>
+          <div className="mt-6 flex items-center justify-between gap-3">
             {lessonNum <= 0 || isNavigating ? (
-              <button className={[styles.prevNextLessonButtonInactive, styles.prev].join(' ')}>
-                <BackIconInactive />
-                <p className={styles.buttonDescription}>Back</p>
+              <button className="flex h-[35px] w-[100px] items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 text-black opacity-60">
+                <BackIconInactive className="h-4 w-4 shrink-0" />
+                <p className="text-base font-bold leading-none">Back</p>
               </button>
             ) : (
               <button
-                className={[styles.prevNextLessonButton, styles.prev].join(' ')}
+                className="flex h-[35px] w-[100px] items-center gap-1 rounded-md bg-primary px-2 text-dark transition hover:bg-[#63a517]"
                 onClick={previousLesson}
               >
-                <BackIcon />
-                <p className={styles.buttonDescription}>Back</p>
+                <BackIcon className="h-4 w-4 shrink-0" />
+                <p className="text-base font-bold leading-none">Back</p>
               </button>
             )}
 
             {(isNavigating || lessonNum >= totalLessons - 1 || (!!cookies.login && lessonNum >= completedNum)) ? (
-              <button className={[styles.prevNextLessonButtonInactive, styles.next].join(' ')}>
-                <p className={styles.buttonDescription}>Next</p>
-                <NextIconInactive />
+              <button className="flex h-[35px] w-[100px] items-center justify-end gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 text-slate-400 opacity-60">
+                <p className="text-base font-bold leading-none">Next</p>
+                <NextIconInactive className="h-4 w-4 shrink-0" />
               </button>
             ) : (
               <button
-                className={[styles.prevNextLessonButton, styles.next].join(' ')}
+                className="flex h-[35px] w-[100px] items-center justify-end gap-1 rounded-md bg-primary px-2 text-dark transition hover:bg-[#63a517]"
                 onClick={nextLesson}
               >
-                <p className={styles.buttonDescription}>Next</p>
-                <NextIcon />
+                <p className="text-base font-bold leading-none">Next</p>
+                <NextIcon className="h-4 w-4 shrink-0" />
               </button>
             )}
           </div>
 
-          {/* Move tracker */}
           {styleType !== 'profile' && <MoveTracker moves={moves} />}
         </div>
 
-        {/* Chessboard or video embed */}
         {isInfoOnly && videoUrl ? (
-          <div className={styles.videoContainer}>
+          <div className="flex w-full max-w-[700px] items-start justify-center">
             <div
-              className={styles.videoThumbnail}
+              className="flex aspect-video w-full max-w-[700px] cursor-pointer flex-col items-center justify-center gap-3 rounded-md border-2 border-dark bg-[#1a1a1a] transition hover:border-red"
               onClick={() => window.open(toAbsoluteUrl(videoUrl), '_blank')}
             >
-              <div className={styles.playButton}>▶</div>
-              <p className={styles.watchLabel}>Watch on YouTube</p>
+              <div className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-[#333] text-3xl text-white transition hover:bg-red">▶</div>
+              <p className="m-0 text-[15px] font-bold text-[#aaa]">Watch on YouTube</p>
             </div>
           </div>
         ) : (
-          <div className={`${styles.chessboardContainer} ${hidePieces ? styles.hidePieces : ""}`}>
+          <div className={`flex w-full max-w-[700px] items-start justify-center ${hidePieces ? '[&_svg_*]:opacity-0' : ''}`}>
             <ChessBoard
               mode="lesson"
               ref={chessBoardRef}
@@ -1084,86 +1075,79 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
         )}
       </div>
 
-      {/* POPUPS */}
-
-      {/* Connection error */}
       {ShowError && (
-        <div className={styles.popup}>
-          <div className={styles.popupContent}>
-            <div className={styles.errorCross}>
-              <svg width="80" height="80" viewBox="0 0 120 120">
-                <circle className={styles.circle} cx="60" cy="60" r="54" fill="none" stroke="#f57c7c" strokeWidth="6" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="w-[min(90vw,420px)] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white px-6 py-8 text-center shadow-[8px_8px_0_rgba(31,31,31,0.15)]">
+            <div className="mb-4 flex justify-center">
+              <svg width="80" height="80" viewBox="0 0 120 120" className="block">
+                <circle cx="60" cy="60" r="54" fill="none" stroke="#f57c7c" strokeWidth="6" />
                 <path d="M40 40 L80 80" fill="none" stroke="#f57c7c" strokeWidth="8" strokeLinecap="round" />
                 <path d="M80 40 L40 80" fill="none" stroke="#f57c7c" strokeWidth="8" strokeLinecap="round" />
               </svg>
             </div>
-            <p className={styles.popupHeader}>Failed to load content</p>
-            <p className={styles.popupSubheading}>Please reload page</p>
+            <p className="text-2xl font-black text-dark">Failed to load content</p>
+            <p className="mt-2 text-base text-gray">Please reload page</p>
           </div>
         </div>
       )}
 
-      {/* Lesson completed */}
       {showVPopup && (
-        <div className={styles.popup}>
-          <div className={styles.popupContent}>
-            <div className={styles.successCheckmark}>
-              <svg width="80" height="80" viewBox="0 0 120 120">
-                <circle className={styles.circle} cx="60" cy="60" r="54" fill="none" stroke="#beea8b" strokeWidth="6" />
-                <path className={styles.checkmark} d="M35 60 L55 80 L85 40" fill="none" stroke="#beea8b" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="w-[min(90vw,420px)] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white px-6 py-8 text-center shadow-[8px_8px_0_rgba(31,31,31,0.15)]">
+            <div className="mb-4 flex justify-center">
+              <svg width="80" height="80" viewBox="0 0 120 120" className="block">
+                <circle cx="60" cy="60" r="54" fill="none" stroke="#beea8b" strokeWidth="6" />
+                <path d="M35 60 L55 80 L85 40" fill="none" stroke="#beea8b" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <p className={styles.popupHeader}>Lesson completed!</p>
-            <p className={styles.popupSubheading}>Good job!</p>
-            <button className={styles.popupButton} onClick={handleVPopup}>OK</button>
+            <p className="text-2xl font-black text-dark">Lesson completed!</p>
+            <p className="mt-2 text-base text-gray">Good job!</p>
+            <button className="mt-5 w-full rounded-md bg-primary px-4 py-3 text-base font-bold text-dark transition hover:bg-[#63a517]" onClick={handleVPopup}>OK</button>
           </div>
         </div>
       )}
 
-      {/* Lesson failed */}
       {showXPopup && !showVPopup && (
-        <div className={styles.popup}>
-          <div className={styles.popupContent}>
-            <div className={styles.errorCross}>
-              <svg width="80" height="80" viewBox="0 0 120 120">
-                <circle className={styles.circle} cx="60" cy="60" r="54" fill="none" stroke="#f57c7c" strokeWidth="6" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="w-[min(90vw,420px)] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white px-6 py-8 text-center shadow-[8px_8px_0_rgba(31,31,31,0.15)]">
+            <div className="mb-4 flex justify-center">
+              <svg width="80" height="80" viewBox="0 0 120 120" className="block">
+                <circle cx="60" cy="60" r="54" fill="none" stroke="#f57c7c" strokeWidth="6" />
                 <path d="M40 40 L80 80" fill="none" stroke="#f57c7c" strokeWidth="8" strokeLinecap="round" />
                 <path d="M80 40 L40 80" fill="none" stroke="#f57c7c" strokeWidth="8" strokeLinecap="round" />
               </svg>
             </div>
-            <p className={styles.popupHeader}>{popupMessage}</p>
-            <p className={styles.popupSubheading}>Please try again.</p>
-            <button className={styles.popupButton} onClick={handleXPopup}>OK</button>
+            <p className="text-2xl font-black text-dark">{popupMessage}</p>
+            <p className="mt-2 text-base text-gray">Please try again.</p>
+            <button className="mt-5 w-full rounded-md bg-primary px-4 py-3 text-base font-bold text-dark transition hover:bg-[#63a517]" onClick={handleXPopup}>OK</button>
           </div>
         </div>
       )}
 
-      {/* Loading */}
       {showLPopup && (
-        <div className={styles.popup}>
-          <div className={styles.popupContent}>
-            <div className={styles.loadingSpinner}>
-              <svg width="80" height="80" viewBox="0 0 120 120">
-                <circle className={styles.spinner} cx="60" cy="60" r="54" fill="none" stroke="#7fcc26" strokeWidth="6" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="w-[min(90vw,420px)] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white px-6 py-8 text-center shadow-[8px_8px_0_rgba(31,31,31,0.15)]">
+            <div className="mb-4 flex justify-center">
+              <svg width="80" height="80" viewBox="0 0 120 120" className="block animate-[spin_1.1s_linear_infinite]">
+                <circle cx="60" cy="60" r="54" fill="none" stroke="#7fcc26" strokeWidth="6" />
               </svg>
             </div>
-            <p className={styles.popupHeader}>Loading lesson...</p>
-            <p className={styles.popupSubheading}>Please wait</p>
+            <p className="text-2xl font-black text-dark">Loading lesson...</p>
+            <p className="mt-2 text-base text-gray">Please wait</p>
           </div>
         </div>
       )}
 
-      {/* Instructions */}
       {showInstruction && (
-        <div className={`${styles.popup} ${isFading ? styles.fadeOut : ''}`} style={{ pointerEvents: 'none' }}>
-          <div className={styles.popupContent} style={{ pointerEvents: 'auto' }}>
-            <p className={styles.popupHeader}>Lesson Instructions</p>
-            <p className={styles.popupSubheading}>{info}</p>
-            <div className={styles.loadingBarContainer}>
-              <div className={styles.loadingBar} style={{ width: `${progress}%` }} />
+        <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] ${isFading ? 'opacity-0 transition-opacity duration-500' : ''}`} style={{ pointerEvents: 'none' }}>
+          <div className="w-[min(90vw,420px)] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white px-6 py-8 text-center shadow-[8px_8px_0_rgba(31,31,31,0.15)]" style={{ pointerEvents: 'auto' }}>
+            <p className="text-2xl font-black text-dark">Lesson Instructions</p>
+            <p className="mt-3 text-base text-gray">{info}</p>
+            <div className="mt-5 h-1.5 w-full overflow-hidden rounded-sm bg-[#e0e0e0]">
+              <div className="h-full rounded-sm bg-primary transition-[width] duration-100" style={{ width: `${progress}%` }} />
             </div>
             <button
-              className={styles.popupButton}
+              className="mt-5 w-full rounded-md bg-primary px-4 py-3 text-base font-bold text-dark transition hover:bg-[#63a517]"
               onClick={() => { setIsFading(true); setTimeout(() => setShowInstruction(false), 500); }}
             >
               Got it
@@ -1172,22 +1156,20 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
         </div>
       )}
 
-      {/* All lessons done */}
       {allLessonsDone && (
-        <div className={styles.popup}>
-          <div className={styles.popupContent}>
-            <p className={styles.popupHeader}>🎉 Congratulations!</p>
-            <p className={styles.popupSubheading}>You have completed all lessons for this scenario.</p>
-            <button className={styles.popupButton} onClick={() => {
-            setAllLessonsDone(false);
-            if (navigateFunc) navigateFunc();
-            else navigate("/lessons-selection");
-          }}>Go to Lessons</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="w-[min(90vw,420px)] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white px-6 py-8 text-center shadow-[8px_8px_0_rgba(31,31,31,0.15)]">
+            <p className="text-2xl font-black text-dark">🎉 Congratulations!</p>
+            <p className="mt-3 text-base text-gray">You have completed all lessons for this scenario.</p>
+            <button className="mt-5 w-full rounded-md bg-primary px-4 py-3 text-base font-bold text-dark transition hover:bg-[#63a517]" onClick={() => {
+              setAllLessonsDone(false);
+              if (navigateFunc) navigateFunc();
+              else navigate('/lessons-selection');
+            }}>Go to Lessons</button>
           </div>
         </div>
       )}
 
-      {/* Promotion popup */}
       {isPromoting && (
         <PromotionPopup
           position={promotionSource}

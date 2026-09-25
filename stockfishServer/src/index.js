@@ -1,21 +1,52 @@
 require("dotenv").config();
 
+const validateEnvironment = require("./validateEnvironment");
+validateEnvironment();
+
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const initializeSocket = require("./managers/socket");
 
+// Defense-in-depth: any future unhandled failure crashes loudly, with a clear
+// log line, instead of silently taking down the process with no diagnostics.
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception, shutting down:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled promise rejection, shutting down:', reason);
+  process.exit(1);
+});
+
+const isProduction = process.env.NODE_ENV === "production";
+
 const allowedOriginsSetting = process.env.CORS_ORIGIN || process.env.ALLOWED_ORIGINS;
-const allowedOrigins = allowedOriginsSetting
+const allowedOrigins = (allowedOriginsSetting
   ? allowedOriginsSetting.split(",").map((o) => o.trim())
   : [
       "https://ystemandchess.com",
       "https://www.ystemandchess.com",
-      "http://localhost:3000",
-      "http://localhost:3002",
-      "http://localhost:4200",
-    ];
+      ...(isProduction
+        ? []
+        : [
+            "http://localhost:3000",
+            "http://localhost:3002",
+            "http://localhost:4200",
+          ]),
+    ]
+).map((origin) => {
+  if (origin !== "*" && origin.endsWith("/")) {
+    const normalized = origin.slice(0, -1);
+    console.warn(
+      `CORS: "${origin}" has a trailing slash, which never matches a browser's Origin header — using "${normalized}" instead`
+    );
+    return normalized;
+  }
+  return origin;
+});
 
 const hasWildcard = allowedOrigins.includes("*");
 
@@ -28,7 +59,8 @@ const corsOptions = {
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      console.warn(`CORS: rejected origin ${origin}`);
+      callback(null, false);
     }
   },
   methods: ["GET", "POST"],
@@ -138,6 +170,8 @@ app.post('/api/analyze', async (req, res) => {
         emit: (event, payload) => {
           if (event === 'evaluation-complete') {
             resolve(payload);
+          } else if (event === 'session-error') {
+            reject(new Error(payload.error));
           }
         },
       };

@@ -97,7 +97,10 @@ test('item 2 — leaderboard shows real backend data, not dummy rows, with corre
 
   const searchBox = page.getByPlaceholder('Search by name...');
   await searchBox.fill(SELF.username);
-  await page.waitForTimeout(400);
+  // No fixed sleep for the 300ms debounce + real network round trip — let
+  // toBeVisible's own auto-retry (default 5s) cover it instead. A fixed
+  // wait here previously made this flaky against a real backend, whose
+  // response time isn't as instant as a mocked one.
   await expect(page.getByRole('table').getByText(SELF.username)).toBeVisible();
 });
 
@@ -107,9 +110,9 @@ test('item 3 — Country, State, and School filters each narrow results via the 
   const table = page.getByRole('table');
 
   // School filter — narrows to exactly the one student in that school.
+  // No fixed sleep for the debounce — toBeVisible/toHaveCount auto-retry.
   const schoolSelect = page.locator('select').nth(2); // Country, State, School order
   await schoolSelect.selectOption({ label: `E2E School A ${RUN_ID}` });
-  await page.waitForTimeout(400);
   await expect(table.getByText(SELF.username)).toBeVisible();
   await expect(table.getByText(PEER_A.username)).toHaveCount(0);
   await schoolSelect.selectOption({ label: 'All Schools' });
@@ -117,7 +120,6 @@ test('item 3 — Country, State, and School filters each narrow results via the 
   // Country filter — Canada should isolate PEER_B only.
   const countrySelect = page.locator('select').nth(0);
   await countrySelect.selectOption({ label: 'Canada' });
-  await page.waitForTimeout(400);
   await expect(table.getByText(PEER_B.username)).toBeVisible();
   await expect(table.getByText(SELF.username)).toHaveCount(0);
   await countrySelect.selectOption({ label: 'All Countries' });
@@ -125,7 +127,6 @@ test('item 3 — Country, State, and School filters each narrow results via the 
   // State filter — GA should isolate PEER_A only.
   const stateSelect = page.locator('select').nth(1);
   await stateSelect.selectOption({ label: 'GA' });
-  await page.waitForTimeout(400);
   await expect(table.getByText(PEER_A.username)).toBeVisible();
   await expect(table.getByText(SELF.username)).toHaveCount(0);
 });
@@ -168,7 +169,6 @@ test('item 4 — uploading a real avatar replaces the rank-based placeholder in 
 
   const searchBox = page.getByPlaceholder('Search by name...');
   await searchBox.fill(SELF.username);
-  await page.waitForTimeout(400);
 
   const row = page.getByRole('table').locator('tr', { has: page.getByText(SELF.username) });
   const avatarImg = row.locator('img.lb-avatar-img');

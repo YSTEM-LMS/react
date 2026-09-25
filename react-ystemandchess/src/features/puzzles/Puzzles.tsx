@@ -4,7 +4,7 @@ import {
   themesDescription,
 } from "../../core/services/themesService";
 import Modal, { ModalProps } from "../../components/modal/Modal";
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 import { v4 as uuidv4 } from "uuid";
 import { SetPermissionLevel } from "../../globals";
 import { useCookies } from "react-cookie";

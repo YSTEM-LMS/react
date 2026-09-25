@@ -2,6 +2,7 @@ jest.mock("child_process", () => ({
   spawn: jest.fn(() => ({
     stdin: { write: jest.fn() },
     stdout: { on: jest.fn() },
+    on: jest.fn(),
     kill: jest.fn(),
   })),
 }));
@@ -63,6 +64,7 @@ describe("StockfishManager", () => {
     spawn.mockReturnValue({
       stdin: { write: fakeWrite },
       stdout: { on: jest.fn() },
+      on: jest.fn(),
       kill: jest.fn(),
     });
 
@@ -85,6 +87,7 @@ describe("StockfishManager", () => {
     spawn.mockReturnValue({
       stdin: { write: jest.fn() },
       stdout: { on: jest.fn() },
+      on: jest.fn(),
       kill: mockKill,
     });
 

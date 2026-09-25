@@ -249,19 +249,49 @@ async function ensureIndexes() {
   }
 }
 
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
 const connectDB = async () => {
+  try {
+    const target = new URL(
+      db.replace("mongodb+srv://", "https://").replace("mongodb://", "http://")
+    );
+    console.log(
+      `[boot] env=${process.env.NODE_ENV || "undefined"} db_host=${target.hostname}${target.pathname}`
+    );
+  } catch (_) {
+    console.log(
+      `[boot] env=${process.env.NODE_ENV || "undefined"} db_host=<unparsable URI>`
+    );
+  }
+
   try {
     console.log(`Connecting to MongoDB...`);
     await mongoose.connect(db, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 1000, // Timeout after 1 second instead of hanging
+      // Production has no fallback (a failure here calls process.exit(1)),
+      // so it gets a longer timeout to ride out a network blip or an Atlas
+      // cold-start during deploy. Dev/test fail fast to the in-memory
+      // fallback below.
+      serverSelectionTimeoutMS: IS_PRODUCTION ? 10000 : 1000,
     });
     console.log("MongoDB Connected...");
     await ensureIndexes();
-    await seedTestUsers();
+
+    if (!IS_PRODUCTION) {
+      await seedTestUsers();
+    }
   } catch (err) {
     console.warn(`Connection to configured MongoDB failed: ${err.message}`);
+
+    if (IS_PRODUCTION) {
+      console.error(
+        "Refusing to fall back to in-memory MongoDB in production. Exiting."
+      );
+      process.exit(1);
+    }
+
     console.warn("Starting local in-memory MongoDB server as fallback...");
     try {
       const { MongoMemoryServer } = require("mongodb-memory-server");
@@ -281,7 +311,7 @@ const connectDB = async () => {
       await seedTestUsers();
     } catch (fallbackErr) {
       console.error("In-memory MongoDB startup failed:", fallbackErr.message);
-      process.exit(1); // Exit process if connection fails
+      process.exit(1);
     }
   }
 };

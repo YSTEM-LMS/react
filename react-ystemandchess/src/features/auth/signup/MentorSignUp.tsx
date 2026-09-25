@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import AuthLayout from "./AuthLayout";
 import stemmyVine from "../../../assets/images/ActivitiesAssets/stemmy.svg";
 
@@ -139,7 +139,6 @@ const MentorSignUp = () => {
       links={[
         { label: "About Us", to: "/about-us" },
         { label: "Our Mission", to: "/mission" },
-        { label: "Online Expansion", to: "/online-expansion" },
       ]}
     >
       <h1 className="text-3xl font-bold text-dark mb-6 text-center">Mentor Sign Up</h1>

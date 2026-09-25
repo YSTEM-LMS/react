@@ -1,6 +1,4 @@
-import pageStyles from "./Lessons.module.scss";
-import profileStyles from "./Lessons-profile.module.scss";
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import RedoIcon from "./icon_redo.svg?react";
 import BackIcon from "./icon_back.svg?react";
 import BackIconInactive from "./icon_back_inactive.svg?react";
@@ -20,10 +18,7 @@ type LessonsProps = {
 
 const Lessons = ({ testOverrides, styleType = "page" }: LessonsProps) => {
   // Use memoization to maintain referential equality and avoid unnecessary re-renders
-  const styles = useMemo(
-    () => (styleType === "profile" ? profileStyles : pageStyles),
-    [styleType]
-  );
+  const isProfile = styleType === "profile";
 
   const [board, setBoard] = useState(getScenario(0).subSections[0].board); // Initialize the board with chess pieces
   const [highlightedSquares, setHighlightedSquares] = useState([]);
@@ -327,101 +322,94 @@ const Lessons = ({ testOverrides, styleType = "page" }: LessonsProps) => {
       handleDragStart,
       handleDrop,
       handleDragOver,
-      draggingPiece,
-      styles
+      draggingPiece
     );
-  }, [board, highlightedSquares, draggingPiece, styles]);
+  }, [board, highlightedSquares, draggingPiece]);
 
   return (
-    <div className={styles.lessonsPage}>
-      <div className={styles.leftRightContainer}>
-        {/* div for elements on the right */}
-        <div className={styles.rightContainer}>
-          {/* Description part */}
-          <div className={styles.lessonHeader}>
-            <h1
-              data-testid="piece_description"
-              className={styles.pieceDescription}
-            >
+    <div className="py-[3%]">
+      <div className="flex flex-row-reverse">
+        <div
+          className={
+            isProfile
+              ? "ml-[100px] flex w-full flex-col rounded-xl bg-white/85 p-6 font-bold text-left shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+              : "m-7 w-[87%] rounded-xl bg-white/85 p-4 pl-6 font-bold text-left shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+          }
+        >
+          <div className="flex items-baseline justify-between">
+            <h1 data-testid="piece_description" className={isProfile ? "text-[32px]" : "text-[22px]"}>
               {scenario.name}
             </h1>
             <button
               data-testid="reset-lesson"
-              className={styles.resetLesson}
+              className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-md bg-[#7fcc26] p-1.5 text-4xl text-black transition hover:bg-[#5d971b]"
               onClick={resetBoard}
             >
               <RedoIcon />
             </button>
           </div>
 
-          <h1 data-testid="subheading" className={styles.subheading}>
+          <h1 data-testid="subheading" className={isProfile ? "mt-1 text-[28px] font-bold" : "mt-1 text-[22px] font-bold"}>
             {lesson.name}
           </h1>
           <p
             data-testid="lesson-description"
-            className={styles.lessonDescription}
+            className={isProfile ? "max-h-[500px] overflow-y-auto text-[26px] text-[#7a7a7a]" : "max-h-[500px] overflow-y-auto text-[18px] text-[#7a7a7a]"}
           >
             {lesson.info}
           </p>
 
-          <div className={styles.prevNextContainer}>
-            {/* Back button */}
+          <div className="mt-3 flex justify-between">
             <button
               data-testid="backLessonButton"
               className={
                 leftEnded
-                  ? [styles.prevNextLessonButtonInactive, styles.prev].join(" ")
-                  : [styles.prevNextLessonButton, styles.prev].join(" ")
+                  ? "flex h-[35px] w-[100px] items-center gap-1 rounded-md bg-[#d4dddd] px-2 text-slate-400"
+                  : "flex h-[35px] w-[100px] items-center gap-1 rounded-md bg-[#d4dddd] px-2 text-black transition hover:bg-[#7a7a7a]"
               }
               onClick={leftEnded ? undefined : () => setupScenario(-1)}
             >
-              {leftEnded ? <BackIconInactive /> : <BackIcon />}
-              <p className={styles.buttonDescription}>Back</p>
+              {leftEnded ? <BackIconInactive className="h-4 w-4 shrink-0" /> : <BackIcon className="h-4 w-4 shrink-0" />}
+              <p className="text-[18px] font-bold leading-none">Back</p>
             </button>
 
             <button
               data-testid="prevNextLessonButton"
               className={
                 rightEnded
-                  ? [styles.prevNextLessonButtonInactive, styles.next].join(" ")
-                  : [styles.prevNextLessonButton, styles.next].join(" ")
+                  ? "flex h-[35px] w-[100px] items-center justify-end gap-1 rounded-md bg-[#d4dddd] px-2 text-slate-400"
+                  : "flex h-[35px] w-[100px] items-center justify-end gap-1 rounded-md bg-[#7fcc26] px-2 text-black transition hover:bg-[#5d971b]"
               }
               onClick={rightEnded ? undefined : () => setupScenario(1)}
             >
-              {rightEnded ? <NextIconInactive /> : <NextIcon />}
-              <p className={styles.buttonDescription}>Next</p>
+              <p className="text-[18px] font-bold leading-none">Next</p>
+              {rightEnded ? <NextIconInactive className="h-4 w-4 shrink-0" /> : <NextIcon className="h-4 w-4 shrink-0" />}
             </button>
           </div>
         </div>
 
-        {/* Div for elements on the left */}
-        <div className={styles.leftContainer}>
-          <div className={styles.chessboardContainer}>
-            <div data-testid="chessboard-L" className={styles.chessboard}>
+        <div className={isProfile ? "ml-[100px]" : "ml-0"}>
+          <div className={isProfile ? "ml-[20px] h-full w-[44vw]" : "ml-[40px] h-full w-[44vw]"}>
+            <div data-testid="chessboard-L" className="grid h-full w-full grid-cols-8 grid-rows-8 gap-0" style={{ gridTemplateColumns: 'repeat(8, minmax(0, 1fr))', gridTemplateRows: 'repeat(8, minmax(0, 1fr))' }}>
               {chessBoard}
             </div>
-            {
-              isPromoting ? (
-                <PromotionPopup
-                  position={promotionPosition}
-                  promoteToPiece={promotePawn}
-                />
-              ) : null /* Show promotion popup if needed */
-            }
+            {isPromoting ? (
+              <PromotionPopup position={promotionPosition} promoteToPiece={promotePawn} />
+            ) : null}
           </div>
         </div>
       </div>
 
       <div>
-        <div className={styles.lessonButtonsContainer}>
+        <div className="mt-8 ml-5 flex flex-wrap items-center md:ml-[100px] md:mr-[100px]">
           {scenario.subSections?.map((section, index) => (
             <button
               key={index}
               data-testid="lesson-button"
               className={
                 section.name == lesson.name
-                  ? [styles.lessonButtons, styles.active].join(" ")
-                  : styles.lessonButtons
+                  ? "min-h-[40px] min-w-[90px] cursor-pointer rounded-md bg-[#7fcc26] px-4 py-2 text-sm font-bold text-black transition md:min-w-[120px]"
+                  : "min-h-[40px] min-w-[90px] cursor-pointer rounded-md bg-[#7a7a7a] px-4 py-2 text-sm font-bold text-white transition hover:bg-slate-600 md:min-w-[120px]"
               }
               onClick={() => setupLesson(section)}
               aria-label={`${section.name}`}
@@ -433,35 +421,41 @@ const Lessons = ({ testOverrides, styleType = "page" }: LessonsProps) => {
         </div>
       </div>
 
-      {/* Popup for lesson completion */}
       {showPopup && (
-        <div className={styles.popup}>
-          <div className={styles.popupContent}>
-            <div className={styles.successCheckmark}>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50">
+          <div className="h-[280px] w-[450px] rounded-xl bg-white p-5 text-center">
+            <div className="mb-2 flex justify-center">
               <svg width="80" height="80" viewBox="0 0 120 120">
                 <circle
-                  className={styles.circle}
                   cx="60"
                   cy="60"
                   r="54"
                   fill="none"
                   stroke="#beea8b"
-                  stroke-width="6"
+                  strokeWidth="6"
+                  strokeDasharray="410"
+                  strokeDashoffset="410"
+                  className="animate-pulse"
                 ></circle>
                 <path
-                  className={styles.checkmark}
                   d="M35 60 L55 80 L85 40"
                   fill="none"
                   stroke="#beea8b"
-                  stroke-width="8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray="100"
+                  strokeDashoffset="100"
+                  className="animate-pulse"
                 ></path>
               </svg>
             </div>
-            <p className={styles.popupHeader}>Lesson completed</p>
-            <p className={styles.popupSubheading}>Good job</p>
-            <button className={styles.popupButton} onClick={handlePopupConfirm}>
+            <p className="mb-1 text-[30px] font-bold text-slate-600">Lesson completed</p>
+            <p className="text-[20px] text-slate-600">Good job</p>
+            <button
+              className="mt-4 rounded-lg border-[3px] border-sky-200 bg-sky-500 px-6 py-2 text-white transition hover:bg-sky-600"
+              onClick={handlePopupConfirm}
+            >
               OK
             </button>
           </div>
@@ -480,8 +474,7 @@ export function createChessBoard(
   handleDragStart: any,
   handleDrop: any,
   handleDragOver: any,
-  draggingPiece: any,
-  styles: any
+  draggingPiece: any
 ) {
   const rows = 8;
   const cols = 8;
@@ -504,14 +497,13 @@ export function createChessBoard(
       chessBoard.push(
         <div
           key={key}
-          className={styles.square}
+          className="relative h-full w-full"
           data-testid={`square-${key}`}
           style={{
             backgroundColor: squareColor,
             filter: highlightedSquares.includes(key)
               ? "brightness(80%)"
               : "brightness(100%)",
-            position: "relative", // Allow positioning for labels and circles
             transition: "filter 0.4s ease",
           }}
           onMouseEnter={() => handleSquareHover(key)} // Show possible moves on hover
@@ -524,20 +516,18 @@ export function createChessBoard(
           onDrop={() => handleDrop(key)} // Handle drop
           onDragOver={handleDragOver} // Allow drag-over for dropping
         >
-          {/* Show gray circle for possible moves on hover */}
           {highlightedSquares.includes(key) && (
-            <div className={styles.highlightCircle} />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-500/70" />
           )}
-          {/* If there is a piece here, show the circle for the opponent's piece */}
           {piece &&
             piece[0] !== draggingPiece?.piece[0] &&
             highlightedSquares.includes(key) && (
-              <div className={styles.highlightCircle} />
+              <div className="pointer-events-none absolute left-1/2 top-1/2 h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-500/70" />
             )}
           {/* Add rank and file labels */}
-          {j === 0 && <span className={styles.rankLabel}>{ranks[i]}</span>}{" "}
+          {j === 0 && <span className="absolute left-1 top-1 text-[10px] font-semibold text-slate-700 md:text-xs">{ranks[i]}</span>}{" "}
           {/* Rank labels (1-8) */}
-          {i === 7 && <span className={styles.fileLabel}>{files[j]}</span>}{" "}
+          {i === 7 && <span className="absolute bottom-1 right-1 text-[10px] font-semibold text-slate-700 md:text-xs">{files[j]}</span>}{" "}
           {/* File labels (a-h) */}
           {/* Display piece image */}
           {pieceImage && (
@@ -545,7 +535,7 @@ export function createChessBoard(
               src={pieceImage}
               alt={piece}
               data-testid={`piece-${piece}`}
-              className={styles.pieceImage}
+              className="h-[90%] w-[90%] object-contain"
               draggable // Allow dragging
               onDragStart={(e) => handleDragStart(e, piece, key)} // Dragging starts
             />

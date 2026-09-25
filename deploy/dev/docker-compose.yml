@@ -12,14 +12,16 @@ services:
       - stockfishserver
 
   react-app:
-    build: ../../react-ystemandchess
+    build:
+      context: ../../react-ystemandchess
+      args:
+        REACT_APP_CHESS_SERVER_URL: http://localhost:3001
+        REACT_APP_MIDDLEWARE_URL: http://localhost:8000
+        REACT_APP_STOCKFISH_SERVER_URL: http://localhost:9324
+        REACT_APP_AGORA_APP_ID: ""
     container_name: react-app
     ports:
       - "3000:3000"
-    environment:
-      - REACT_APP_CHESS_SERVER_URL=http://localhost:3001
-      - REACT_APP_MIDDLEWARE_URL=http://localhost:8000
-      - REACT_APP_STOCKFISH_URL=http://localhost:8080
 
   middlewarenode:
     build: ../../middlewareNode
@@ -27,10 +29,13 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - NODE_ENV=development
       - PORT=8000
+      - INDEX_KEY=dev-index-key-replace-in-prod
+      - CORS_ORIGIN=http://localhost,http://localhost:3000
       - SESSION_SECRET=dev-secret-replace-in-prod
-      # Analytics rate limit — requests per 15-minute window per IP (default: 100)
       - ANALYTICS_RATE_LIMIT_MAX=100
+      - LEADERBOARD_RATE_LIMIT_MAX=60
 
   chessserver:
     build: ../../chessServer
@@ -38,8 +43,10 @@ services:
     ports:
       - "3001:3001"
     environment:
+      - NODE_ENV=development
       - PORT=3001
       - MIDDLEWARE_URL=http://middlewarenode:8000
+      - CORS_ORIGIN=http://localhost,http://localhost:3000,http://localhost:3002
 
   stockfishserver:
     build: ../../stockfishServer
@@ -47,7 +54,9 @@ services:
     ports:
       - "9324:9324"
     environment:
+      - NODE_ENV=development
       - PORT=9324
+      - CORS_ORIGIN=http://localhost,http://localhost:3000
 
 # Usage: docker-compose up --build
 # Access at: http://localhost
