@@ -22,6 +22,12 @@ jobs:
         with:
           node-version: 20.19.0
           cache: 'npm'
+          # No root lockfile; key the cache on each service's own lockfile.
+          cache-dependency-path: |
+            middlewareNode/package-lock.json
+            chessServer/package-lock.json
+            stockfishServer/package-lock.json
+            react-ystemandchess/package-lock.json
 
       # middlewareNode
       - name: Install dependencies (middlewareNode)
