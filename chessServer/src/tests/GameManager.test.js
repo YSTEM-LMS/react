@@ -246,11 +246,37 @@ describe('GameManager', () => {
     const eventsFor = (emitted, id) => emitted[id].map((e) => e.event);
 
     // Mocks the GET /user/getMentorship call a mentor join makes before being
-    // seated. A student join never calls this.
+    // seated. Also satisfies a same-test student join's GET /user/me call if
+    // its expected username happens to match, since this stubs every URL the
+    // same way — use mockFetchRoutes below when a test needs the two to
+    // differ.
     const mockGetMentorship = (status, body) => {
       global.fetch = jest.fn().mockResolvedValue({
         status,
         json: async () => body,
+      });
+    };
+
+    // Mocks the GET /user/me call a non-guest student join makes before
+    // being seated. Guest ("guest:"-prefixed) joins never call this.
+    const mockWhoAmI = (status, body) => {
+      global.fetch = jest.fn().mockResolvedValue({
+        status,
+        json: async () => body,
+      });
+    };
+
+    // For tests where a mentor's GET /user/getMentorship call and a
+    // student's GET /user/me call both happen and need distinct responses.
+    const mockFetchRoutes = ({ getMentorship, me }) => {
+      global.fetch = jest.fn((url) => {
+        if (getMentorship && url.includes('/user/getMentorship')) {
+          return Promise.resolve({ status: getMentorship[0], json: async () => getMentorship[1] });
+        }
+        if (me && url.includes('/user/me')) {
+          return Promise.resolve({ status: me[0], json: async () => me[1] });
+        }
+        return Promise.resolve({ status: 404, json: async () => ({}) });
       });
     };
 
@@ -264,21 +290,21 @@ describe('GameManager', () => {
       jest.restoreAllMocks();
     });
 
-    test('the connecting student becomes the host (solver)', async () => {
+    test('a correctly identified student becomes the host (solver)', async () => {
+      mockWhoAmI(200, { username: 'Alice' });
       const { io, emitted, addSocket } = makeIo();
       addSocket('sStudent');
       await gameManager.createOrJoinPuzzle(
-        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent' }, io
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
       );
       expect(eventsFor(emitted, 'sStudent')).toContain('host');
-      expect(global.fetch).not.toHaveBeenCalled(); // student joins never call middlewareNode
     });
 
-    test('a student with no token still joins (covers Puzzle Streak, which has no real login)', async () => {
+    test('a guest join ("guest:" prefix, no token) still joins — covers anonymous /puzzles visits and Puzzle Streak', async () => {
       const { io, emitted, addSocket } = makeIo();
       addSocket('sStudent');
       await gameManager.createOrJoinPuzzle(
-        { student: 'Alice', mentor: 'puzzle_mentor_Alice', role: 'student', socketId: 'sStudent' }, io
+        { student: 'guest:abc123', mentor: 'puzzle_mentor_abc123', role: 'student', socketId: 'sStudent' }, io
       );
       expect(eventsFor(emitted, 'sStudent')).toContain('host');
       expect(global.fetch).not.toHaveBeenCalled();
@@ -365,8 +391,96 @@ describe('GameManager', () => {
       ).rejects.toThrow(/not this student's mentor/);
     });
 
+    // --- Student identity: fail closed like the mentor check -------------
+
+    test('rejects a (non-guest) student join with no token', async () => {
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      await expect(
+        gameManager.createOrJoinPuzzle(
+          { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent' }, io
+        )
+      ).rejects.toThrow(/login token is required/);
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    test('rejects a student join with a token middlewareNode refuses (bad/fake token)', async () => {
+      mockWhoAmI(401, { message: 'Unauthorized' });
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      await expect(
+        gameManager.createOrJoinPuzzle(
+          { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'fake-token' }, io
+        )
+      ).rejects.toThrow(/Could not verify student identity/);
+    });
+
+    test('rejects a student join authenticated as a different student', async () => {
+      mockWhoAmI(200, { username: 'SomeoneElse' });
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      await expect(
+        gameManager.createOrJoinPuzzle(
+          { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-someone-else' }, io
+        )
+      ).rejects.toThrow(/You are not this student/);
+    });
+
+    test('rejects a student join when MIDDLEWARE_URL is unset', async () => {
+      delete process.env.MIDDLEWARE_URL;
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      await expect(
+        gameManager.createOrJoinPuzzle(
+          { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
+        )
+      ).rejects.toThrow(/misconfigured/);
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    test('a second student join cannot take over the seat without a matching token', async () => {
+      mockWhoAmI(200, { username: 'Alice' });
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent1');
+      addSocket('sStudent2');
+      await gameManager.createOrJoinPuzzle(
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent1', credentials: 'token-alice' }, io
+      );
+
+      // An attacker (or a bug) tries to take the same seat with no token.
+      await expect(
+        gameManager.createOrJoinPuzzle(
+          { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent2' }, io
+        )
+      ).rejects.toThrow(/login token is required/);
+
+      const room = gameManager.ongoingGames.find((g) => g.student.username === 'Alice');
+      expect(room.student.id).toBe('sStudent1'); // original seat untouched
+    });
+
+    test('a guest join cannot collide with a same-named regular student room', async () => {
+      mockWhoAmI(200, { username: 'Alice' });
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      addSocket('sGuest');
+      await gameManager.createOrJoinPuzzle(
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
+      );
+      await gameManager.createOrJoinPuzzle(
+        { student: 'guest:Alice', mentor: 'puzzle_mentor_Alice', role: 'student', socketId: 'sGuest' }, io
+      );
+
+      // Two distinct rooms, not one — "guest:Alice" never matches "Alice".
+      expect(gameManager.ongoingGames.length).toBe(2);
+      const realRoom = gameManager.ongoingGames.find((g) => g.student.username === 'Alice');
+      expect(realRoom.student.id).toBe('sStudent'); // unaffected by the guest join
+    });
+
     test('the student solves even when the mentor connects first', async () => {
-      mockGetMentorship(200, { username: 'Alice', firstName: 'Bob', lastName: 'Smith' });
+      mockFetchRoutes({
+        getMentorship: [200, { username: 'Alice', firstName: 'Bob', lastName: 'Smith' }],
+        me: [200, { username: 'Alice' }],
+      });
       const { io, emitted, addSocket } = makeIo();
       addSocket('sMentor');
       addSocket('sStudent');
@@ -377,7 +491,7 @@ describe('GameManager', () => {
       );
       // Student connects second.
       await gameManager.createOrJoinPuzzle(
-        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent' }, io
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
       );
 
       expect(eventsFor(emitted, 'sMentor')).toContain('guest');
@@ -403,12 +517,15 @@ describe('GameManager', () => {
     // --- Seat enforcement: only the student may move/undo ----------------
 
     test('a move from the mentor seat is rejected', async () => {
-      mockGetMentorship(200, { username: 'Alice' });
+      mockFetchRoutes({
+        getMentorship: [200, { username: 'Alice' }],
+        me: [200, { username: 'Alice' }],
+      });
       const { io, addSocket } = makeIo();
       addSocket('sStudent');
       addSocket('sMentor');
       await gameManager.createOrJoinPuzzle(
-        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent' }, io
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
       );
       await gameManager.createOrJoinPuzzle(
         { student: 'Alice', mentor: 'Bob', role: 'mentor', socketId: 'sMentor', credentials: 'token-bob' }, io
@@ -418,10 +535,11 @@ describe('GameManager', () => {
     });
 
     test('a move from the student seat succeeds', async () => {
+      mockWhoAmI(200, { username: 'Alice' });
       const { io, addSocket } = makeIo();
       addSocket('sStudent');
       await gameManager.createOrJoinPuzzle(
-        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent' }, io
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
       );
 
       const moveResult = gameManager.makeMove('sStudent', 'e2', 'e4');
@@ -429,12 +547,15 @@ describe('GameManager', () => {
     });
 
     test('an undo from the mentor seat is rejected', async () => {
-      mockGetMentorship(200, { username: 'Alice' });
+      mockFetchRoutes({
+        getMentorship: [200, { username: 'Alice' }],
+        me: [200, { username: 'Alice' }],
+      });
       const { io, addSocket } = makeIo();
       addSocket('sStudent');
       addSocket('sMentor');
       await gameManager.createOrJoinPuzzle(
-        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent' }, io
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
       );
       gameManager.makeMove('sStudent', 'e2', 'e4');
       await gameManager.createOrJoinPuzzle(
@@ -445,10 +566,11 @@ describe('GameManager', () => {
     });
 
     test('an undo from the student seat succeeds', async () => {
+      mockWhoAmI(200, { username: 'Alice' });
       const { io, addSocket } = makeIo();
       addSocket('sStudent');
       await gameManager.createOrJoinPuzzle(
-        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent' }, io
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
       );
       gameManager.makeMove('sStudent', 'e2', 'e4');
 

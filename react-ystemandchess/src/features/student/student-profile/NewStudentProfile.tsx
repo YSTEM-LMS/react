@@ -88,6 +88,10 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
   const [username, setUsername] = useState(" ");
   const [firstName, setFirstName] = useState(" ");
   const [lastName, setLastName] = useState(" ");
+  // True unless this is a parent viewing a child's profile via ?student=,
+  // in which case the logged-in session's token doesn't belong to the
+  // profile being viewed — see the <Puzzles> render below.
+  const [isOwnProfile, setIsOwnProfile] = useState(true);
   const [mentorUsername, setMentorUsername] = useState("");
 
   // Time spent on different activities (header display)
@@ -169,6 +173,7 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
     const targetUsername = studentParam || uInfo.username;
 
     setUsername(targetUsername);
+    setIsOwnProfile(targetUsername === uInfo.username);
     if (studentParam) {
       setFirstName(params.get("name") || studentParam);
       setLastName("");
@@ -488,7 +493,12 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
     case "puzzles":
       return (
         <div className="w-full h-full">
-          <Puzzles student={username} mentor={mentorUsername} role={"student"} styleType="profile" />
+          {/* A parent viewing a child's profile (?student=) is authenticated
+              as the parent, not the child — the new chessServer identity
+              check would reject that mismatch. Omit the student prop in
+              that case so it falls back to an unauthenticated guest room
+              instead of being rejected. */}
+          <Puzzles student={isOwnProfile ? username : undefined} mentor={mentorUsername} role={"student"} styleType="profile" />
         </div>
       );
     

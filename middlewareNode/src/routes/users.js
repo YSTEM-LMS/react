@@ -57,6 +57,28 @@ async function getDb() {
   return cachedClient.db();
 }
 
+// Usernames starting with "guest:" are reserved for chessServer's ephemeral,
+// unauthenticated puzzle rooms (anonymous /puzzles visits and Puzzle Streak —
+// see chessServer/src/managers/GameManager.js). No real account may use one,
+// so a real student's room can never collide with a guest room.
+const RESERVED_USERNAME_PREFIX = /^guest:/i;
+function isReservedUsername(username) {
+  return typeof username === "string" && RESERVED_USERNAME_PREFIX.test(username);
+}
+
+/**
+ * GET /user/me
+ *
+ * Returns the authenticated caller's own username. Used by chessServer to
+ * verify that a socket claiming to be a given student actually holds that
+ * student's login token, before seating them in a puzzle room.
+ *
+ * @access JWT authenticated
+ */
+router.get("/me", passport.authenticate("jwt"), async (req, res) => {
+  res.json({ username: req.user.username });
+});
+
 /**
  * GET /user/children
  * 
@@ -108,6 +130,12 @@ router.post(
     const { username, password, first, last, email, role, students, zipcode, gender, gradeLevel, occupation } =
       req.query;
 
+    if (isReservedUsername(username)) {
+      return res
+        .status(400)
+        .json({ error: 'Usernames starting with "guest:" are reserved.' });
+    }
+
     //Error catching when using mongoose functions like Users.findOne()
     try {
       const sha384 = crypto.createHash("sha384");
@@ -130,6 +158,11 @@ router.post(
         if (studentsArray && studentsArray.length > 0) {
           //Ensure student usernames aren't already in the database
           for (i = 0; i < studentsArray.length; i++) {
+            if (isReservedUsername(studentsArray[i].username)) {
+              return res
+                .status(400)
+                .json({ error: 'Usernames starting with "guest:" are reserved.' });
+            }
             const studentUser = await users.findOne({
               username: studentsArray[i].username,
             });
@@ -237,6 +270,12 @@ router.post(
     }
 
     const { username, password, first, last, email, birthday, gender, gradeLevel } = req.query;
+
+    if (isReservedUsername(username)) {
+      return res
+        .status(400)
+        .json({ error: 'Usernames starting with "guest:" are reserved.' });
+    }
 
     try {
       const sha384 = crypto.createHash("sha384");

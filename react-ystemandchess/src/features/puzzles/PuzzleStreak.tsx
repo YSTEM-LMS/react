@@ -58,7 +58,12 @@ const PuzzleStreak = () => {
   const closeModal = () => setModal(null);
 
   const socket = useChessSocket({
-    student: studentId,
+    // "guest:" marks this as an unauthenticated room, not a real student's —
+    // chessServer keys these separately and skips the login-token check for
+    // them (see GameManager.js). Real usernames can never start with
+    // "guest:" (rejected at signup), so this can never collide with or take
+    // over an actual student's puzzle room.
+    student: `guest:${studentId}`,
     mentor: mentorId,
     role: "student",
     serverUrl: environment.urls.chessServerURL,

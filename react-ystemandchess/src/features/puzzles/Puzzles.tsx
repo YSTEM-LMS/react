@@ -136,8 +136,14 @@ const Puzzles: React.FC<PuzzlesProps> = ({
   const [startTime, setStartTime] = useState(null);
   const [username, setUsername] = useState(null);
 
-  // User identification
-  const studentId = student || cookies.login?.studentId || uuidv4();
+  // User identification. A real `student` prop (the mentor/student profile
+  // flow) is used as-is — it's a real, verifiable username. Without one,
+  // this is an anonymous visit, so the id is "guest:"-prefixed: chessServer
+  // keys guest rooms separately and skips the login-token check for them
+  // (see GameManager.js). Real usernames can never start with "guest:"
+  // (rejected at signup), so this can never collide with or take over an
+  // actual student's puzzle room.
+  const studentId = student || `guest:${cookies.login?.studentId || uuidv4()}`;
   const mentorId = mentor || "puzzle_mentor_" + studentId;
 
   // ============================================================================

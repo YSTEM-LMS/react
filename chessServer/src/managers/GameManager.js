@@ -208,6 +208,45 @@ class GameManager {
     }
 
     /**
+     * Verifies that the holder of `credentials` actually owns the `claimedStudent`
+     * username, via middlewareNode's GET /user/me. Same fail-closed shape as
+     * verifyMentorPairing: missing config, a missing/invalid token, a non-200
+     * response, a network error, or a mismatched username all throw and reject
+     * the join. Not applied to guest rooms (see isGuestRoom below) — those
+     * have no real login to check.
+     * @param {string} claimedStudent
+     * @param {string} credentials
+     */
+    async verifyStudentIdentity(claimedStudent, credentials) {
+        if (!process.env.MIDDLEWARE_URL) {
+            console.error("[createOrJoinPuzzle] MIDDLEWARE_URL unset — rejecting student join");
+            throw new Error("Server misconfigured: cannot verify student identity");
+        }
+        if (!credentials) {
+            throw new Error("A login token is required to join as a student");
+        }
+
+        let data;
+        try {
+            const response = await fetch(`${process.env.MIDDLEWARE_URL}/user/me`, {
+                headers: {
+                    Authorization: `Bearer ${credentials}`,
+                },
+            });
+            if (response.status !== 200) {
+                throw new Error("Could not verify student identity");
+            }
+            data = await response.json();
+        } catch (e) {
+            throw new Error("Could not verify student identity");
+        }
+
+        if (!data || !data.username || data.username !== claimedStudent) {
+            throw new Error("You are not this student");
+        }
+    }
+
+    /**
      *
      * @param {Object} param0 - Contains student, mentor, role, socketId
      * @returns {Object} Game object, assigned color, and new game status
@@ -218,12 +257,22 @@ class GameManager {
             throw new Error("Invalid role!");
         }
 
+        // Guest rooms (anonymous /puzzles visits and Puzzle Streak) are keyed
+        // with a "guest:" prefix — a namespace no real username can ever
+        // occupy (middlewareNode's registration routes reject it), so a guest
+        // join can never collide with or take over a real student's room, and
+        // a real student's join can never land in a guest room. Guests have
+        // no real login, so neither identity check below applies to them.
+        const isGuestRoom = student.startsWith("guest:");
+
         // The mentor seat gets a live view into another user's puzzle session,
-        // so it must be verified against the real mentor/student pairing before
-        // anyone is seated. Student joins are unchanged (see PuzzleStreak.tsx,
-        // which shares this room model but has no real mentor to verify against).
+        // and the student seat is the only one allowed to move (see makeMove/
+        // undoMove) — both must be verified against the real account before
+        // anyone is seated or an existing seat is handed to a new socket.
         if (role === "mentor") {
             await this.verifyMentorPairing(student, credentials);
+        } else if (role === "student" && !isGuestRoom) {
+            await this.verifyStudentIdentity(student, credentials);
         }
 
         const socket = io.sockets.sockets.get(socketId);
