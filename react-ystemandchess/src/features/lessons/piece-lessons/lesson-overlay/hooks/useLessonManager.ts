@@ -6,6 +6,7 @@ export function useLessonManager(piece: string, cookies: any, initialLessonNum?:
   const [completedNum, setCompletedNum] = useState<number>(0);
   const [totalLessons, setTotalLessons] = useState<number>(0);
   const [lessonData, setLessonData] = useState<any>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   // Fetch helpers
   const fetchCompletedCount = useCallback(async () => {
@@ -66,15 +67,26 @@ export function useLessonManager(piece: string, cookies: any, initialLessonNum?:
   // Refresh totals and completed, then load current lesson (initialization)
   const refreshProgress = useCallback(async (targetLessonNum?: number) => {
     const total = await fetchTotalLessons();
-    setTotalLessons(total);
-
     const completed = await fetchCompletedCount();
+
+    // If total is 0 and piece is set, likely a server/fetch failure
+    if (total === 0 && piece) {
+      setLoadFailed(true);
+      return;
+    }
+
+    setLoadFailed(false);
+    setTotalLessons(total);
     setCompletedNum(completed);
 
     // decide which lesson to open: explicit targetLessonNum -> that, otherwise
     // if initialLessonNum provided then respect it (if in range), else open next uncompleted
-    let toOpen = typeof targetLessonNum === 'number' ? targetLessonNum
-      : (initialLessonNum != null ? initialLessonNum : completed);
+    let toOpen =
+      typeof targetLessonNum === "number"
+        ? targetLessonNum
+        : initialLessonNum != null
+        ? initialLessonNum
+        : completed;
 
     if (toOpen < 0) toOpen = 0;
     if (total > 0 && toOpen >= total) toOpen = total - 1;
@@ -82,7 +94,7 @@ export function useLessonManager(piece: string, cookies: any, initialLessonNum?:
     setLessonNum(toOpen);
     const lesson = await fetchLessonByNumber(toOpen);
     setLessonData(lesson);
-  }, [fetchTotalLessons, fetchCompletedCount, fetchLessonByNumber, initialLessonNum]);
+  }, [fetchTotalLessons, fetchCompletedCount, fetchLessonByNumber, initialLessonNum, piece]);
 
   // Go to a specific lesson number (0-based)
   const goToLesson = useCallback(async (num: number) => {
@@ -139,6 +151,7 @@ export function useLessonManager(piece: string, cookies: any, initialLessonNum?:
     lessonNum,
     completedNum,
     totalLessons,
+    loadFailed,
     refreshProgress,
     goToLesson,
     nextLesson,

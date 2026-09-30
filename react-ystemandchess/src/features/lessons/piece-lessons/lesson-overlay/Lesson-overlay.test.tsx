@@ -409,20 +409,33 @@ describe("LessonOverlay", () => {
     expect(disabledIndicator.textContent).toBe("true");
   });
 
-  test("shows error popup on socket error", async () => {
+  test("shows error popup on socket error", () => {
+    // 1. Enable Jest's fake timers to skip the 6-second wait
+    jest.useFakeTimers();
+
+    // 2. Ensure the socket looks disconnected so the if-statement passes
+    mockSocket.connected = false;
     render(
       <MemoryRouter>
         <LessonOverlay />
       </MemoryRouter>
     );
 
+    // 3. Trigger the error
     act(() => {
       socketCallbacks.onError && socketCallbacks.onError("test-error");
     });
 
-    expect(
-      await screen.findByText(/Failed to load content/i)
-    ).toBeInTheDocument();
+    // 4. Fast-forward time past the 6000ms setTimeout
+    act(() => {
+      jest.advanceTimersByTime(6100);
+    });
+
+    // 5. Assert the text is now in the document (use getByText instead of findByText since we advanced time instantly)
+    expect(screen.getByText(/Failed to load content/i)).toBeInTheDocument();
+
+    // 6. Clean up fake timers for any subsequent tests
+    jest.useRealTimers();
   });
 
   test("puzzle mode with solution uses exact move sequence", async () => {

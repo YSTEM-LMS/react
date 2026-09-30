@@ -53,6 +53,9 @@ const NavBar = () => {
   const [signupDropDown, setSignupDropDown] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
 
+  //puzzle drop down
+  const [puzzlesDropDown, setPuzzlesDropDown] = useState(false);
+
   // Navigation and user state variables
   const [logged, setLogged] = useState(false);
   const [username, setUsername] = useState("");
@@ -64,7 +67,8 @@ const NavBar = () => {
   const profileDropdownRef = useRef<any>(null);
   const mobileMenuRef = useRef<any>(null);
   const hamburgerRef = useRef<any>(null);
-
+  // puzzle ref
+  const puzzlesRef = useRef<any>(null);
 
   const toggleMobileMenu = () => {
     setMobileMenuDropDown((prev) => !prev);
@@ -72,6 +76,10 @@ const NavBar = () => {
 
   const toggleAboutUs = () => {
     setAboutUsDropDown((prev) => !prev);
+  };
+  // puzzle drop down
+  const togglePuzzles = () => {
+    setPuzzlesDropDown((prev) => !prev);
   };
 
   const toggleSignup = () => {
@@ -88,6 +96,11 @@ const NavBar = () => {
         setAboutUsDropDown(false);
       }
 
+      // Close "Puzzles" dropdown if click is outside
+      if (puzzlesRef.current && !puzzlesRef.current.contains(event.target)) {
+        setPuzzlesDropDown(false);
+      }
+
       // Close "Sign Up" dropdown if click is outside its container
       if (signupRef.current && !signupRef.current.contains(event.target)) {
         setSignupDropDown(false);
@@ -100,7 +113,11 @@ const NavBar = () => {
         hamburgerRef.current &&
         !hamburgerRef.current.contains(event.target) &&
         aboutUsRef.current &&
-        !aboutUsRef.current.contains(event.target)
+        !aboutUsRef.current.contains(event.target) &&
+
+        //
+        puzzlesRef.current &&
+        !puzzlesRef.current.contains(event.target)
       ) {
         setMobileMenuDropDown(false);
       }
@@ -296,12 +313,52 @@ const NavBar = () => {
       >
         Lessons
       </Link>
-      <Link
-        to="/puzzles"
-        className="px-4 text-lg font-medium text-dark transition-colors hover:text-primary"
-      >
-        Puzzles
-      </Link>
+      {/* Puzzles dropdown menu container */}
+      <div ref={puzzlesRef} className="relative">
+        {/* Puzzles dropdown trigger button */}
+        <div
+          onClick={togglePuzzles}
+          className="flex items-center cursor-pointer justify-center px-4 text-lg font-medium text-dark transition-colors hover:text-primary"
+          aria-haspopup="true"
+          aria-expanded={puzzlesDropDown}
+          aria-controls="puzzles-menu"
+        >
+          Puzzles
+          {/* Dropdown indicator icon that changes based on menu state */}
+          <FontAwesomeIcon
+            icon={puzzlesDropDown ? faCaretUp : faCaretDown}
+            className={`ml-2 ${puzzlesDropDown ? "translate-y-[2px]" : "translate-y-[-1px]"}`}
+          />
+        </div>
+        
+        {/* Puzzles dropdown menu content (conditionally rendered) */}
+        {puzzlesDropDown && (
+          <motion.div
+            id="puzzles-menu"
+            className="absolute z-20 mt-3 w-48 rounded-md bg-light p-4 shadow-lg"
+            initial="parentInitial"
+            animate="parentAnimate"
+            variants={navbarVariants}
+          >
+            <div className="flex flex-col gap-3">
+              <Link
+                to="/puzzles"
+                onClick={togglePuzzles}
+                className="text-base text-gray transition-colors hover:text-primary"
+              >
+                Puzzle Themes
+              </Link>
+              <Link
+                to="/puzzle-streak"
+                onClick={togglePuzzles}
+                className="text-base text-gray transition-colors hover:text-primary"
+              >
+                Puzzle Streak
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </div>
 
       {/* Analytics link — visible only to admin users */}
       {role === "admin" && (

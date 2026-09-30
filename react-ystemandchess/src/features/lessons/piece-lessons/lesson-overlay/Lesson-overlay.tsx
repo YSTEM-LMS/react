@@ -151,7 +151,7 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
     onBoardStateChange: (newFEN, color) => {
       try {
-        gameRef.current.load(newFEN);
+        gameRef.current.load(newFEN, { skipValidation: true });
         setCurrentFEN(newFEN);
         if (color) setBoardOrientation(color);
         if (onChessMove) onChessMove(newFEN);
@@ -180,7 +180,15 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
     onError: (msg) => {
       console.error("Socket error:", msg);
-      setShowError(true);
+      // Socket retries 5 times with 1s delay — wait before showing hard error
+      // The loading popup (showLPopup) is already visible during this time
+
+      setTimeout(() => {
+        if (!socket.connected) {
+          setShowLPopup(false);
+          setShowError(true);
+        }
+      }, 6000); // 5 retries × 1s + buffer
     },
   });
 
@@ -245,7 +253,7 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
     stockfishSocket.on('evaluation-complete', ({ mode, move }: any) => {
       if (mode === 'move' && move) {
-        handleStockfishMove(move);
+        handleStockfishMoveRef.current(move);
       }
     });
 
@@ -278,6 +286,10 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
     }
   }, [lessonGoal, stockfishConnected, stockfishSessionStarted, isPuzzleMode]);
 
+
+  // Kept in a ref so the stockfish socket listener (set up once with [] deps)
+  // always calls the latest version without needing to reconnect.
+  const handleStockfishMoveRef = useRef<(move: string) => void>(() => {});
 
   const handleStockfishMove = useCallback((move: string) => {
     try {
@@ -328,10 +340,15 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
     }
   }, [onChessMove, lessonData]);
 
+  // Keep ref in sync with the latest memoized callback
+  useEffect(() => {
+    handleStockfishMoveRef.current = handleStockfishMove;
+  }, [handleStockfishMove]);
+
 
   // Fallback: Get random legal move
   const getRandomLegalMove = useCallback((fen: string) => {
-    const tempGame = new Chess(fen);
+    const tempGame = new Chess(fen, { skipValidation: true });
     const moves = tempGame.moves({ verbose: true });
 
     if (moves.length === 0) return null;
@@ -394,12 +411,16 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
     });
   }, [piece, initialLessonNum, refreshProgress]);
 
+  // Reveal pieces as soon as lesson data arrives — never gate this on socket state
+  useEffect(() => {
+    if (lessonData?.startFen) setHidePieces(false);
+  }, [lessonData?.startFen]);
+
   // Main lesson initialization
   useEffect(() => {
     if (!lessonData?.startFen) return;
     if (!socket.connected) return;
 
-    setHidePieces(false);
     setShowLPopup(false);
     setShowInstruction(true);
 
@@ -418,7 +439,7 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
     playerColorRef.current = turn;
 
     // Initialize game position
-    gameRef.current = new Chess(lessonData.startFen);
+    gameRef.current = new Chess(lessonData.startFen, { skipValidation: true });
     setCurrentFEN(lessonData.startFen);
     // Immediately sync ChessBoard's internal game so hover dots work without
     // waiting for the fen prop → useEffect render cycle
@@ -486,6 +507,8 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
     let startTime = Date.now();
 
+    let fadeTimeout: ReturnType<typeof setTimeout>;
+
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const pct = Math.min((elapsed / totalTime) * 100, 100);
@@ -493,11 +516,14 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
       if (pct >= 100) {
         clearInterval(interval);
         setIsFading(true);
-        setTimeout(() => setShowInstruction(false), 500);
+        fadeTimeout = setTimeout(() => setShowInstruction(false), 500);
       }
     }, 100);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(fadeTimeout);
+    };
   }, [showInstruction, info]);
 
   const initializeLessonOnServer = useCallback(() => {
@@ -524,7 +550,7 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
   // Check lesson completion for free-play mode
   const checkFreePlayCompletion = useCallback((fen: string) => {
-    const game = new Chess(fen);
+    const game = new Chess(fen, { skipValidation: true });
     const infoLower = info.toLowerCase();
 
     // Checkmate goal
@@ -597,7 +623,7 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
       return;
     }
 
-    const tempGame = new Chess(currentFEN);
+    const tempGame = new Chess(currentFEN, { skipValidation: true });
     const expectedMove = sanToMove(expectedSolutionMove.san, tempGame);
 
     if (!expectedMove) {
@@ -838,7 +864,7 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
   }, [moveHistory.length, isPuzzleMode]);
 
   const handleReset = useCallback(() => {
-    gameRef.current = new Chess(lessonStartFENRef.current);
+    gameRef.current = new Chess(lessonStartFENRef.current, { skipValidation: true });
     setCurrentFEN(lessonStartFENRef.current);
     setMoveHistory([]);
     setHighlightSquares([]);

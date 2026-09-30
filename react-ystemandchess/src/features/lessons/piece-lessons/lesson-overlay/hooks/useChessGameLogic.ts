@@ -32,7 +32,8 @@ export function useChessGameLogic() {
 	}
 
 	function getPositionKey(fen: string) {
-		return fen.split(" ").slice(0, 3).join(" ");
+		// Trim and use Regex \s+ to safely handle double-spaces in messy FENs
+		return fen.trim().split(/\s+/).slice(0, 3).join(" ");
 	}
 
 	return { moves, processMove, resetLesson, prevFenRef, currentFenRef };
