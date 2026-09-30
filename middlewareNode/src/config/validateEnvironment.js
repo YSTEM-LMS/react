@@ -36,3 +36,4 @@ function validateEnvironment() {
 }
 
 module.exports = validateEnvironment;
+module.exports.isLocalEnvironment = isLocalEnvironment;

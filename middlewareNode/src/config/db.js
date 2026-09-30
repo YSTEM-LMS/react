@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const config = require("config");
+const { isLocalEnvironment } = require("./validateEnvironment");
 
 let db = config.get("mongoURI");
 
@@ -189,7 +190,10 @@ async function ensureIndexes() {
   }
 }
 
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+// Any non-local NODE_ENV (production, but also staging, qa, or a typo like
+// "prod") is a real deployment: no mock-data seeding, no in-memory fallback,
+// and the longer connection timeout. Same rule validateEnvironment.js uses.
+const IS_DEPLOYED = !isLocalEnvironment();
 
 const connectDB = async () => {
   try {
@@ -210,24 +214,24 @@ const connectDB = async () => {
     await mongoose.connect(db, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      // Production has no fallback (a failure here calls process.exit(1)),
+      // Deployed environments have no fallback (a failure here calls process.exit(1)),
       // so it gets a longer timeout to ride out a network blip or an Atlas
       // cold-start during deploy. Dev/test fail fast to the in-memory
       // fallback below.
-      serverSelectionTimeoutMS: IS_PRODUCTION ? 10000 : 1000,
+      serverSelectionTimeoutMS: IS_DEPLOYED ? 10000 : 1000,
     });
     console.log("MongoDB Connected...");
     await ensureIndexes();
 
-    if (!IS_PRODUCTION) {
+    if (!IS_DEPLOYED) {
       await seedTestUsers();
     }
   } catch (err) {
     console.warn(`Connection to configured MongoDB failed: ${err.message}`);
 
-    if (IS_PRODUCTION) {
+    if (IS_DEPLOYED) {
       console.error(
-        "Refusing to fall back to in-memory MongoDB in production. Exiting."
+        `Refusing to fall back to in-memory MongoDB with NODE_ENV=${process.env.NODE_ENV}. Exiting.`
       );
       process.exit(1);
     }

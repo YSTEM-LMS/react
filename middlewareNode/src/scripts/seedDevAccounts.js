@@ -18,8 +18,9 @@
  *     by running this again.
  *   - The password is printed to the terminal only. It is never written to
  *     a file, never logged anywhere persistent, and never committed.
- *   - Refuses to run at all if NODE_ENV=production, matching the same
- *     fail-loud posture already used in src/config/validateEnvironment.js.
+ *   - Refuses to run at all outside local development (any NODE_ENV other
+ *     than unset/development/test), using the same isLocalEnvironment()
+ *     check as src/config/validateEnvironment.js.
  *
  * Usage:
  *   npm run seed:dev
@@ -34,10 +35,11 @@ const mongoose = require("mongoose");
 const config = require("config");
 const crypto = require("crypto");
 const Users = require("../models/users");
+const { isLocalEnvironment } = require("../config/validateEnvironment");
 
-if (process.env.NODE_ENV === "production") {
+if (!isLocalEnvironment()) {
   console.error(
-    "Refusing to seed demo accounts in production. This script is for local development only."
+    `Refusing to seed demo accounts with NODE_ENV=${process.env.NODE_ENV}. This script is for local development only.`
   );
   process.exit(1);
 }

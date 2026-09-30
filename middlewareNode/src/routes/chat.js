@@ -12,11 +12,12 @@ const { detectCrisis, getCrisisResponse } = require('../utils/guardrails');
 const passport = require('passport');
 const Guardrail = require('../models/Guardrail');
 const requireAuth = require('../middleware/requireAuth');
+const { isLocalEnvironment } = require('../config/validateEnvironment');
 
-// Same fail-loud-in-production posture as config/db.js's seedTestUsers —
-// config-template seeding, not credential-bearing, but still an
-// unconditional side effect on import that shouldn't run in production.
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+// Same gate as config/db.js's seedTestUsers: config-template seeding, not
+// credential-bearing, but still a side effect on import that should only
+// run locally, not in production, staging, qa, or any other deployment.
+const IS_DEPLOYED = !isLocalEnvironment();
 
 // Ensure logs directory exists
 const LOGS_DIR = path.join(__dirname, '../../logs');
@@ -102,7 +103,7 @@ const seedDefaultTemplates = async () => {
     console.error('Error seeding CoachTemplates:', error.message);
   }
 };
-if (!IS_PRODUCTION) {
+if (!IS_DEPLOYED) {
   seedDefaultTemplates();
 }
 
@@ -120,7 +121,7 @@ const seedDefaultGuardrail = async () => {
     console.error('Error seeding Guardrails:', error.message);
   }
 };
-if (!IS_PRODUCTION) {
+if (!IS_DEPLOYED) {
   seedDefaultGuardrail();
 }
 

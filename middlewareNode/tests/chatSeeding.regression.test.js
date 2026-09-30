@@ -1,6 +1,7 @@
 /**
  * Regression test — chat.js's default CoachTemplate/Guardrail seeding
- * must never run when NODE_ENV=production. Issue 5, Phase 2/6 (same gate
+ * must never run in a deployed environment (production, staging, qa, or
+ * any other non-local NODE_ENV). Issue 5, Phase 2/6 (same gate
  * pattern as db.js's seedTestUsers, applied here for consistency).
  */
 
@@ -30,9 +31,9 @@ afterEach(() => {
 // so we're not checking before an (incorrectly) fired call would land.
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
-describe("chat.js seeding — production gate", () => {
-  test("does NOT seed default templates or guardrails when NODE_ENV=production", async () => {
-    process.env.NODE_ENV = "production";
+describe("chat.js seeding — deployed-environment gate", () => {
+  test.each(["production", "staging", "qa", "prod"])("does NOT seed default templates or guardrails when NODE_ENV=%s", async (env) => {
+    process.env.NODE_ENV = env;
     jest.resetModules();
 
     const CoachTemplate = require("../src/models/CoachTemplate");
@@ -46,8 +47,8 @@ describe("chat.js seeding — production gate", () => {
     expect(Guardrail.countDocuments).not.toHaveBeenCalled();
   });
 
-  test("DOES seed default templates and guardrails outside production (gate isn't inverted)", async () => {
-    process.env.NODE_ENV = "test";
+  test.each(["test", "development"])("DOES seed default templates and guardrails when NODE_ENV=%s (gate isn't inverted)", async (env) => {
+    process.env.NODE_ENV = env;
     jest.resetModules();
 
     const CoachTemplate = require("../src/models/CoachTemplate");

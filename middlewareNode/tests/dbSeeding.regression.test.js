@@ -1,6 +1,7 @@
 /**
  * Regression test — db.js's mock-data seeding (seedTestUsers) must never
- * run when NODE_ENV=production. Issue 5, Phase 6.
+ * run in a deployed environment (production, staging, qa, or any other
+ * non-local NODE_ENV). Issue 5, Phase 6.
  *
  * mongoose is fully mocked so this runs without a real database; the only
  * thing under test is whether the seeding-specific collections get
@@ -46,9 +47,9 @@ afterEach(() => {
 
 const SEED_ONLY_COLLECTIONS = ["activityTypes", "activities", "newLessons", "puzzles"];
 
-describe("db.js seeding — production gate", () => {
-  test("does NOT seed mock data when NODE_ENV=production", async () => {
-    process.env.NODE_ENV = "production";
+describe("db.js seeding — deployed-environment gate", () => {
+  test.each(["production", "staging", "qa", "prod"])("does NOT seed mock data when NODE_ENV=%s", async (env) => {
+    process.env.NODE_ENV = env;
     jest.resetModules();
 
     const mongoose = require("mongoose");
@@ -59,10 +60,11 @@ describe("db.js seeding — production gate", () => {
     for (const name of SEED_ONLY_COLLECTIONS) {
       expect(requested).not.toContain(name);
     }
+    expect(mongoose.connect.mock.calls[0][1].serverSelectionTimeoutMS).toBe(10000);
   });
 
-  test("DOES seed mock data outside production (gate isn't inverted)", async () => {
-    process.env.NODE_ENV = "test";
+  test.each(["test", "development"])("DOES seed mock data when NODE_ENV=%s (gate isn't inverted)", async (env) => {
+    process.env.NODE_ENV = env;
     jest.resetModules();
 
     const mongoose = require("mongoose");
@@ -73,5 +75,6 @@ describe("db.js seeding — production gate", () => {
     for (const name of SEED_ONLY_COLLECTIONS) {
       expect(requested).toContain(name);
     }
+    expect(mongoose.connect.mock.calls[0][1].serverSelectionTimeoutMS).toBe(1000);
   });
 });
