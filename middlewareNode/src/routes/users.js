@@ -577,11 +577,8 @@ router.put("/profile", passport.authenticate("jwt"), async (req, res) => {
     const { zipcode, gender, gradeLevel, country, state, school } = req.body;
     const allowed = ["M", "F", "Other", null];
 
-    // gender is stored via the native driver (which bypasses the Mongoose enum),
-    // so validate it here. An empty value clears the field back to null.
-    if (gender !== undefined && !allowed.includes(gender || null)) {
-      return res.status(400).json("Invalid gender value");
-    }
+    if (gender !== undefined && !allowed.includes(gender))
+      return res.status(400).json({ error: "gender must be M, F, Other, or null" });
 
     const updates = {};
     if (zipcode    !== undefined) updates.zipcode    = zipcode    || null;
@@ -591,21 +588,13 @@ router.put("/profile", passport.authenticate("jwt"), async (req, res) => {
     if (state      !== undefined) updates.state      = state      || null;
     if (school     !== undefined) updates.school     = school     || null;
 
-    if (Object.keys(updates).length === 0) {
-      return res.status(400).json("No profile fields provided");
-    }
+    if (Object.keys(updates).length === 0)
+      return res.status(400).json({ error: "No updatable fields provided" });
 
-    const db = await getDb();
-    const usersCollection = db.collection("users");
-
-    await usersCollection.updateOne(
-      { username: req.user.username },
-      { $set: updates }
-    );
-
-    res.status(200).json({ message: "Profile updated successfully" });
-  } catch (error) {
-    console.error("Error updating profile:", error);
+    await users.updateOne({ username: req.user.username }, { $set: updates });
+    res.json({ message: "Profile updated" });
+  } catch (err) {
+    console.error("PUT /user/profile:", err.message);
     res.status(500).json("Server error");
   }
 });
