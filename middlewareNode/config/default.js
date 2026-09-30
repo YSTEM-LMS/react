@@ -45,7 +45,6 @@ if (!process.env.INDEX_KEY) {
 
 module.exports = {
   mongoURI: "",
-  jwtSecret: "",
   indexKey: devIndexKey,
 
   corsOptions: {
