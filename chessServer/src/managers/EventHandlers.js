@@ -188,7 +188,10 @@ const registerSocketHandlers = (socket, io) => {
     socket.on("newPuzzle", async (msg) => {
         try {
             const parsed = JSON.parse(msg);
-            console.log('data',parsed, msg);
+            // Log without credentials (and without the raw msg, which also
+            // contains it) — this is a bearer token, not debug data.
+            const { credentials: _credentials, ...loggable } = parsed;
+            console.log('data', loggable);
             // create the new puzzle
             await gameManager.createOrJoinPuzzle({
                 student: parsed.student,

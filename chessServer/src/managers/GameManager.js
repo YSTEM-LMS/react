@@ -259,11 +259,12 @@ class GameManager {
 
         // Guest rooms (anonymous /puzzles visits and Puzzle Streak) are keyed
         // with a "guest:" prefix — a namespace no real username can ever
-        // occupy (middlewareNode's registration routes reject it), so a guest
-        // join can never collide with or take over a real student's room, and
-        // a real student's join can never land in a guest room. Guests have
-        // no real login, so neither identity check below applies to them.
-        const isGuestRoom = student.startsWith("guest:");
+        // occupy (middlewareNode's registration routes reject it, case-
+        // insensitively — matched the same way here), so a guest join can
+        // never collide with or take over a real student's room, and a real
+        // student's join can never land in a guest room. Guests have no real
+        // login, so neither identity check below applies to them.
+        const isGuestRoom = /^guest:/i.test(student);
 
         // The mentor seat gets a live view into another user's puzzle session,
         // and the student seat is the only one allowed to move (see makeMove/

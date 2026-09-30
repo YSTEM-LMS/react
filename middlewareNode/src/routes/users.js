@@ -615,17 +615,20 @@ router.put("/profile", passport.authenticate("jwt"), async (req, res) => {
   try {
     const { zipcode, gender, gradeLevel, country, state, school } = req.body;
     const allowed = ["M", "F", "Other", null];
+    // Empty string means "clear the field", same as the other fields' `|| null`
+    // below — normalize before validating so it isn't rejected as an invalid value.
+    const normalizedGender = gender === "" ? null : gender;
 
-    if (gender !== undefined && !allowed.includes(gender))
+    if (normalizedGender !== undefined && !allowed.includes(normalizedGender))
       return res.status(400).json({ error: "gender must be M, F, Other, or null" });
 
     const updates = {};
-    if (zipcode    !== undefined) updates.zipcode    = zipcode    || null;
-    if (gender     !== undefined) updates.gender     = gender     || null;
-    if (gradeLevel !== undefined) updates.gradeLevel = gradeLevel || null;
-    if (country    !== undefined) updates.country    = country    || null;
-    if (state      !== undefined) updates.state      = state      || null;
-    if (school     !== undefined) updates.school     = school     || null;
+    if (zipcode          !== undefined) updates.zipcode    = zipcode    || null;
+    if (normalizedGender !== undefined) updates.gender     = normalizedGender;
+    if (gradeLevel       !== undefined) updates.gradeLevel = gradeLevel || null;
+    if (country          !== undefined) updates.country    = country    || null;
+    if (state            !== undefined) updates.state      = state      || null;
+    if (school           !== undefined) updates.school     = school     || null;
 
     if (Object.keys(updates).length === 0)
       return res.status(400).json({ error: "No updatable fields provided" });

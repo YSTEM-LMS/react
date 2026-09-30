@@ -330,7 +330,8 @@ export const useChessSocket = ({
       role: roleRef.current,
       credentials: credentialsRef.current
     };
-    console.log("Starting new puzzle:", data);
+    // Log without credentials — this is a bearer token, not debug data.
+    console.log("Starting new puzzle:", { ...data, credentials: undefined });
     socketRef.current?.emit("newPuzzle", JSON.stringify(data));
   }, []);
 
