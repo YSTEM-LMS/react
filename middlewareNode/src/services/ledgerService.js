@@ -15,6 +15,11 @@
  * No MongoDB transaction here by default — see the file-level comment on
  * why below applyLedgerEntry. Set LEDGER_USE_TRANSACTIONS=true once Week 0's
  * replica-set gate (`rs.status()` in mongosh) confirms one is available.
+ * That branch is covered by tests/ledgerService.transactions.test.js
+ * against a real (in-memory) replica set, so flipping the flag isn't
+ * exercising untested code — but nobody has run the actual `rs.status()`
+ * check against the real deployment yet, so the flag itself stays off by
+ * default until someone does.
  */
 
 const mongoose = require("mongoose");
@@ -130,24 +135,31 @@ async function applyLedgerEntry({ eventId, userId, actionKey, amount, occurredAt
   if (useTransactions) {
     const session = await mongoose.startSession();
     try {
-      let duplicate = false;
+      // The duplicate-key error must propagate OUT of withTransaction's
+      // callback, not be caught and swallowed inside it. The driver's
+      // withTransaction() retries the whole callback on a transient
+      // error, and a callback that catches an error and returns normally
+      // looks to it like "finished, but as a no-op" — against a real
+      // replica set this was observed to retry indefinitely (hundreds of
+      // calls) rather than just committing nothing, because the driver
+      // can't tell "I decided not to write anything" apart from "I need
+      // to be retried." Letting it throw aborts the transaction cleanly
+      // (correct here — nothing else was written) and is caught once,
+      // after withTransaction itself settles.
       await session.withTransaction(async () => {
-        try {
-          await LedgerEntry.create([{ eventId, userId, actionKey, amount, occurredAt }], { session });
-        } catch (err) {
-          if (err && err.code === DUPLICATE_KEY_ERROR) {
-            duplicate = true;
-            return;
-          }
-          throw err;
-        }
+        await LedgerEntry.create([{ eventId, userId, actionKey, amount, occurredAt }], { session });
         await UserBalance.updateOne(
           { userId },
           { $inc: { balance: amount, lifetimeEarned: amount } },
           { upsert: true, session }
         );
       });
-      return { applied: !duplicate, duplicate };
+      return { applied: true, duplicate: false };
+    } catch (err) {
+      if (err && err.code === DUPLICATE_KEY_ERROR) {
+        return { applied: false, duplicate: true };
+      }
+      throw err;
     } finally {
       await session.endSession();
     }
