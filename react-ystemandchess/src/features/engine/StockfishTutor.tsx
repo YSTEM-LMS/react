@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { environment } from '../../environments';
-import styles from './StockfishTutor.module.scss';
+import { cn } from '../../core/utils/cn';
 import { CoachMascot, CoachExpression } from '../../components/animations/CoachMascot/CoachMascot';
 import { Chess as ChessClass } from 'chess.js';
 const Chess: any = ChessClass;
@@ -1466,7 +1466,7 @@ const StockfishTutor: React.FC<Props> = ({ enabled, trigger, fenBefore, fenAfter
     };
   }, [trigger, enabled, fenBefore, fenAfter, moveUci, uciHistory]);
 
-  if (!enabled) return <div className={styles.tutorPlaceholder}>Tutor disabled</div>;
+  if (!enabled) return <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-100 px-4 py-4 text-center font-semibold text-slate-500">Tutor disabled</div>;
 
   const getCoachExpression = (): CoachExpression => {
     if (isAnalyzing) return 'thinking';
@@ -1492,32 +1492,41 @@ const StockfishTutor: React.FC<Props> = ({ enabled, trigger, fenBefore, fenAfter
   const renderBubbleContent = () => {
     if (isAnalyzing) {
       return (
-        <div className={styles.bubbleLoading}>
-          <div className={styles.typingLoader}>
-            <span></span>
-            <span></span>
-            <span></span>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-1">
+            {[0, 1, 2].map((dot) => (
+              <span
+                key={dot}
+                className="h-2 w-2 rounded-full bg-slate-600 animate-typing-dots"
+                style={{ animationDelay: `${dot * 0.16}s` }}
+              />
+            ))}
           </div>
-          <p className={styles.bubbleText}>Analyzing your move... Let me see if there is a better path! 🤔</p>
+          <p className="m-0 text-[15px] font-medium leading-6 text-slate-700">
+            Analyzing your move... Let me see if there is a better path! 🤔
+          </p>
         </div>
       );
     }
     if (error) {
       return (
         <div>
-          <p className={styles.bubbleTextError}>Oops, I ran into an issue: {error}</p>
+          <p className="m-0 text-sm font-semibold text-red-500">Oops, I ran into an issue: {error}</p>
         </div>
       );
     }
     if (analysis) {
       const ind = analysis.moveIndicator || '—';
-      let indicatorClass = styles.indicatorNeutral;
-      if (ind === 'Best') indicatorClass = styles.indicatorBest;
-      else if (ind === 'Good' || ind === 'Book') indicatorClass = styles.indicatorGood;
-      else if (ind === 'Mistake') indicatorClass = styles.indicatorMistake;
-      else if (ind === 'Blunder') indicatorClass = styles.indicatorBlunder;
+      const indicatorClassMap: Record<string, string> = {
+        Best: 'border-[#1F1F1F] bg-[#8CC63F] text-[#1F1F1F]',
+        Good: 'border-[#1F1F1F] bg-[#BFD99E] text-[#1F1F1F]',
+        Book: 'border-[#1F1F1F] bg-[#BFD99E] text-[#1F1F1F]',
+        Neutral: 'border-[#1F1F1F] bg-slate-200 text-[#1F1F1F]',
+        Mistake: 'border-[#1F1F1F] bg-[#F6AD55] text-[#1F1F1F]',
+        Blunder: 'border-[#1F1F1F] bg-[#FC8181] text-[#1F1F1F]',
+      };
+      const indicatorClass = indicatorClassMap[ind] ?? 'border-[#1F1F1F] bg-slate-200 text-[#1F1F1F]';
 
-      // Helper to describe proximity type in human terms
       const getProximityLabel = (proximityType?: string): string => {
         switch (proximityType) {
           case 'exact': return '🎯 Exact Match';
@@ -1530,43 +1539,43 @@ const StockfishTutor: React.FC<Props> = ({ enabled, trigger, fenBefore, fenAfter
       };
 
       return (
-        <div className={styles.bubbleAnalysis}>
-          <div className={styles.bubbleHeaderRow}>
-            <span className={`${styles.indicatorBadge} ${indicatorClass}`}>
+        <div>
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <span className={cn('inline-flex rounded-xl border-2 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wide shadow-[2px_2px_0_#1F1F1F]', indicatorClass)}>
               {ind === 'Book' ? '📖 Book Move' : ind === 'Best' ? '⭐ Best Move' : ind === 'Good' ? '✅ Good Move' : ind === 'Neutral' ? '⚪ Neutral' : ind === 'Mistake' ? '⚠️ Mistake' : ind === 'Blunder' ? '❌ Blunder' : ind}
             </span>
             {typeof analysis.matchPoints === 'number' && (
-              <span className={styles.matchPointsBadge}>
+              <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[13px] font-bold text-slate-600">
                 {analysis.matchPoints}/100 pts
               </span>
             )}
           </div>
-          <p className={styles.bubbleText}>{analysis.Analysis ?? 'No explanation provided.'}</p>
-          
-          <div className={styles.detailsRow}>
+          <p className="m-0 text-[15px] font-medium leading-6 text-slate-700">{analysis.Analysis ?? 'No explanation provided.'}</p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
             {analysis.proximityType && (
-              <span className={styles.detailPill} title="How your move compares to the engine's choice">
+              <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[12px] font-semibold text-slate-600" title="How your move compares to the engine's choice">
                 {getProximityLabel(analysis.proximityType)}
               </span>
             )}
             {typeof analysis.centipawnLoss === 'number' && analysis.centipawnLoss > 0 && (
-              <span className={styles.detailPill} title="Evaluation loss in centipawns (1 pawn = 100 cp)">
+              <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[12px] font-semibold text-slate-600" title="Evaluation loss in centipawns (1 pawn = 100 cp)">
                 📉 Loss: {Math.round(analysis.centipawnLoss / 100 * 10) / 10}pt
               </span>
             )}
             {analysis.botPreference && (
-              <span className={styles.detailPill}>Preference: {analysis.botPreference}</span>
+              <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[12px] font-semibold text-slate-600">Preference: {analysis.botPreference}</span>
             )}
             {analysis.botPreferenceReason && (
-              <span className={styles.detailPill} title={analysis.botPreferenceReason}>Why: {analysis.botPreferenceReason}</span>
+              <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[12px] font-semibold text-slate-600" title={analysis.botPreferenceReason}>Why: {analysis.botPreferenceReason}</span>
             )}
             {typeof analysis.favorsCenter === 'boolean' && (
-              <span className={styles.detailPill}>
+              <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[12px] font-semibold text-slate-600">
                 {analysis.favorsCenter ? '🎯 Controls Center' : '↔️ Side Play'}
               </span>
             )}
             {analysis.nextStepHint && (
-              <span className={styles.detailPillHint}>💡 Next: {analysis.nextStepHint}</span>
+              <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[12px] font-bold text-sky-700">💡 Next: {analysis.nextStepHint}</span>
             )}
           </div>
         </div>
@@ -1574,31 +1583,27 @@ const StockfishTutor: React.FC<Props> = ({ enabled, trigger, fenBefore, fenAfter
     }
     return (
       <div>
-        <p className={styles.bubbleText}>Make a move on the board and I'll give you instant tactical feedback! 🧠</p>
+        <p className="m-0 text-[15px] font-medium leading-6 text-slate-700">Make a move on the board and I'll give you instant tactical feedback! 🧠</p>
       </div>
     );
   };
 
   return (
-    <div className={styles.tutorContainer}>
-      <div className={styles.tutorHeader}>AI Tutor Feedback</div>
-      
-      <div className={styles.tutorMainArea}>
-        <div className={styles.mascotWrapper}>
-          <CoachMascot expression={expression} />
-        </div>
-        
-        <div className={styles.speechBubble}>
-          <div className={styles.bubbleArrow}></div>
-          <div className={styles.bubbleContent}>
-            {renderBubbleContent()}
-          </div>
-        </div>
+    <div className="w-full rounded-2xl border-2 border-[#1F1F1F] bg-white p-5 shadow-none">
+      <div className="mb-4 border-b-2 border-[#1F1F1F]/10 pb-2 text-[18px] font-extrabold uppercase tracking-[0.5px] text-[#1F1F1F]">
+        AI Tutor Feedback
       </div>
 
-      {/* debugLog intentionally not rendered in UI anymore to avoid exposing raw engine output */}
+      <div className="flex w-full items-center gap-6 sm:flex-row flex-col">
+        <div className="flex shrink-0 items-center justify-center">
+          <CoachMascot expression={expression} />
+        </div>
 
-
+        <div className="relative flex-1 rounded-[20px] border-2 border-[#1F1F1F] bg-white p-[18px] shadow-[4px_4px_0_rgba(31,31,31,0.08)]">
+          <div className="absolute left-1/2 top-[-10px] h-4 w-4 -translate-x-1/2 rotate-45 border-l-2 border-t-2 border-[#1F1F1F] bg-white sm:left-[-2px] sm:top-1/2 sm:-translate-y-1/2 sm:border-b-2 sm:border-l-2 sm:border-t-0" />
+          <div className="w-full">{renderBubbleContent()}</div>
+        </div>
+      </div>
     </div>
   );
 };
