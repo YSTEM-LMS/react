@@ -4,7 +4,11 @@
  *
  * Scoped to the property this session's change needs proven:
  * authenticated puzzle completion creates a puzzle.solved ActionEvent,
- * while invalid/guest requests do not.
+ * while invalid/guest requests do not — AND, critically, that completion
+ * actually requires submitting the puzzle's real solution. The route
+ * originally accepted a bare puzzleId with no proof of solving it; these
+ * tests include the regression coverage for that (see "does NOT emit when
+ * submitted moves don't match the puzzle's solution" below).
  */
 
 const { MongoMemoryServer } = require("mongodb-memory-server");
@@ -80,16 +84,18 @@ async function waitForActionEvent(query, timeoutMs = 2000) {
   return null;
 }
 
-async function seedPuzzle(puzzleId) {
+const SOLUTION_MOVES = "e1g1 e8g8";
+
+async function seedPuzzle(puzzleId, moves = SOLUTION_MOVES) {
   await puzzles.create({
     puzzleId,
-    FEN: "8/8/8/8/8/8/8/K6k w - - 0 1",
-    moves: "a1a2",
+    FEN: "r3k2r/ppp2ppp/2n5/1B1p4/3P4/2P5/PP3PPP/R3K2R w KQkq - 0 1",
+    moves,
   });
 }
 
 describe("POST /puzzles/solved — currency emit", () => {
-  it("emits puzzle.solved for an authenticated puzzle completion", async () => {
+  it("emits puzzle.solved when the submitted moves match the puzzle's solution", async () => {
     const userId = new mongoose.Types.ObjectId();
     const puzzleId = "test-puzzle-1";
 
@@ -97,7 +103,7 @@ describe("POST /puzzles/solved — currency emit", () => {
 
     const res = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId })
+      .send({ puzzleId, moves: ["e1g1", "e8g8"] })
       .set("x-test-user-id", userId.toString())
       .set("x-test-username", "alice");
 
@@ -113,12 +119,123 @@ describe("POST /puzzles/solved — currency emit", () => {
     expect(stored.metadata).toEqual({ puzzleId });
   });
 
+  it("accepts a 4-char submitted move against a 5-char (promotion) solution, matching the client's own leniency", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-promo-lenient";
+
+    // Solution requires promoting to a queen; Puzzles.tsx's
+    // handlePlayerMove accepts the move even if the player didn't specify
+    // a promotion piece (playerAttemptedMove === expectedMove.substring(0,4)),
+    // so the server has to accept that same shape or it would reject a
+    // move the client UI itself already treated as solved.
+    await seedPuzzle(puzzleId, "e7e8q");
+
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: ["e7e8"] })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "dave");
+
+    expect(res.status).toBe(200);
+  });
+
+  it("rejects the wrong promotion piece even though the first 4 chars match", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-wrong-promo";
+
+    await seedPuzzle(puzzleId, "e7e8q"); // solution promotes to queen
+
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: ["e7e8r"] }) // submitted promotes to rook
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "ivan");
+
+    expect(res.status).toBe(400);
+  });
+
+  it("does NOT emit when the submitted moves don't match the puzzle's solution", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-wrong-moves";
+
+    await seedPuzzle(puzzleId);
+
+    // This is the regression case: a caller who knows (or guesses) a real
+    // puzzleId but never actually played — or played incorrectly — must
+    // be rejected, not credited.
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: ["a1a2", "a7a8"] })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "eve");
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/do not match/i);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
+  it("does NOT emit when fewer moves are submitted than the solution requires", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-partial";
+
+    await seedPuzzle(puzzleId); // solution is two moves
+
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: ["e1g1"] }) // only the first move
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "frank");
+
+    expect(res.status).toBe(400);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
+  it("does NOT emit when moves is missing — a bare puzzleId is no longer sufficient", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-no-moves";
+
+    await seedPuzzle(puzzleId);
+
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "grace");
+
+    expect(res.status).toBe(400);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
+  it("does NOT emit when moves is an empty array", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-empty-moves";
+
+    await seedPuzzle(puzzleId);
+
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: [] })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "heidi");
+
+    expect(res.status).toBe(400);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
   it("does NOT emit when the puzzle does not exist", async () => {
     const userId = new mongoose.Types.ObjectId();
 
     const res = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId: "does-not-exist" })
+      .send({ puzzleId: "does-not-exist", moves: ["e1g1", "e8g8"] })
       .set("x-test-user-id", userId.toString())
       .set("x-test-username", "bob");
 
@@ -134,7 +251,7 @@ describe("POST /puzzles/solved — currency emit", () => {
 
     const res = await request(app)
       .post("/puzzles/solved")
-      .send({})
+      .send({ moves: ["e1g1", "e8g8"] })
       .set("x-test-user-id", userId.toString())
       .set("x-test-username", "carol");
 
@@ -152,7 +269,7 @@ describe("POST /puzzles/solved — currency emit", () => {
 
     const res = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId })
+      .send({ puzzleId, moves: ["e1g1", "e8g8"] })
       .set("x-test-guest", "true");
 
     expect(res.status).not.toBe(200);

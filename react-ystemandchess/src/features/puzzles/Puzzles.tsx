@@ -56,6 +56,12 @@ const Puzzles: React.FC<PuzzlesProps> = ({
   // Refs
   const chessBoardRef = useRef<ChessBoardRef>(null);
   const moveListRef = useRef<string[]>([]);
+  // Accumulates the player's own moves as they're confirmed correct,
+  // separately from moveListRef (which shrinks via .shift() as the
+  // remaining solution is consumed, so it's empty by the time a puzzle
+  // completes). This is what gets submitted to POST /puzzles/solved for
+  // server-side verification.
+  const playedMovesRef = useRef<string[]>([]);
   const isPuzzleEndRef = useRef(false);
   const currentPuzzleRef = useRef<any>(null);
   const isInitializingRef = useRef(false);
@@ -161,6 +167,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
         const firstPuzzle = puzzles[0];
         currentPuzzleRef.current = firstPuzzle;
         moveListRef.current = firstPuzzle?.Moves?.split(" ") || [];
+        playedMovesRef.current = [];
 
         if (moveListRef.current.length === 0) {
           console.warn("No valid moves in initial puzzle:", firstPuzzle);
@@ -206,6 +213,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     setCurrentFEN(normalizedFen);
 
     moveListRef.current = puzzle?.Moves?.split(" ") || [];
+    playedMovesRef.current = [];
     isPuzzleEndRef.current = false;
     setHighlightSquares([]);
 
@@ -293,6 +301,45 @@ const Puzzles: React.FC<PuzzlesProps> = ({
     }
   };
 
+  /**
+   * Reports a completed puzzle to POST /puzzles/solved so the student
+   * earns currency for it (see middlewareNode/src/routes/puzzles.js).
+   * Submits the move sequence actually played — verified server-side
+   * against the puzzle's stored solution — rather than just the
+   * puzzleId, so a request can't claim credit for a puzzle it never
+   * solved. Guests never earn currency (no account to credit), so this
+   * is skipped entirely for them rather than sent and rejected.
+   */
+  const reportPuzzleSolved = async () => {
+    if (status === "guest" || !cookies.login) return;
+
+    const puzzleId = currentPuzzleRef.current?.puzzleId;
+    if (!puzzleId) return;
+
+    try {
+      const res = await fetch(`${environment.urls.middlewareURL}/puzzles/solved`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${cookies.login}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          puzzleId,
+          moves: playedMovesRef.current,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        console.error("Failed to record puzzle completion:", body.error || res.status);
+      }
+    } catch (error) {
+      // Currency crediting is a side effect of completing the puzzle, not
+      // a prerequisite for the UI's own success state — a network error
+      // here shouldn't block or roll back the "Puzzle completed" modal.
+      console.error("Failed to record puzzle completion:", error);
+    }
+  };
+
   const handlePlayerMove = (move: Move) => {
     if (
       isPuzzleEndRef.current ||
@@ -310,6 +357,11 @@ const Puzzles: React.FC<PuzzlesProps> = ({
       playerAttemptedMove === expectedPlayerMove.substring(0, 4);
 
     if (isCorrect) {
+      // Record the verified move (the expected UCI string, not the raw
+      // attempt, so promotion suffixes etc. match exactly what the
+      // puzzle's own solution — and the server-side check — expect) before
+      // shifting it off moveListRef.
+      playedMovesRef.current.push(expectedPlayerMove);
       moveListRef.current.shift();
       setHighlightSquares([move.from, move.to]);
 
@@ -326,6 +378,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
       if (moveListRef.current.length === 0) {
         isPuzzleEndRef.current = true;
         socket.sendMessage("puzzle completed");
+        reportPuzzleSolved();
         setTimeout(() => {
           setModal({
             type: "success",
@@ -368,6 +421,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
         if (data && data.type === "puzzle_data") {
           if (status === "guest") {
             moveListRef.current = data.moves?.split(" ") || [];
+            playedMovesRef.current = [];
             setThemeList(data.themes?.split(" ") || []);
             currentPuzzleRef.current = {
               FEN: data.fen,
