@@ -25,7 +25,9 @@ jest.setTimeout(60000);
 let mongod;
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 30000 } });
+  mongod = await MongoMemoryServer.create({
+    instance: { launchTimeout: 30000 },
+  });
   await mongoose.connect(mongod.getUri() + "ystem");
 });
 
@@ -65,7 +67,10 @@ app.use(express.json());
 // simulates "this is the already-authenticated user" without a real JWT.
 app.use((req, _res, next) => {
   if (req.headers["x-test-user-id"]) {
-    req.__testUser = { _id: req.headers["x-test-user-id"], username: req.headers["x-test-username"] };
+    req.__testUser = {
+      _id: req.headers["x-test-user-id"],
+      username: req.headers["x-test-username"],
+    };
   }
   next();
 });
@@ -80,9 +85,29 @@ async function seedUser({ username, piece, lessonNumber }) {
   return result.insertedId;
 }
 
+async function waitForActionEvent(query, timeoutMs = 2000) {
+  const start = Date.now();
+
+  while (Date.now() - start < timeoutMs) {
+    const event = await ActionEvent.findOne(query);
+
+    if (event) {
+      return event;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+
+  return null;
+}
+
 describe("GET /lessons/updateLessonCompletion — currency emit", () => {
   it("emits lesson.completed when the write is genuine forward progress", async () => {
-    const userId = await seedUser({ username: "alice", piece: "The Fork", lessonNumber: 0 });
+    const userId = await seedUser({
+      username: "alice",
+      piece: "The Fork",
+      lessonNumber: 0,
+    });
 
     const res = await request(app)
       .get("/lessons/updateLessonCompletion")
@@ -96,7 +121,7 @@ describe("GET /lessons/updateLessonCompletion — currency emit", () => {
     // — give it a tick to land before asserting.
     await new Promise((r) => setImmediate(r));
 
-    const stored = await ActionEvent.findOne({ actionKey: "lesson.completed" });
+    const stored = await waitForActionEvent({ actionKey: "lesson.completed" });
     expect(stored).not.toBeNull();
     expect(stored.userId.toString()).toBe(userId.toString());
     expect(stored.metadata).toEqual({ piece: "The Fork", lessonNum: 1 });
@@ -105,7 +130,11 @@ describe("GET /lessons/updateLessonCompletion — currency emit", () => {
   it("does NOT emit when the request doesn't advance progress (304 branch)", async () => {
     // lessonNumber already at 5; requesting lessonNum=2 (index of an
     // earlier lesson) can't win the $lt comparison, so modifiedCount is 0.
-    const userId = await seedUser({ username: "bob", piece: "The Fork", lessonNumber: 5 });
+    const userId = await seedUser({
+      username: "bob",
+      piece: "The Fork",
+      lessonNumber: 5,
+    });
 
     const res = await request(app)
       .get("/lessons/updateLessonCompletion")
@@ -117,27 +146,48 @@ describe("GET /lessons/updateLessonCompletion — currency emit", () => {
 
     await new Promise((r) => setImmediate(r));
 
-    expect(await ActionEvent.countDocuments({ actionKey: "lesson.completed" })).toBe(0);
+    expect(
+      await ActionEvent.countDocuments({ actionKey: "lesson.completed" }),
+    ).toBe(0);
   });
 
   it("does NOT emit for a repeated request that already succeeded once (idempotent, not double-counted)", async () => {
-    const userId = await seedUser({ username: "carol", piece: "The Fork", lessonNumber: 0 });
+    const userId = await seedUser({
+      username: "carol",
+      piece: "The Fork",
+      lessonNumber: 0,
+    });
 
     const query = { piece: "The Fork", lessonNum: "1" };
-    const headers = { "x-test-user-id": userId.toString(), "x-test-username": "carol" };
+    const headers = {
+      "x-test-user-id": userId.toString(),
+      "x-test-username": "carol",
+    };
 
-    const first = await request(app).get("/lessons/updateLessonCompletion").query(query).set(headers);
+    const first = await request(app)
+      .get("/lessons/updateLessonCompletion")
+      .query(query)
+      .set(headers);
     expect(first.status).toBe(200);
-    await new Promise((r) => setImmediate(r));
+
+    const firstEvent = await waitForActionEvent({
+      actionKey: "lesson.completed",
+    });
+    expect(firstEvent).not.toBeNull();
 
     // Re-sending the exact same request: the DB write itself is now a
     // no-op (lessonNumber is already 1, not < 1), so this hits the 304
     // branch and must not add a second event even if it somehow did.
-    const second = await request(app).get("/lessons/updateLessonCompletion").query(query).set(headers);
+    const second = await request(app)
+      .get("/lessons/updateLessonCompletion")
+      .query(query)
+      .set(headers);
     expect(second.status).toBe(304);
     await new Promise((r) => setImmediate(r));
 
-    expect(await ActionEvent.countDocuments({ actionKey: "lesson.completed" })).toBe(1);
+    expect(
+      await ActionEvent.countDocuments({ actionKey: "lesson.completed" }),
+    ).toBe(1);
   });
 
   it("never emits for a guest (unauthenticated) request", async () => {

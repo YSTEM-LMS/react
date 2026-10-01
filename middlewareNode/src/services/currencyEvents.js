@@ -37,7 +37,13 @@ const DUPLICATE_KEY_ERROR = 11000;
  * fresh insert, { emitted: false, duplicate: true } for an already-seen
  * eventId.
  */
-async function emit({ eventId, actionKey, userId, metadata = {}, occurredAt = new Date() }) {
+async function emit({
+  eventId,
+  actionKey,
+  userId,
+  metadata = {},
+  occurredAt = new Date(),
+}) {
   try {
     await ActionEvent.create({
       eventId,
@@ -79,7 +85,24 @@ async function emitLessonCompleted({ userId, piece, lessonNum, occurredAt }) {
   });
 }
 
+/**
+ * Emits puzzle.solved after a student successfully completes a puzzle.
+ *
+ * eventId is `puzzle:<userId>:<puzzleId>` — deterministic per
+ * (student, puzzle) pair so a retry cannot award the same puzzle twice.
+ */
+async function emitPuzzleSolved({ userId, puzzleId, occurredAt }) {
+  return emit({
+    eventId: `puzzle:${userId}:${puzzleId}`,
+    actionKey: "puzzle.solved",
+    userId,
+    metadata: { puzzleId },
+    occurredAt,
+  });
+}
+
 module.exports = {
   emit,
   emitLessonCompleted,
+  emitPuzzleSolved,
 };
