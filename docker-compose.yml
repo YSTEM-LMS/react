@@ -1,7 +1,21 @@
-
 services:
+  mongo:
+    image: mongo:6
+    container_name: dev-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - dev-mongo-data:/data/db
+
   frontend:
-    build: ./react-ystemandchess
+    build:
+      context: ./react-ystemandchess
+      args:
+        REACT_APP_MIDDLEWARE_URL: http://localhost:8000
+        REACT_APP_STOCKFISH_SERVER_URL: http://localhost:8080
+        REACT_APP_CHESS_SERVER_URL: http://localhost:3001
+        REACT_APP_CHESS_CLIENT_URL: http://localhost:3002
+        REACT_APP_AGORA_APP_ID: ""
     container_name: frontend
     ports:
       - "3000:3000"
@@ -12,6 +26,11 @@ services:
     container_name: chess-server
     ports:
       - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MIDDLEWARE_URL=http://middleware:8000
+      - CORS_ORIGIN=http://localhost,http://localhost:3000,http://localhost:3002
     restart: unless-stopped
 
   chess-client:
@@ -27,9 +46,16 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - NODE_ENV=production
-    volumes:
-      - ./middlewareNode/config/production.json:/app/config/production.json:ro
+      - NODE_ENV=development
+      - PORT=8000
+      - MONGO_URI=mongodb://mongo:27017/ystem_dev
+      - INDEX_KEY=dev-index-key-replace-in-prod
+      - CORS_ORIGIN=http://localhost,http://localhost:3000
+      - SESSION_SECRET=dev-secret-replace-in-prod
+      - ANALYTICS_RATE_LIMIT_MAX=100
+      - LEADERBOARD_RATE_LIMIT_MAX=60
+    depends_on:
+      - mongo
     restart: unless-stopped
 
   stockfish-server:
@@ -37,4 +63,11 @@ services:
     container_name: stockfish-server
     ports:
       - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - CORS_ORIGIN=http://localhost,http://localhost:3000
     restart: unless-stopped
+
+volumes:
+  dev-mongo-data:
