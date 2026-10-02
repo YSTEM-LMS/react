@@ -47,7 +47,7 @@ const ActionEventSchema = new mongoose.Schema(
     // actionKey + occurredAt.
     status: {
       type: String,
-      enum: ["pending", "processed", "failed"],
+      enum: ["pending", "claimed", "processed", "failed"],
       default: "pending",
       index: true,
     },
