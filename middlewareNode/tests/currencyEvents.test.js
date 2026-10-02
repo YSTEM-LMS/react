@@ -11,6 +11,8 @@
 
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
+const ActionEvent = require("../src/models/actionEvent");
+const { emit, emitLessonCompleted } = require("../src/services/currencyEvents");
 
 jest.setTimeout(60000);
 
@@ -19,6 +21,7 @@ let mongod;
 beforeAll(async () => {
   mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 30000 } });
   await mongoose.connect(mongod.getUri() + "ystem");
+  await ActionEvent.init();
 });
 
 afterAll(async () => {
@@ -30,9 +33,6 @@ afterEach(async () => {
   const collections = mongoose.connection.collections;
   await Promise.all(Object.values(collections).map((c) => c.deleteMany({})));
 });
-
-const ActionEvent = require("../src/models/actionEvent");
-const { emit, emitLessonCompleted } = require("../src/services/currencyEvents");
 
 const userId = new mongoose.Types.ObjectId();
 
