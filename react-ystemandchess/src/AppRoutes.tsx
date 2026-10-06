@@ -17,6 +17,9 @@ import SponsorsPartners from "./features/about-us/sponsors-partners/SponsorsPart
 import Board from "./features/about-us/board/Board";
 import Financial from "./features/about-us/financial/Financial";
 import AboutUs from "./features/about-us/aboutus/AboutUs";
+import OnlineExpansion from "./features/about-us/online-expansion/OnlineExpansion";
+
+// Educational content pages
 import PlayComputer from "./features/engine/PlayComputer";
 import Lessons from "./features/lessons/lessons-main/Lessons";
 import Puzzles from './features/puzzles/Puzzles';
@@ -33,6 +36,7 @@ import Student from "./features/student/student-page/Student";
 import Mentor from "./features/mentor/mentor-page/Mentor";
 import StudentInventory from "./features/student/student-inventory/StudentInventory";
 import NewMentorProfile from "./features/mentor/mentor-profile/NewMentorProfile";
+  
 import NewStudentProfile from "./features/student/student-profile/NewStudentProfile";
 import AdminProfile from "./features/admin/AdminProfile";
 import userPortraitImg from "./assets/images/user-portrait-placeholder.svg";
@@ -79,6 +83,7 @@ const AppRoutes = () => {
       <Route path="/financial" element={<Financial />} />
       <Route path="/board" element={<Board />} />
       <Route path="/sponsors&partners" element={<SponsorsPartners />} />
+      <Route path="/online-expansion" element={<OnlineExpansion />} />
 
       <Route path="/play" element={<PlayComputer />} />
       <Route path="/puzzles" element={<Puzzles />} />
