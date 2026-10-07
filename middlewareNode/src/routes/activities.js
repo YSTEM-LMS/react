@@ -140,17 +140,32 @@ router.put("/:username/activity", requireAuth, requireActivityWriteAccess, async
             return res.status(404).json({error:'User not found'});
         }
         const activities = db.collection("activities");
-        const activityIncomplete = await activities.findOne(
-            { userId, "activities.name": activityName }, 
-            { activities: {$elemMatch: { name: activityName }}, _id:0},
-        );
-        if(activityIncomplete) {
-            console.log('incomplete activity: ', activityName);
-        }
+
         await activities.updateOne(
             { userId, "activities.name": activityName },
             { $set: { "activities.$.completed": true } }
         );
+
+        // If every daily activity is now complete, record today's date
+        // (once) in completedDates — used for streak/badge stats.
+        const doc = await activities.findOne({ userId });
+        const allCompleted = doc?.activities?.length > 0 &&
+            doc.activities.every((a) => a.completed === true);
+
+        if (allCompleted) {
+            const today = new Date();
+            today.setUTCHours(0, 0, 0, 0);
+            const alreadyRecorded = (doc.completedDates || []).some(
+                (d) => new Date(d).getTime() === today.getTime()
+            );
+            if (!alreadyRecorded) {
+                await activities.updateOne(
+                    { userId },
+                    { $push: { completedDates: today } }
+                );
+            }
+        }
+
         return res.status(200).json({message:'success'});
     } catch (err) {
         console.error('Error updating activities: ', err);
@@ -158,4 +173,4 @@ router.put("/:username/activity", requireAuth, requireActivityWriteAccess, async
     }
 });
 
-module.exports = router;
+module.exports = router;
