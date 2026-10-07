@@ -18,6 +18,7 @@ concurrency:
 
 env:
   RESOURCE_GROUP: ystem-prod-rg
+  IMAGE_PREFIX: ghcr.io/ystem-lms
   DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
 jobs:
@@ -52,8 +53,8 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/ystemandchess/middlewarenode:${{ env.DEPLOY_SHA }}
-            ghcr.io/ystemandchess/middlewarenode:latest
+            ${{ env.IMAGE_PREFIX }}/middlewarenode:${{ env.DEPLOY_SHA }}
+            ${{ env.IMAGE_PREFIX }}/middlewarenode:latest
 
       - name: Build and push chess server
         uses: docker/build-push-action@v6
@@ -62,8 +63,8 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/ystemandchess/chessserver:${{ env.DEPLOY_SHA }}
-            ghcr.io/ystemandchess/chessserver:latest
+            ${{ env.IMAGE_PREFIX }}/chessserver:${{ env.DEPLOY_SHA }}
+            ${{ env.IMAGE_PREFIX }}/chessserver:latest
 
       - name: Build and push Stockfish
         uses: docker/build-push-action@v6
@@ -72,8 +73,8 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/ystemandchess/stockfishserver:${{ env.DEPLOY_SHA }}
-            ghcr.io/ystemandchess/stockfishserver:latest
+            ${{ env.IMAGE_PREFIX }}/stockfishserver:${{ env.DEPLOY_SHA }}
+            ${{ env.IMAGE_PREFIX }}/stockfishserver:latest
 
       - name: Build and push chess client
         uses: docker/build-push-action@v6
@@ -82,8 +83,8 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/ystemandchess/chessclient:${{ env.DEPLOY_SHA }}
-            ghcr.io/ystemandchess/chessclient:latest
+            ${{ env.IMAGE_PREFIX }}/chessclient:${{ env.DEPLOY_SHA }}
+            ${{ env.IMAGE_PREFIX }}/chessclient:latest
 
       - name: Build and push frontend
         uses: docker/build-push-action@v6
@@ -98,8 +99,8 @@ jobs:
             REACT_APP_CHESS_CLIENT_URL=${{ secrets.CHESS_CLIENT_URL }}
             REACT_APP_AGORA_APP_ID=${{ secrets.APP_ID }}
           tags: |
-            ghcr.io/ystemandchess/ystemandchess:${{ env.DEPLOY_SHA }}
-            ghcr.io/ystemandchess/ystemandchess:latest
+            ${{ env.IMAGE_PREFIX }}/ystemandchess:${{ env.DEPLOY_SHA }}
+            ${{ env.IMAGE_PREFIX }}/ystemandchess:latest
 
       - name: Azure login with OIDC
         uses: azure/login@v2
@@ -113,35 +114,35 @@ jobs:
           az containerapp update \
             --name ystem-middleware \
             --resource-group "$RESOURCE_GROUP" \
-            --image "ghcr.io/ystemandchess/middlewarenode:${DEPLOY_SHA}"
+            --image "${IMAGE_PREFIX}/middlewarenode:${DEPLOY_SHA}"
 
       - name: Deploy chess server
         run: |
           az containerapp update \
             --name ystem-chessserver \
             --resource-group "$RESOURCE_GROUP" \
-            --image "ghcr.io/ystemandchess/chessserver:${DEPLOY_SHA}"
+            --image "${IMAGE_PREFIX}/chessserver:${DEPLOY_SHA}"
 
       - name: Deploy Stockfish
         run: |
           az containerapp update \
             --name ystem-stockfish \
             --resource-group "$RESOURCE_GROUP" \
-            --image "ghcr.io/ystemandchess/stockfishserver:${DEPLOY_SHA}"
+            --image "${IMAGE_PREFIX}/stockfishserver:${DEPLOY_SHA}"
 
       - name: Deploy chess client
         run: |
           az containerapp update \
             --name ystem-chessclient \
             --resource-group "$RESOURCE_GROUP" \
-            --image "ghcr.io/ystemandchess/chessclient:${DEPLOY_SHA}"
+            --image "${IMAGE_PREFIX}/chessclient:${DEPLOY_SHA}"
 
       - name: Deploy frontend
         run: |
           az containerapp update \
             --name ystem-frontend \
             --resource-group "$RESOURCE_GROUP" \
-            --image "ghcr.io/ystemandchess/ystemandchess:${DEPLOY_SHA}"
+            --image "${IMAGE_PREFIX}/ystemandchess:${DEPLOY_SHA}"
 
       - name: Smoke test frontend
         run: |
