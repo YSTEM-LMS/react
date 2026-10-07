@@ -630,6 +630,8 @@ describe("Security Audit Regression: Intentionally Public Routes (No Auth Requir
   test("GET /category/list returns 200 without authentication", async () => {
     const res = await request(app).get("/category/list");
     expect(res.status).toBe(200);
+    expect(res.body).toEqual([{ name: "fundamentals" }]);
+    expect(categorys.find).toHaveBeenCalledWith({});
   });
 
   test("GET /puzzles/list and /puzzles/random return 200 without 401", async () => {
