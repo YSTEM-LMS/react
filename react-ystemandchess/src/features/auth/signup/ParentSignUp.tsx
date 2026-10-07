@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import AuthLayout from "./AuthLayout";
 import stemmyVine from "../../../assets/images/ActivitiesAssets/stemmy.svg";
 

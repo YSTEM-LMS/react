@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import { getAllScenarios } from "../lessons-main/Scenarios";
 import { useCookies } from "react-cookie";
 

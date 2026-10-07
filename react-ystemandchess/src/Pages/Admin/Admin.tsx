@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useCookies } from "react-cookie";
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 const Admin = () => {
   const navigate = useNavigate();
   // verify admin status

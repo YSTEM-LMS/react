@@ -6,9 +6,8 @@ import { io } from 'socket.io-client';
 import { useLocation } from 'react-router';
 import { Move } from '../../core/types/chess';
 import ChessBoard, { ChessBoardRef } from '../../components/ChessBoard/ChessBoard';
-import { environment } from "../../environments/environment";
-// Module styles (placeholder file should exist at the same folder)
-import styles from './PlayComputer.module.scss';
+import { environment } from "../../environments";
+import { cn } from '../../core/utils/cn';
 import StockfishTutor from './StockfishTutor';
 
 // chess.js exposes a named export `Chess`; normalize to a local constructor variable.
@@ -408,48 +407,52 @@ const PlayComputer: React.FC = () => {
   ];
 
   return (
-    <div className={styles.playPageContainer}>
+    <div className="flex min-h-[calc(100vh-100px)] w-full flex-col items-center justify-center bg-[#e2f0d9] px-4 py-10 font-sans box-border">
       {showSettings ? (
-        <div className={styles.settingsCard}>
-          <h2 className={styles.settingsHeader}>Game Settings</h2>
+        <div className="w-full max-w-[500px] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white p-10 shadow-[6px_6px_0_rgba(31,31,31,0.15)]">
+          <h2 className="mb-8 text-center text-[24px] font-extrabold text-[#1F1F1F]">Game Settings</h2>
 
-          <div className={styles.settingsGroup}>
-            <label className={styles.settingsLabel}>Play as</label>
-            <div className={styles.buttonGrid2}>
+          <div className="mb-6 w-full">
+            <label className="mb-3 block text-[16px] font-bold uppercase tracking-[0.5px] text-slate-600">Play as</label>
+            <div className="grid w-full grid-cols-2 gap-4">
               <button
-                className={`${styles.colorBtnWhite} ${playerColor === 'white' ? styles.active : ''}`}
+                className={cn('rounded-2xl border-[3px] border-[#1F1F1F] outline outline-[3px] outline-[#1F1F1F] bg-white px-0 py-5 text-lg font-extrabold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5', playerColor === 'white' && 'scale-[1.02] border-[#7FCC26] outline-[#7FCC26]')}
                 onClick={() => setPlayerColor('white')}
+                aria-pressed={playerColor === 'white'}
               >
                 White
               </button>
               <button
-                className={`${styles.colorBtnBlack} ${playerColor === 'black' ? styles.active : ''}`}
+                className={cn('rounded-2xl border-[3px] border-[#1F1F1F] outline outline-[3px] outline-[#1F1F1F] bg-[#1F1F1F] px-0 py-5 text-lg font-extrabold text-white transition-all duration-200 hover:-translate-y-0.5', playerColor === 'black' && 'scale-[1.02] border-[#7FCC26] outline-[#7FCC26]')}
                 onClick={() => setPlayerColor('black')}
+                aria-pressed={playerColor === 'black'}
               >
                 Black
               </button>
             </div>
           </div>
 
-          <div className={styles.settingsGroup}>
-            <label className={styles.settingsLabel}>Difficulty</label>
-            <div className={styles.difficultyGrid}>
+          <div className="mb-6 w-full">
+            <label className="mb-3 block text-[16px] font-bold uppercase tracking-[0.5px] text-slate-600">Difficulty</label>
+            <div className="grid w-full grid-cols-3 gap-3">
               {difficulties.slice(0, 3).map(({ label, value }) => (
                 <button
                   key={value}
-                  className={`${styles.difficultyBtn} ${difficulty === value ? styles.active : ''}`}
+                  className={cn('rounded-2xl border-[2px] border-[#1F1F1F] outline outline-2 outline-[#1F1F1F] bg-white px-0 py-3 text-sm font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5', difficulty === value && 'bg-[#7FCC26]')}
                   onClick={() => setDifficulty(value)}
+                  aria-pressed={difficulty === value}
                 >
                   {label}
                 </button>
               ))}
             </div>
-            <div className={`${styles.difficultyGrid} ${styles.row2}`}>
+            <div className="mt-3 grid w-full grid-cols-2 gap-3">
               {difficulties.slice(3).map(({ label, value }) => (
                 <button
                   key={value}
-                  className={`${styles.difficultyBtn} ${difficulty === value ? styles.active : ''}`}
+                  className={cn('rounded-2xl border-[2px] border-[#1F1F1F] outline outline-2 outline-[#1F1F1F] bg-white px-0 py-3 text-sm font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5', difficulty === value && 'bg-[#7FCC26]')}
                   onClick={() => setDifficulty(value)}
+                  aria-pressed={difficulty === value}
                 >
                   {label}
                 </button>
@@ -457,49 +460,46 @@ const PlayComputer: React.FC = () => {
             </div>
           </div>
 
-          <button 
-            className={styles.startButton} 
-            onClick={startSession} 
+          <button
+            className="mt-4 w-full rounded-2xl border-[3px] border-[#1F1F1F] bg-[#7FCC26] px-0 py-4 text-[20px] font-extrabold text-[#1F1F1F] shadow-[4px_4px_0_#1F1F1F] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#1F1F1F] active:translate-y-0 active:shadow-[2px_2px_0_#1F1F1F] disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={startSession}
             disabled={!connected}
           >
             {connected ? 'Start Game' : 'Connecting...'}
           </button>
         </div>
       ) : (
-        <div className={styles.outerFrame}>
-          {/* Left Column: Opponent, Tutor, Chessboard, Player */}
-          <div className={styles.leftColumn}>
-            {/* Stockfish Header Card */}
-            <div className={styles.stockfishHeaderCard}>
-              <div className={styles.headerLeft}>
-                <div className={styles.iconSquare}>
+        <div className="flex w-full max-w-[1300px] gap-6 rounded-[24px] border-2 border-[#1F1F1F] bg-white p-6 shadow-[10px_10px_0_#7FCC26] box-border max-[840px]:flex-col max-[840px]:items-center">
+          <div className="flex w-full min-w-0 flex-1 flex-col gap-4">
+            <div className="flex w-full items-center justify-between rounded-2xl border-2 border-[#1F1F1F] bg-white px-4 py-3">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[10px] bg-[#E5F3D2]">
                   <CpuIcon />
                 </div>
-                <div className={styles.headerText}>
-                  <div className={styles.headerTitle}>Stockfish Computer</div>
-                  <div className={styles.headerSubtitle}>Level {difficulty} ({difficulty === 1 ? 'Easy' : difficulty === 5 ? 'Medium' : difficulty === 10 ? 'Hard' : difficulty === 15 ? 'Expert' : 'Master'})</div>
+                <div className="flex flex-col">
+                  <div className="text-[15px] font-extrabold text-[#1F1F1F]">Stockfish Computer</div>
+                  <div className="text-[12px] font-semibold text-slate-600">Level {difficulty} ({difficulty === 1 ? 'Easy' : difficulty === 5 ? 'Medium' : difficulty === 10 ? 'Hard' : difficulty === 15 ? 'Expert' : 'Master'})</div>
                 </div>
               </div>
-              <div className={styles.readyBadge}>
-                <span className={styles.dot}></span>
+              <div className="flex items-center gap-2 rounded-full bg-[#E5F3D2] px-3.5 py-1.5 text-[13px] font-extrabold text-[#6EB21E]">
+                <span className="h-2 w-2 rounded-full bg-[#7FCC26]" />
                 Ready
               </div>
             </div>
 
-            {/* AI Tutor Card */}
-            <div className={styles.tutorCardWrapper}>
-              <div className={styles.tutorToggle}>
-                <label className={styles.tutorToggleLabel}>
-                  <input 
-                    type="checkbox" 
-                    checked={tutorEnabled} 
-                    onChange={(e) => setTutorEnabled(e.target.checked)} 
-                    className={styles.tutorCheckbox}
-                  /> 
-                  <span className={styles.tutorToggleText}>Show AI Tutor</span>
+            <div className="w-full">
+              <div className="mb-2 flex justify-end">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-2.5 py-1 text-[13px] font-bold text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={tutorEnabled}
+                    onChange={(e) => setTutorEnabled(e.target.checked)}
+                    className="h-3.5 w-3.5 accent-[#7FCC26]"
+                  />
+                  <span>Show AI Tutor</span>
                 </label>
               </div>
-              
+
               <StockfishTutor
                 enabled={tutorEnabled}
                 trigger={tutorTrigger}
@@ -520,17 +520,16 @@ const PlayComputer: React.FC = () => {
               />
             </div>
 
-            {/* Chessboard Card */}
-            <div className={styles.chessboardCard}>
-              <div className={styles.statusBarFixed}>
+            <div className="w-full rounded-[20px] border-2 border-[#1F1F1F] bg-white p-3">
+              <div className="mb-2 w-full">
                 {gameStatus && (
-                  <div className={`${styles.statusMessage} ${styles.check}`}>
+                  <div className="w-full rounded-lg border-[1.5px] border-[#FC8181] bg-[#FFF5F5] px-2 py-2 text-center text-[14px] font-bold text-[#C53030]">
                     {gameStatus}
                   </div>
                 )}
               </div>
 
-              <div className={styles.chessboardContainer}>
+              <div className="flex w-full justify-center">
                 <ChessBoard
                   mode="engine"
                   ref={chessBoardRef}
@@ -543,80 +542,76 @@ const PlayComputer: React.FC = () => {
               </div>
             </div>
 
-            {/* You Footer Card */}
-            <div className={styles.playerFooterCard}>
-              <div className={styles.headerLeft}>
-                <div className={styles.iconSquare}>
+            <div className="flex w-full items-center justify-between rounded-2xl border-2 border-[#1F1F1F] bg-white px-4 py-3">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[10px] bg-[#E5F3D2]">
                   <UserIcon />
                 </div>
-                <div className={styles.headerText}>
-                  <div className={styles.headerTitle}>You</div>
-                  <div className={styles.headerSubtitle}>Playing as {playerColor.charAt(0).toUpperCase() + playerColor.slice(1)}</div>
+                <div className="flex flex-col">
+                  <div className="text-[15px] font-extrabold text-[#1F1F1F]">You</div>
+                  <div className="text-[12px] font-semibold text-slate-600">Playing as {playerColor.charAt(0).toUpperCase() + playerColor.slice(1)}</div>
                 </div>
               </div>
               {playerColor === (gameRef.current.turn() === 'w' ? 'white' : 'black') ? (
-                <div className={styles.turnBadgeActive}>Your Turn</div>
+                <div className="rounded-full bg-[#7FCC26] px-3.5 py-1.5 text-[13px] font-extrabold text-[#1F1F1F]">Your Turn</div>
               ) : (
-                <div className={styles.turnBadgeThinking}>Opponent Thinking</div>
+                <div className="rounded-full bg-slate-200 px-3.5 py-1.5 text-[13px] font-bold text-slate-500">Opponent Thinking</div>
               )}
             </div>
           </div>
 
-          {/* Right Column: Game Info, Actions, Move History */}
-          <div className={styles.rightColumn}>
-            {/* Game Info Panel */}
-            <div className={styles.infoCard}>
-              <div className={styles.cardHeader}>
+          <div className="flex w-[330px] shrink-0 flex-col gap-4 max-[840px]:w-full">
+            <div className="w-full rounded-[20px] border-2 border-[#1F1F1F] bg-white p-5">
+              <div className="mb-5 flex items-center gap-2 text-[16px] font-extrabold text-[#1F1F1F]">
                 <StarIcon />
                 <span>Game Info</span>
               </div>
-              <div className={styles.infoGrid}>
-                <div className={styles.infoCell}>
-                  <div className={styles.infoCellLabel}>Active Turn</div>
-                  <div className={styles.infoCellValue}>
-                    <span className={`${styles.turnColorDot} ${gameRef.current.turn() === 'w' ? styles.whiteDot : styles.blackDot}`}></span>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex min-h-[80px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-[#F9FAF7] px-3 py-4">
+                  <div className="mb-2 text-[11px] font-extrabold uppercase tracking-normal text-slate-400">Active Turn</div>
+                  <div className="flex items-center gap-2 text-[15px] font-extrabold text-[#1F1F1F]">
+                    <span className={cn('inline-block h-3 w-3 rounded-full border-[1.5px] border-[#1F1F1F]', gameRef.current.turn() === 'w' ? 'bg-white' : 'bg-[#1F1F1F]')} />
                     {gameRef.current.turn() === 'w' ? 'White' : 'Black'}
                   </div>
                 </div>
-                <div className={styles.infoCell}>
-                  <div className={styles.infoCellLabel}>Total Moves</div>
-                  <div className={styles.infoCellValueNum}>{moveHistory.length}</div>
+                <div className="flex min-h-[80px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-[#F9FAF7] px-3 py-4">
+                  <div className="mb-2 text-[11px] font-extrabold uppercase tracking-normal text-slate-400">Total Moves</div>
+                  <div className="text-[24px] font-black text-[#1F1F1F]">{moveHistory.length}</div>
                 </div>
               </div>
             </div>
 
-            {/* Actions Panel */}
-            <div className={styles.actionsCard}>
-              <div className={styles.cardHeader}>
+            <div className="w-full rounded-[20px] border-2 border-[#1F1F1F] bg-white p-5">
+              <div className="mb-5 flex items-center gap-2 text-[16px] font-extrabold text-[#1F1F1F]">
                 <GearIcon />
                 <span>Actions</span>
               </div>
-              <div className={styles.actionsGrid}>
-                <button 
-                  className={styles.actionGridBtn} 
-                  onClick={undoMove} 
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-[#F9FAF7] px-3 py-3.5 text-[13px] font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1F1F1F] disabled:cursor-not-allowed disabled:opacity-40"
+                  onClick={undoMove}
                   disabled={moveHistory.length < 2 || isThinking}
                 >
                   <UndoIcon />
                   <span>Undo</span>
                 </button>
-                <button 
-                  className={styles.actionGridBtn} 
-                  onClick={resetGame} 
+                <button
+                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-[#F9FAF7] px-3 py-3.5 text-[13px] font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1F1F1F] disabled:cursor-not-allowed disabled:opacity-40"
+                  onClick={resetGame}
                   disabled={isThinking}
                 >
                   <ResetIcon />
                   <span>Reset</span>
                 </button>
-                <button 
-                  className={styles.actionGridBtn} 
+                <button
+                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-[#F9FAF7] px-3 py-3.5 text-[13px] font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1F1F1F]"
                   onClick={newGame}
                 >
                   <PlayIcon />
                   <span>New Game</span>
                 </button>
-                <button 
-                  className={styles.actionGridBtn} 
+                <button
+                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-[#F9FAF7] px-3 py-3.5 text-[13px] font-bold text-[#1F1F1F] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1F1F1F]"
                   onClick={() => chessBoardRef.current?.flip()}
                 >
                   <SwapIcon />
@@ -625,38 +620,37 @@ const PlayComputer: React.FC = () => {
               </div>
             </div>
 
-            {/* Move History Panel */}
-            <div className={styles.moveHistoryCard}>
-              <div className={styles.cardHeader}>
+            <div className="w-full rounded-[20px] border-2 border-[#1F1F1F] bg-white p-5">
+              <div className="mb-5 flex items-center gap-2 text-[16px] font-extrabold text-[#1F1F1F]">
                 <RibbonIcon />
                 <span>Move History</span>
               </div>
-              <div ref={movesContainerRef} className={styles.moveHistoryScroll}>
+              <div ref={movesContainerRef} className="flex max-h-[200px] flex-col gap-2 overflow-y-auto pr-1.5">
                 {moveHistory.reduce((acc: JSX.Element[], move, idx) => {
                   if (idx % 2 === 0) {
                     const moveNumber = Math.floor(idx / 2) + 1;
                     acc.push(
-                      <div key={idx} className={styles.moveHistoryRow}>
-                        <span className={styles.moveNumberText}>{moveNumber}.</span>
-                        <button 
+                      <div key={idx} className="grid grid-cols-[32px_1fr_1fr] items-center gap-2.5">
+                        <span className="text-right text-[13px] font-extrabold text-[#7FCC26]">{moveNumber}.</span>
+                        <button
                           onClick={() => {
                             const hasOpponent = moveHistory.length > idx + 1;
                             const target = hasOpponent ? idx + 1 : idx;
                             gotoPly(target);
-                          }} 
-                          className={styles.movePillPlayer}
+                          }}
+                          className="rounded-lg border border-[#1F1F1F] bg-white px-3 py-1.5 font-mono text-[13px] font-bold text-[#1F1F1F] transition-all duration-150 hover:-translate-y-0.5 hover:bg-slate-100"
                         >
                           {move}
                         </button>
                         {moveHistory[idx + 1] ? (
-                          <button 
-                            onClick={() => gotoPly(idx + 1)} 
-                            className={styles.movePillOpponent}
+                          <button
+                            onClick={() => gotoPly(idx + 1)}
+                            className="rounded-lg border border-[#1F1F1F] bg-[#1F1F1F] px-3 py-1.5 font-mono text-[13px] font-bold text-white transition-all duration-150 hover:-translate-y-0.5 hover:bg-neutral-800"
                           >
                             {moveHistory[idx + 1]}
                           </button>
                         ) : (
-                          <span className={styles.movePillPlaceholder}></span>
+                          <span className="h-[31px]" />
                         )}
                       </div>
                     );
@@ -670,12 +664,12 @@ const PlayComputer: React.FC = () => {
       )}
 
       {showGameEndModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowGameEndModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>{gameEndMessage}</h2>
-            <div className={styles.modalButtons}>
-              <button className={styles.modalBtnPrimary} onClick={() => { setShowGameEndModal(false); newGame(); }}>New Game</button>
-              <button className={styles.modalBtnSecondary} onClick={() => setShowGameEndModal(false)}>Close</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1F1F1F]/40 p-4 backdrop-blur-sm" onClick={() => setShowGameEndModal(false)}>
+          <div className="w-full max-w-[380px] rounded-[24px] border-[3px] border-[#1F1F1F] bg-white p-10 text-center shadow-[8px_8px_0_#1F1F1F] animate-modal-in" onClick={(e) => e.stopPropagation()}>
+            <h2 className="mb-6 text-[24px] font-black text-[#1F1F1F]">{gameEndMessage}</h2>
+            <div className="flex gap-3">
+              <button className="flex-1 rounded-xl border-2 border-[#1F1F1F] bg-[#7FCC26] px-0 py-3 font-extrabold text-[#1F1F1F] shadow-[2px_2px_0_#1F1F1F] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#1F1F1F] active:translate-y-0 active:shadow-[1px_1px_0_#1F1F1F]" onClick={() => { setShowGameEndModal(false); newGame(); }}>New Game</button>
+              <button className="flex-1 rounded-xl border-2 border-slate-200 bg-white px-0 py-3 font-bold text-slate-600 transition-all duration-150 hover:border-[#1F1F1F] hover:text-[#1F1F1F]" onClick={() => setShowGameEndModal(false)}>Close</button>
             </div>
           </div>
         </div>

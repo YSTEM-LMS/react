@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from 'react';
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments";
 import { useCookies } from 'react-cookie';
 import stemmy from "../../../assets/images/StreakProgressAssets/stemmy.svg";
 import stemette from "../../../assets/images/StreakProgressAssets/stemette.svg";

@@ -17,7 +17,7 @@ jest.mock("react-cookie", () => ({
   useCookies: () => [{ login: "test-token" }],
 }));
 
-jest.mock("../../../../environments/environment", () => ({
+jest.mock("../../../../environments", () => ({
   environment: { urls: { middlewareURL: "http://mw" } },
 }));
 

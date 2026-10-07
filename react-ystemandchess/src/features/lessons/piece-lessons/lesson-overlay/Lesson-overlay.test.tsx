@@ -4,7 +4,7 @@
 jest.mock("socket.io-client");
 
 // Mock environment
-jest.mock("../../../../environments/environment");
+jest.mock("../../../../environments");
 
 // Mock utility modules
 jest.mock("../../../../core/utils/goalEvaluator");
@@ -103,7 +103,7 @@ const mockIo = io as jest.MockedFunction<typeof io>;
 // Import mocked modules
 const goalEvaluator = require("../../../../core/utils/goalEvaluator");
 const eventLogger = require("../../../../core/utils/eventLogger");
-const { environment } = require("../../../../environments/environment");
+const { environment } = require("../../../../environments");
 
 // Create socket factory
 const createMockSocket = () => {
@@ -449,7 +449,7 @@ describe("LessonOverlay", () => {
     });
     
     // Verify the lesson info displays the puzzle instruction in the lesson description area
-    const lessonDescription = container.querySelector(".lessonDescription");
+    const lessonDescription = container.querySelector('[data-testid="lesson-description"]');
     expect(lessonDescription).toHaveTextContent("Checkmate in 3 moves");
   });
 
@@ -475,7 +475,7 @@ describe("LessonOverlay", () => {
     });
     
     // Verify the lesson info displays in the lesson description area
-    const lessonDescription = container.querySelector(".lessonDescription");
+    const lessonDescription = container.querySelector('[data-testid="lesson-description"]');
     expect(lessonDescription).toHaveTextContent("get a winning position");
   });
 });

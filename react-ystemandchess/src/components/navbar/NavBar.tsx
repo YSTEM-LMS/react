@@ -232,13 +232,6 @@ const NavBar = () => {
             <h3 className="mt-4 mb-2 text-base font-bold uppercase tracking-wide text-dark">What We Do</h3>
             <div className="flex flex-col gap-2">
               <Link
-                to="/online-expansion"
-                onClick={toggleAboutUs}
-                className="text-base text-gray transition-colors hover:text-primary"
-              >
-                Online Expansion
-              </Link>
-              <Link
                 to="/about-us"
                 onClick={toggleAboutUs}
                 className="text-base text-gray transition-colors hover:text-primary"

@@ -1,17 +1,14 @@
-version: '3.4'
-
 networks:
   ysc-net:
-    external:
-      name: ysc-net
+    name: ysc-net
+    external: true
 
 services:
   nginx:
     image: nginx:1.19.2-alpine
     container_name: reverse-proxy-server
     volumes:
-      - ./deploy/prod/nginx.conf:/etc/nginx/nginx.conf
-      - /home/azureuser/ysc-2/app.ystemandchess.com/YStemAndChess/dist_new/YStemAndChess:/var/www/html
+      - ./nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt/live/ystemandchess.com/fullchain.pem:/etc/ysc-certs/ysc-cert.pem
       - /etc/letsencrypt/live/ystemandchess.com/privkey.pem:/etc/ysc-certs/ysc-key.pem
       - /etc/letsencrypt/options-ssl-nginx.conf:/etc/ysc-certs/options-ssl-nginx.conf
@@ -29,20 +26,25 @@ services:
       - ystemandchess
 
   chessserver:
-    image: chessserver:${TAG}
+    image: chessserver:${TAG:-latest}
     container_name: chessserver
     environment:
-      - PORT=${PORT}
+      - NODE_ENV=production
+      - PORT=3001
+      - MIDDLEWARE_URL=${MIDDLEWARE_URL}
+      - CORS_ORIGIN=${CORS_ORIGIN}
     networks:
       - ysc-net
     expose:
       - "3001"
 
   stockfishserver:
-    image: stockfishserver:${TAG}
+    image: stockfishserver:${TAG:-latest}
     container_name: stockfishserver
     environment:
+      - NODE_ENV=production
       - PORT=8080
+      - CORS_ORIGIN=${CORS_ORIGIN}
     networks:
       - ysc-net
     expose:
@@ -52,48 +54,42 @@ services:
     image: middlewarenode
     container_name: middleware
     environment:
+      - NODE_ENV=production
       - PORT=8000
-      - indexKey=${indexKey}
+      - MONGO_URI=${MONGO_URI}
+      - INDEX_KEY=${INDEX_KEY}
+      - CORS_ORIGIN=${CORS_ORIGIN}
       - AZURE_STORAGE_ACCOUNT=${AZURE_STORAGE_ACCOUNT}
       - AZURE_STORAGE_KEY=${AZURE_STORAGE_KEY}
       - AZURE_STORAGE_CONTAINER=${AZURE_STORAGE_CONTAINER}
       - AZURE_STORAGE_REGION=${AZURE_STORAGE_REGION}
-      - mongoURI=${mongoURI}
-      - appID=${appID}
-      - auth=${auth}
-      - channel=${channel}
-      - uid=${uid}
-      - jwtSecret=${jwtSecret}
-      - NODE_ENV=${NODE_ENV}
-      - basepath=${basepath}
-      - clientId=${clientId}
-      - clientSecret=${clientSecret}
-      - redirectUri=${redirectUri}
-      - refreshToken=${refreshToken}
-      - user=${user}
-      - senderEmail=${senderEmail}
+      - AGORA_APP_ID=${AGORA_APP_ID}
+      - AGORA_UID=${AGORA_UID}
+      - AGORA_CUSTOMER_ID=${AGORA_CUSTOMER_ID}
+      - AGORA_CUSTOMER_CERT=${AGORA_CUSTOMER_CERT}
+      - BASEPATH=${BASEPATH}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      - GOOGLE_REFRESH_TOKEN=${GOOGLE_REFRESH_TOKEN}
+      - EMAIL_USER=${EMAIL_USER}
+      - SENDER_EMAIL=${SENDER_EMAIL}
       - SESSION_SECRET=${SESSION_SECRET}
       - ANALYTICS_RATE_LIMIT_MAX=${ANALYTICS_RATE_LIMIT_MAX:-100}
+      - LEADERBOARD_RATE_LIMIT_MAX=${LEADERBOARD_RATE_LIMIT_MAX:-60}
     networks:
       - ysc-net
     expose:
       - '8000'
 
   ystemandchess:
-    image: ystemandchess:${TAG}
+    image: ystemandchess:${TAG:-latest}
     container_name: ystemandchess
-    environment:
-      - agora:appID=${appID}
-      - urls:middlewareURL=52.249.251.163/middleware
-      - urls:stockFishURL=52.249.251.163/stockfishserver
-      - urls:chessServerURL=52.249.251.163/chessserver
     networks:
       - ysc-net
     expose:
-      - "80"
+      - "3000"
     depends_on:
       - middleware
       - stockfishserver
       - chessserver
-    volumes:
-      - ../YStemAndChess:/usr/src/app

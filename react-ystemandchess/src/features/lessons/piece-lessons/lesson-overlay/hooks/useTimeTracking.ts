@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { environment } from "../../../../../environments/environment";
+import { environment } from "../../../../../environments";
 import { SetPermissionLevel } from "../../../../../globals";
 
 export function useTimeTracking(piece: string, cookies: any) {

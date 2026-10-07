@@ -5,7 +5,7 @@ import { CookiesProvider } from "react-cookie";
 import Admin from "./Admin";
 
 // Mock environment
-jest.mock("../../environments/environment", () => ({
+jest.mock("../../environments", () => ({
   environment: {
     urls: {
       middlewareURL: "http://mock-api.com",

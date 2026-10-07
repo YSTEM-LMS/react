@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ChatWidget.scss';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 import { useCookies } from 'react-cookie';
 import { CoachMascot, CoachExpression } from '../animations/CoachMascot/CoachMascot';
 

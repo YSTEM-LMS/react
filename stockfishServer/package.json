@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "chess.js": "^0.11.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.6.0",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
@@ -19,11 +20,15 @@
     "stockfish": "^11.0.0"
   },
   "volta": {
-    "node": "20.19.0"
+    "node": "24.21.0"
   },
   "devDependencies": {
     "jest": "^30.0.4",
     "nodemon": "^3.1.10",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "supertest": "^7.2.2"
+  },
+  "engines": {
+    "node": ">=24 <25"
   }
 }

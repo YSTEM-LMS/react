@@ -92,7 +92,7 @@ const Home = () => {
 
   const handleDonateButton = () => {
     window.location.href =
-      "https://donorbox.org/y-stem-and-chess-inc-learning-platform";
+      "https://donate.stripe.com/9B600jdVwd5x1jQ34r8IU01";
   };
 
   const handleBuyNow = (title = "") => {

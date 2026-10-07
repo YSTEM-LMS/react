@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 import { DateRange } from '../../components/Analytics/DateRangeFilter';
 import LoadingSpinner from '../../components/Analytics/LoadingSpinner';
 import ErrorBanner from '../../components/Analytics/ErrorBanner';

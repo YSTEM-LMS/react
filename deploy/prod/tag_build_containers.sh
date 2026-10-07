@@ -1,52 +1,52 @@
 #!/bin/bash
 
-# Build Docker images for production deployment
-# Usage: cd scripts && ./tag_build_containers.sh
+set -eu
+
+TAG=${TAG:-latest}
 
 echo "=========================================="
 echo "Building Docker images for PRODUCTION"
+echo "TAG=$TAG"
 echo "=========================================="
-echo ""
 
-# Move to parent directory (where service folders are)
-cd ../.. || exit 1
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$REPO_ROOT" || exit 1
 
-services=(react-ystemandchess chessServer middlewareNode stockfishServer)
+build_image() {
+    service_dir="$1"
+    image_name="$2"
 
-for service in "${services[@]}"
-do
     echo "=========================================="
-    echo "Building: $service"
+    echo "Building: $service_dir"
+    echo "Image: $image_name"
     echo "=========================================="
 
-    if [ ! -d "$service" ]; then
-        echo "ERROR: Directory $service not found!"
+    if [ ! -d "$service_dir" ]; then
+        echo "ERROR: Directory $service_dir not found!"
         exit 1
     fi
 
-    cd $service || exit 1
+    docker build -t "$image_name" "$service_dir"
+}
 
-    # Convert to lowercase for image name
-    imagename=$(echo "$service" | awk '{ print tolower($0) }')
+echo "=========================================="
+echo "Building: react-ystemandchess"
+echo "Image: ystemandchess:${TAG}"
+echo "=========================================="
 
-    echo "Image name: $imagename"
-
-    # Build Docker image
-    docker build -t $imagename . || {
-        echo "ERROR: Failed to build $imagename"
-        cd ..
-        exit 1
-    }
-
-    cd ..
-    echo "Successfully built $imagename"
-    echo ""
-done
+docker build \
+  --build-arg REACT_APP_MIDDLEWARE_URL="${REACT_APP_MIDDLEWARE_URL}" \
+  --build-arg REACT_APP_STOCKFISH_SERVER_URL="${REACT_APP_STOCKFISH_SERVER_URL}" \
+  --build-arg REACT_APP_CHESS_SERVER_URL="${REACT_APP_CHESS_SERVER_URL}" \
+  --build-arg REACT_APP_CHESS_CLIENT_URL="${REACT_APP_CHESS_CLIENT_URL}" \
+  --build-arg REACT_APP_AGORA_APP_ID="${REACT_APP_AGORA_APP_ID}" \
+  -t "ystemandchess:${TAG}" \
+  react-ystemandchess
+build_image "chessServer" "chessserver:${TAG}"
+build_image "middlewareNode" "middlewarenode:${TAG}"
+build_image "stockfishServer" "stockfishserver:${TAG}"
 
 echo "=========================================="
 echo "All production images built!"
 echo "=========================================="
-echo ""
-echo "To deploy:"
-echo "  cd scripts"
-echo "  docker-compose up -d"

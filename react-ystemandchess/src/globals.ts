@@ -5,7 +5,7 @@
  * components, particularly for authentication and permission management.
  */
 
-import { environment } from "./environments/environment";
+import { environment } from "./environments";
 
 /**
  * Global variable to store user information after authentication

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments';
 
 export interface AnalyticsParams {
   from?: string;
