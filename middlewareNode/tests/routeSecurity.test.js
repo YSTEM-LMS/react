@@ -482,6 +482,102 @@ describe("Security Audit Regression: Role & Ownership Authorization (403 Forbidd
       expect(res2.status).toBe(200);
     });
   });
+
+  describe("Challenge Matchmaking Lifecycle", () => {
+    beforeEach(() => {
+      challengeRouter._reset();
+      mockAuthUser = { _id: "u1", username: "alice", role: "student" };
+    });
+
+    test("creates a challenge, exposes it to the recipient, and shares the accepted gameId", async () => {
+      const createRes = await request(app)
+        .post("/challenge")
+        .send({ fromUsername: "alice", toUsername: "bob" });
+
+      expect(createRes.status).toBe(201);
+      expect(createRes.body.challengeId).toBeTruthy();
+      expect(createRes.body.gameId).toBeTruthy();
+
+      mockAuthUser = { _id: "u2", username: "bob", role: "student" };
+      const incomingRes = await request(app).get("/challenge/incoming/bob");
+      expect(incomingRes.status).toBe(200);
+      expect(incomingRes.body.challenges).toEqual([
+        {
+          challengeId: createRes.body.challengeId,
+          fromUsername: "alice",
+          gameId: createRes.body.gameId,
+        },
+      ]);
+
+      const acceptRes = await request(app).post(`/challenge/${createRes.body.challengeId}/accept`);
+      expect(acceptRes.status).toBe(200);
+      expect(acceptRes.body.gameId).toBe(createRes.body.gameId);
+
+      mockAuthUser = { _id: "u1", username: "alice", role: "student" };
+      const statusRes = await request(app).get(`/challenge/${createRes.body.challengeId}`);
+      expect(statusRes.status).toBe(200);
+      expect(statusRes.body).toMatchObject({
+        status: "accepted",
+        gameId: createRes.body.gameId,
+      });
+    });
+
+    test("allows a participant to decline a pending challenge", async () => {
+      const createRes = await request(app)
+        .post("/challenge")
+        .send({ fromUsername: "alice", toUsername: "bob" });
+
+      mockAuthUser = { _id: "u2", username: "bob", role: "student" };
+      const declineRes = await request(app).post(`/challenge/${createRes.body.challengeId}/decline`);
+      expect(declineRes.status).toBe(200);
+      expect(declineRes.body).toEqual({ message: "declined" });
+
+      const statusRes = await request(app).get(`/challenge/${createRes.body.challengeId}`);
+      expect(statusRes.body.status).toBe("declined");
+    });
+
+    test("rejects a second accept with 409", async () => {
+      const createRes = await request(app)
+        .post("/challenge")
+        .send({ fromUsername: "alice", toUsername: "bob" });
+      mockAuthUser = { _id: "u2", username: "bob", role: "student" };
+
+      const firstAccept = await request(app).post(`/challenge/${createRes.body.challengeId}/accept`);
+      const secondAccept = await request(app).post(`/challenge/${createRes.body.challengeId}/accept`);
+
+      expect(firstAccept.status).toBe(200);
+      expect(secondAccept.status).toBe(409);
+    });
+
+    test("rejects a self-challenge with 400", async () => {
+      const res = await request(app)
+        .post("/challenge")
+        .send({ fromUsername: "alice", toUsername: "alice" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/cannot challenge yourself/i);
+    });
+
+    test("expires a challenge after the TTL", async () => {
+      const now = Date.now();
+      const dateNow = jest.spyOn(Date, "now").mockReturnValue(now);
+      try {
+        const createRes = await request(app)
+          .post("/challenge")
+          .send({ fromUsername: "alice", toUsername: "bob" });
+        dateNow.mockReturnValue(now + 2 * 60 * 1000 + 1);
+
+        mockAuthUser = { _id: "u2", username: "bob", role: "student" };
+        const incomingRes = await request(app).get("/challenge/incoming/bob");
+        const statusRes = await request(app).get(`/challenge/${createRes.body.challengeId}`);
+
+        expect(incomingRes.body.challenges).toEqual([]);
+        expect(statusRes.status).toBe(404);
+      } finally {
+        dateNow.mockRestore();
+      }
+    });
+  });
 });
 
 describe("Security Audit Regression: Auth Endpoint Body Credentials Hardening", () => {
