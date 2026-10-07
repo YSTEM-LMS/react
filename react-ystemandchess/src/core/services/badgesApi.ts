@@ -47,3 +47,32 @@ export async function getUserBadges(userId: string, token: string) {
   if (!res.ok) throw new Error("Failed to fetch earned badges");
   return (await res.json()).earned;
 }
+
+/**
+ * Triggers a server-side check of the user's current stats and awards
+ * any badges they've newly qualified for. Server-authoritative — it
+ * recomputes stats itself and does not accept client-supplied predicates.
+ *
+ * The backend only permits a caller to check/award their own badges
+ * (:userId must match the authenticated JWT's username), so token is
+ * required here.
+ *
+ * @param {string} userId - User's own username (must match the JWT)
+ * @param {string} token - Bearer token (e.g. from the 'login' cookie)
+ * @returns {Promise<Array>} Array of newly-awarded badge objects
+ * @throws {Error} If the API request fails
+ */
+export async function checkAndAward(userId: string, token: string) {
+  // Auth is carried by the Bearer header, not cookies — omit
+  // credentials: "include" for the same reason noted in getBadgeCatalog
+  // above (wildcard-origin CORS rejects credentialed requests).
+  const res = await fetch(
+    `${environment.urls.middlewareURL}/badges/${userId}/check-and-award`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  if (!res.ok) throw new Error("Failed to check and award badges");
+  return (await res.json()).awarded;
+}
