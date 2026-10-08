@@ -14,8 +14,9 @@
 
 const express = require('express');
 const crypto = require('crypto');
-const router = express.Router({ mergeParams: true });
 const requireAuth = require('../middleware/requireAuth');
+const PvpGame = require('../models/PvpGame');
+const router = express.Router({ mergeParams: true });
 
 // challengeId -> { id, gameId, fromUsername, toUsername, status, createdAt }
 // status: "pending" | "accepted" | "declined"
@@ -136,8 +137,14 @@ router.get('/:id', requireAuth, (req, res) => {
 /**
  * POST /challenge/:id/accept
  * Opponent accepts; both sides now share `gameId`.
+ *
+ * Also persists a PvpGame record (white = challenger, black = opponent) —
+ * this is the middleware's own record of who the two real players are, so
+ * GET /challenge/game/:gameId can later verify a joining chess-server socket
+ * against it instead of trusting a client-supplied username. See the PvP
+ * results plan (v2), target design.
  */
-router.post('/:id/accept', requireAuth, (req, res) => {
+router.post('/:id/accept', requireAuth, async (req, res) => {
     sweepExpired();
     const challenge = challenges.get(req.params.id);
     if (!challenge) {
@@ -153,10 +160,52 @@ router.post('/:id/accept', requireAuth, (req, res) => {
         return res.status(409).json({ error: `Challenge already ${challenge.status}` });
     }
     challenge.status = 'accepted';
+
+    try {
+        await PvpGame.create({
+            gameId: challenge.gameId,
+            white: challenge.fromUsername,
+            black: challenge.toUsername,
+        });
+    } catch (err) {
+        // Unique-index race: two accepts for the same challenge can't both get
+        // here in practice (the in-memory status guard above already blocks a
+        // second accept), but if they somehow did, the duplicate key means a
+        // PvpGame already exists for this gameId — nothing more to do.
+        if (!err || err.code !== 11000) {
+            console.error('challenge accept — failed to save PvpGame:', err && err.message);
+            return res.status(500).json({ error: 'Server error' });
+        }
+    }
+
     return res.status(200).json({
         gameId: challenge.gameId,
         challenger: challenge.fromUsername,
         opponent: challenge.toUsername,
+    });
+});
+
+/**
+ * GET /challenge/game/:gameId
+ * Lets the chess server verify who the two real players in a game are before
+ * seating a joining socket. Behind requireAuth: the caller's own JWT decides
+ * `you`, so a socket can never claim to be someone else's seat.
+ */
+router.get('/game/:gameId', requireAuth, async (req, res) => {
+    const game = await PvpGame.findOne({ gameId: req.params.gameId });
+    if (!game) {
+        return res.status(404).json({ error: 'Game not found' });
+    }
+    const you = req.user.username;
+    if (you !== game.white && you !== game.black) {
+        return res.status(403).json({ error: 'You are not a player in this game' });
+    }
+    return res.status(200).json({
+        gameId: game.gameId,
+        you,
+        white: game.white,
+        black: game.black,
+        status: game.status,
     });
 });
 

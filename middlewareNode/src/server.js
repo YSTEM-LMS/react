@@ -141,7 +141,16 @@ app.use("/streak", streakRoutes);
 app.use("/badges", require("./routes/badges"));
 app.use("/chat", require("./routes/chat"));
 app.use("/challenge", require("./routes/challenge"));
+// PvP results plan (v2): the only write path left under /gameResults was the
+// player-facing POST, now removed (a student can no longer report their own
+// game — see routes/gameResults.js). currencyEventLimiter stays here since
+// GET is still mounted behind it and there's no harm rate-limiting a read,
+// but it's no longer guarding a write. The actual write path moved to
+// /internal/gameResults below, protected by CHESS_SERVICE_KEY instead of a
+// per-user limiter, since its only legitimate caller is the chess server.
 app.use("/gameResults", currencyEventLimiter, requireAuth, require("./routes/gameResults"));
+// Chess server only — authenticated with CHESS_SERVICE_KEY, not a player JWT.
+app.use("/internal/gameResults", require("./routes/internalGameResults"));
 app.use("/analytics", analyticsLimiter, adminGuard, require("./routes/analytics"));
 app.use("/leaderboard", leaderboardLimiter, requireAuth, require("./routes/leaderboard"));
 

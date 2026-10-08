@@ -18,17 +18,21 @@
  *     reporting the same game is a no-op, not a double count.
  *
  * Endpoints:
- *   POST /gameResults              -> record one finished game (idempotent)
  *   GET  /gameResults/:username    -> that student's W/D/L + chess score
  *
- * Mounted behind requireAuth (any logged-in role). POST additionally requires
- * that the caller was one of the two players — a student cannot report a game
- * they did not play.
+ * Mounted behind requireAuth (any logged-in role).
+ *
+ * There is no player-facing POST here. A student cannot write their own game
+ * result — only the chess server can, via the separately-mounted, service-key
+ * -gated POST /internal/gameResults (routes/internalGameResults.js), which
+ * reuses buildRecord/serialize below for validation and response shape. See
+ * the PvP results plan (v2): the old player-facing POST never actually
+ * reached the database (finding #1), so a student posting to the legacy path
+ * now just gets a 404 — there is no route left to match.
  */
 
 const express = require("express");
 const router = express.Router();
-const GameResults = require("../models/gameResults");
 const { getChessRecord } = require("../utils/studentStats");
 
 const VALID_RESULTS = ["win", "draw"];
@@ -44,6 +48,7 @@ function serialize(doc) {
     loserUsername: doc.loserUsername,
     reason: doc.reason,
     playedAt: doc.playedAt,
+    source: doc.source,
   };
 }
 
@@ -103,48 +108,6 @@ function buildRecord(body) {
 }
 
 /**
- * POST /gameResults
- * Body (win):  { gameId, result: "win", reason, winnerUsername, loserUsername, playedAt? }
- * Body (draw): { gameId, result: "draw", reason: "draw", players: [a, b], playedAt? }
- *
- * Idempotent on gameId: re-reporting a recorded game returns 200 with
- * duplicate: true and changes nothing.
- */
-router.post("/", async (req, res) => {
-  try {
-    const { error, record } = buildRecord(req.body);
-    if (error) return res.status(400).json({ success: false, error });
-
-    // Only a participant may report the game.
-    const caller = req.user && req.user.username;
-    if (!caller || !record.players.includes(caller)) {
-      return res
-        .status(403)
-        .json({ success: false, error: "Only a player in this game may report its result" });
-    }
-
-    const existing = await GameResults.findOne({ gameId: record.gameId });
-    if (existing) {
-      return res.json({ success: true, duplicate: true, gameResult: serialize(existing) });
-    }
-
-    const created = await GameResults.create(record);
-    return res.status(201).json({ success: true, duplicate: false, gameResult: serialize(created) });
-  } catch (err) {
-    // Unique-index race: the other client reported the same game first. That's
-    // the idempotency guarantee doing its job, not an error.
-    if (err && err.code === 11000) {
-      const existing = await GameResults.findOne({ gameId: req.body.gameId });
-      if (existing) {
-        return res.json({ success: true, duplicate: true, gameResult: serialize(existing) });
-      }
-    }
-    console.error("gameResults POST /:", err.message);
-    return res.status(500).json({ success: false, error: "Server error" });
-  }
-});
-
-/**
  * GET /gameResults/:username
  * That student's competitive record and derived chess score.
  */
@@ -159,3 +122,6 @@ router.get("/:username", async (req, res) => {
 });
 
 module.exports = router;
+// Reused by routes/internalGameResults.js for body validation and response shape.
+module.exports.buildRecord = buildRecord;
+module.exports.serialize = serialize;
