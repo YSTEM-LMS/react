@@ -58,10 +58,15 @@ const GameResultsSchema = new mongoose.Schema(
 
     playedAt: { type: Date, default: Date.now, index: true },
 
+    // Defaults to "legacy-unverified" rather than being required: any write
+    // that doesn't explicitly claim source: "chessServer" (only
+    // routes/internalGameResults.js does) should safely fall back to
+    // unverified, not fail. This also keeps older code paths that create a
+    // GameResults doc without knowing about this field working unchanged.
     source: {
       type: String,
       enum: ["chessServer", "legacy-unverified"],
-      required: true,
+      default: "legacy-unverified",
     },
   },
   { timestamps: true }

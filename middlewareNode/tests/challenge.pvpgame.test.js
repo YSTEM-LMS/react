@@ -48,10 +48,19 @@ afterEach(async () => {
   await Promise.all(Object.values(collections).map((c) => c.deleteMany({})));
 });
 
-/** Creates and accepts a challenge, returning its gameId. */
+/**
+ * Creates and accepts a challenge, returning its gameId. Both calls now need
+ * an identity header: POST /challenge requires the caller to be fromUsername,
+ * and only the recipient (toUsername) may accept.
+ */
 async function acceptedGame(fromUsername = "alice", toUsername = "bob") {
-  const created = await request(app).post("/challenge").send({ fromUsername, toUsername });
-  const accept = await request(app).post(`/challenge/${created.body.challengeId}/accept`);
+  const created = await request(app)
+    .post("/challenge")
+    .set("x-test-user", fromUsername)
+    .send({ fromUsername, toUsername });
+  const accept = await request(app)
+    .post(`/challenge/${created.body.challengeId}/accept`)
+    .set("x-test-user", toUsername);
   return { challengeId: created.body.challengeId, gameId: accept.body.gameId, accept };
 }
 
@@ -70,7 +79,9 @@ describe("POST /challenge/:id/accept — persists a PvpGame", () => {
   test("a second accept of the same challenge returns 409 and creates no extra PvpGame", async () => {
     const { challengeId, gameId } = await acceptedGame("alice", "bob");
 
-    const second = await request(app).post(`/challenge/${challengeId}/accept`);
+    const second = await request(app)
+      .post(`/challenge/${challengeId}/accept`)
+      .set("x-test-user", "bob");
     expect(second.status).toBe(409);
 
     const PvpGame = require("../src/models/PvpGame");
