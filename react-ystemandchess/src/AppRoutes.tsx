@@ -18,6 +18,7 @@ import Board from "./features/about-us/board/Board";
 import Financial from "./features/about-us/financial/Financial";
 import AboutUs from "./features/about-us/aboutus/AboutUs";
 import PlayComputer from "./features/engine/PlayComputer";
+import SelectGame from "./features/engine/SelectGame";
 import Lessons from "./features/lessons/lessons-main/Lessons";
 import Puzzles from './features/puzzles/Puzzles';
 import LessonSelection from "./features/lessons/lessons-selection/LessonsSelection";
@@ -81,6 +82,7 @@ const AppRoutes = () => {
       <Route path="/sponsors&partners" element={<SponsorsPartners />} />
 
       <Route path="/play" element={<PlayComputer />} />
+      <Route path="/select-game" element={<SelectGame />} />
       <Route path="/puzzles" element={<Puzzles />} />
       <Route path="/lessons-selection" element={<LessonSelection />} />
       <Route path="/lessons" element={<LessonOverlay />} />
