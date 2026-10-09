@@ -54,6 +54,18 @@ const currencyEventLimiter = rateLimit({
   message: { error: "Too many requests, please try again later" },
 });
 
+// Saved games: Play Computer saves after each move (debounced), so the limit
+// is per user rather than per IP, otherwise a classroom behind one school IP
+// would share a single budget. Runs after requireAuth so req.user is set.
+const savedGamesLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: parseInt(process.env.SAVED_GAMES_RATE_LIMIT_MAX) || 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `user:${req.user._id}`,
+  message: { error: "Too many requests, please try again later" },
+});
+
 // Enable schedulers
 require("./scheduler/activitiesScheduler.js");
 require("./scheduler/analyticsSummaryScheduler.js");
@@ -144,6 +156,7 @@ app.use("/challenge", require("./routes/challenge"));
 app.use("/gameResults", currencyEventLimiter, requireAuth, require("./routes/gameResults"));
 app.use("/analytics", analyticsLimiter, adminGuard, require("./routes/analytics"));
 app.use("/leaderboard", leaderboardLimiter, requireAuth, require("./routes/leaderboard"));
+app.use("/savedGames", requireAuth, savedGamesLimiter, require("./routes/savedGames"));
 
 // Start server on specified port
 const PORT = process.env.PORT || 8000;
