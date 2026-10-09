@@ -13,7 +13,7 @@ import ChessBoard, {
 } from "../../components/ChessBoard/ChessBoard";
 import { useChessSocket } from "../lessons/piece-lessons/lesson-overlay/hooks/useChessSocket";
 import { Move } from "../../core/types/chess";
-import { useSearchParams } from "react-router";
+import { useSearchParams } from "react-router-dom";
 import { checkAndAward } from "../../core/services/badgesApi";
 import { completeActivity, getActivityNameByTaskId } from "../../core/services/activitiesApi";
 
