@@ -15,6 +15,7 @@
 
 const schedule = require("node-schedule");
 const config = require("config");
+const fallbackDbName = require("../config/fallbackDbName");
 const { MongoClient } = require('mongodb');
 const { selectActivities } = require("../utils/activities");
 require('dotenv').config();
@@ -36,7 +37,7 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  return cachedClient.db("ystem");
+  return cachedClient.db(fallbackDbName(config.get("mongoURI")));
 }
 
 /**

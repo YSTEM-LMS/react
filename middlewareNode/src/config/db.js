@@ -130,9 +130,23 @@ const seedTestUsers = async () => {
     const lessonsCount = await lessonsCollection.countDocuments({});
     if (lessonsCount === 0) {
       console.log("Seeding mock newLessons...");
+      // Must match the scenario names the lesson menu sends
+      // (react-ystemandchess/src/features/lessons/lessons-main/Scenarios.js);
+      // lessons are looked up by exact name.
       const pieces = [
-        "pawn",
+        "Pawn - It moves forward only",
+        "Bishop - It moves diagonally",
+        "Knight - It moves in an L shape",
+        "Rook - It moves in straight lines",
+        "Queen - Queen = Rook + Bishop",
+        "King - The most important piece",
         "Piece Checkmate 1 Basic checkmates",
+        "Checkmate Pattern 1 Recognize the patterns",
+        "Checkmate Pattern 2 Recognize the patterns",
+        "Checkmate Pattern 3 Recognize the patterns",
+        "Checkmate Pattern 4 Recognize the patterns",
+        "Piece checkmates 2 Challenging checkmates",
+        "Knight and Bishop Mate interactive lesson",
         "The Pin Pin it to win it",
         "The Skewer Yum - Skewers!",
         "The Fork Use the fork, Luke",
@@ -155,7 +169,7 @@ const seedTestUsers = async () => {
         "Opposition take the opposition",
         "7th-Rank Rook Pawn Versus a Queen",
         "7th-Rank Rook Pawn And Passive Rook vs Rook",
-        "Basic Rook Endgames Lucena and Philidor"
+        "Basic Rook Endgames Lucena and Philidor",
       ];
       const mockLessonsDocs = pieces.map(pieceName => ({
         piece: pieceName,
