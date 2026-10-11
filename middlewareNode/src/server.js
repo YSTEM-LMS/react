@@ -115,7 +115,7 @@ app.use(
   session({
     secret:
       process.env.SESSION_SECRET ||
-      (process.env.NODE_ENV !== "production"
+      (validateEnvironment.isLocalEnvironment()
         ? "dev-secret-change-in-prod"
         : undefined),
     resave: false,
