@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YSTEM Mobile App — Screen Previews</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ────────────────────────────────── */
+    :root {
+      --primary:     #7FCC26;
+      --secondary:   #BFD99E;
+      --soft:        #E5F3D2;
+      --accent:      #EAD94C;
+      --dark:        #1F1F1F;
+      --gray:        #5C5C5C;
+      --muted:       #8A8A8A;
+      --borderLight: #D6D6D6;
+      --light:       #F9FAF7;
+      --red:         #D64545;
+      --redLight:    #F5E9E9;
+      --primaryFaint: rgba(127,204,38,0.1);
+      --primaryLight: rgba(127,204,38,0.2);
+      --accentFaint:  rgba(234,217,76,0.2);
+      --white60:      rgba(255,255,255,0.6);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lato', system-ui, sans-serif;
+      background: #111;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    /* ── Page header ──────────────────────────────────── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .page-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .page-logo {
+      width: 44px; height: 44px;
+      background: var(--dark);
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 700; color: var(--primary);
+    }
+    .page-title { font-size: 20px; font-weight: 700; color: #fff; }
+    .page-sub   { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .pr-badge {
+      background: var(--primaryFaint);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-size: 12px; font-weight: 700;
+      padding: 6px 14px; border-radius: 999px;
+      text-decoration: none; letter-spacing: 0.4px;
+    }
+
+    /* ── Section label ────────────────────────────────── */
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: rgba(255,255,255,0.3);
+      padding: 0 48px;
+      margin-top: 52px; margin-bottom: 24px;
+    }
+
+    /* ── Gallery grid ─────────────────────────────────── */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      padding: 0 48px 64px;
+    }
+
+    /* ── Phone frame ──────────────────────────────────── */
+    .phone-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .phone-label {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.4);
+    }
+    .phone-deliverable {
+      font-size: 10px;
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .phone {
+      width: 320px;
+      background: #1a1a1a;
+      border-radius: 44px;
+      padding: 12px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 32px 64px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .phone-inner {
+      border-radius: 34px;
+      overflow: hidden;
+      width: 100%;
+      position: relative;
+      background: var(--soft);
+    }
+    /* notch */
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 18px; left: 50%; transform: translateX(-50%);
+      width: 80px; height: 24px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      z-index: 10;
+    }
+    .phone-inner > * { display: block; }
+
+    /* ── Screen: safe area top space ─────────────────── */
+    .screen {
+      background: var(--soft);
+      padding-top: 44px;
+      min-height: 640px;
+      position: relative;
+      overflow: hidden;
+    }
+    .screen-dark { background: var(--dark); }
+    .screen-light { background: var(--light); }
+
+    /* ── Status bar ───────────────────────────────────── */
+    .status-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 44px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 20px 6px;
+      z-index: 5;
+    }
+    .status-time { font-size: 12px; font-weight: 700; color: var(--dark); }
+    .status-icons { font-size: 11px; color: var(--dark); opacity: 0.6; }
+    .status-dark .status-time,
+    .status-dark .status-icons { color: #fff; }
+
+    /* ── Shared UI primitives ─────────────────────────── */
+    .px { padding-left: 20px; padding-right: 20px; }
+
+    .btn-primary {
+      display: flex; align-items: center; justify-content: center;
+      background: var(--dark); border-radius: 999px; border: 2px solid var(--dark);
+      height: 48px; font-weight: 700; font-size: 15px; color: var(--light);
+      cursor: default;
+    }
+    .btn-green {
+      display: flex; align-items: center; justify-content: center;
+      background: var(--primary); border-radius: 10px;
+      height: 48px; font-weight: 700; font-size: 16px; color: var(--light);
+      box-shadow: 0 2px 8px rgba(127,204,38,0.3);
+      cursor: default;
+    }
+    .btn-green.disabled { background: var(--borderLight); box-shadow: none; }
+
+    .input-field {
+      background: #fff; border: 2px solid var(--borderLight);
+      border-radius: 10px; height: 44px;
+      padding: 0 14px; font-size: 13px; color: var(--muted);
+      display: flex; align-items: center;
+    }
+    .input-field.focused { border-color: var(--primary); }
+
+    .card {
+      background: var(--light); border-radius: 8px;
+      border: 1px solid var(--borderLight);
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .form-card {
+      background: var(--light); border-radius: 16px;
+      border: 2px solid var(--dark);
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+
+    .label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; }
+    .field-label { font-size: 12px; font-weight: 700; color: var(--dark); }
+    .body-text { font-size: 13px; color: var(--dark); line-height: 1.6; }
+    .body-muted { font-size: 12px; color: var(--gray); line-height: 1.5; }
+    .link { color: var(--primary); font-weight: 700; text-decoration: underline; }
+
+    /* ── Tab bar ──────────────────────────────────────── */
+    .tab-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--light);
+      border-top: 1px solid var(--borderLight);
+      display: flex; align-items: flex-end; justify-content: space-around;
+      padding: 8px 4px 20px;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      z-index: 10;
+    }
+    .tab-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      flex: 1;
+    }
+    .tab-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .tab-icon.active { background: var(--primaryFaint); }
+    .tab-name { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.3px; }
+    .tab-name.active { color: var(--primary); }
+    .tab-center {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--dark); border: 3px solid var(--light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    /* ── Chess board ──────────────────────────────────── */
+    .chess-board {
+      width: 100%; aspect-ratio: 1;
+      display: grid; grid-template-columns: repeat(8,1fr);
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .sq { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .sq-l { background: #F0D9B5; }
+    .sq-d { background: #B58863; }
+    .sq-hl { background: rgba(127,204,38,0.45); }
+
+    /* ── Progress bar ─────────────────────────────────── */
+    .progress-track { height: 6px; background: var(--borderLight); border-radius: 999px; overflow: hidden; }
+    .progress-fill  { height: 100%; background: var(--primary); border-radius: 999px; }
+
+    /* ── Badge ────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--primaryFaint); border: 1px solid rgba(127,204,38,0.3);
+      border-radius: 999px; padding: 3px 10px;
+      font-size: 11px; font-weight: 700; color: var(--primary);
+    }
+    .badge-accent {
+      background: var(--accentFaint); border-color: var(--accent); color: #7a6e1a;
+    }
+    .badge-dark {
+      background: var(--dark); color: var(--light);
+      border: none; padding: 4px 10px;
+    }
+
+    /* ── Avatar ───────────────────────────────────────── */
+    .avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--primaryFaint); border: 2px solid var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700; color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    /* ── Divider ──────────────────────────────────────── */
+    .divider { height: 1px; background: var(--borderLight); }
+
+    /* ── Scrollable hint for tall screens ─────────────── */
+    .scroll-hint {
+      position: absolute; bottom: 56px; left: 0; right: 0;
+      height: 40px;
+      background: linear-gradient(to top, var(--soft), transparent);
+      pointer-events: none; z-index: 4;
+    }
+    .scroll-hint-dark {
+      background: linear-gradient(to top, var(--dark), transparent);
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Page header ──────────────────────────────────── -->
+<header class="page-header">
+  <div class="page-brand">
+    <div class="page-logo">Y</div>
+    <div>
+      <div class="page-title">YSTEM Mobile App</div>
+      <div class="page-sub">UI/UX Screen Library · React Native + Expo · Designed by Sandith Hewage</div>
+    </div>
+  </div>
+  <a class="pr-badge" href="https://github.com/YSTEMandChess/react/pull/246" target="_blank">PR #246 on GitHub ↗</a>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════ -->
+<!--  D1 — Auth + Navigation                           -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="section-label">D1 — Auth + Navigation</div>
+<div class="gallery">
+
+  <!-- Login -->
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D1</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen" style="min-height:640px;">
+          <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <!-- Hero -->
+          <div style="display:flex;flex-direction:column;align-items:center;padding:36px 20px 24px;">
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--primary);box-shadow:0 4px 16px rgba(0,0,0,0.25);margin-bottom:14px;">Y</div>
+            <div style="font-size:20px;font-weight:700;color:var(--dark);letter-spacing:0.3px;">Y STEM and Chess</div>
+            <div style="font-size:11px;color:var(--gray);letter-spacing:2px;text-transform:uppercase;margin-top:4px;">Learn. Play. Grow.</div>
+          </div>
+
+          <!-- Form card -->
+          <div class="form-card px" style="margin:0 16px;">
+            <div style="font-size:18px;font-weight:700;color:var(--dark);text-align:center;margin-bottom:18px;">Welcome back</div>
+
+            <div style="margin-bottom:14px;">
+              <div class="field-label" style="margin-bottom:6px;">Username</div>
+              <div class="input-field focused">sandith_h</div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <div class="field-label" style="margin-bottom:6px;">Password</div>
+              <div class="input-field">••••••••••</div>
+            </div>
+
+            <div style="text-align:right;margin-bottom:16px;">
+              <span class="link" style="font-size:12px;">Forgot password?</span>
+            </div>
+
+            <div class="btn-green" style="margin-bottom:14px;">Enter</div>
+
+            <div style="text-align:center;font-size:12px;color:var(--gray);">
+              Don't have an account? <span class="link">Sign up</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Login Screen</div>
+  </div>
+
+  <!-- Sign Up -->
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D1</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen" style="min-height:640px;">
+          <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <div style="display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;">
+            <div style="width:56px;height:56px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:var(--primary);margin-bottom:10px;">Y</div>
+            <div style="font-size:18px;font-weight:700;color:var(--dark);">Create your account</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:3px;">Join Y STEM and Chess today</div>
+          </div>
+
+          <div class="form-card px" style="margin:0 16px;">
+            <div style="margin-bottom:12px;">
+              <div class="field-label" style="margin-bottom:5px;">Username</div>
+              <div class="input-field">Choose a username</div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div class="field-label" style="margin-bottom:5px;">Password</div>
+              <div class="input-field">Create a password (min 8)</div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div class="field-label" style="margin-bottom:5px;">Confirm password</div>
+              <div class="input-field">Re-enter your password</div>
+            </div>
+
+            <!-- Role selector -->
+            <div style="margin-bottom:16px;">
+              <div class="field-label" style="margin-bottom:5px;">I am a…</div>
+              <div style="display:flex;border:2px solid var(--borderLight);border-radius:10px;overflow:hidden;">
+                <div style="flex:1;padding:10px;text-align:center;background:var(--dark);font-size:14px;font-weight:700;color:var(--light);">Student</div>
+                <div style="flex:1;padding:10px;text-align:center;font-size:14px;font-weight:700;color:var(--muted);">Mentor</div>
+              </div>
+            </div>
+
+            <div class="btn-primary">Create Account</div>
+            <div style="text-align:center;font-size:12px;color:var(--gray);margin-top:12px;">
+              Already have an account? <span class="link">Log in</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Sign Up Screen</div>
+  </div>
+
+  <!-- Home -->
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D1</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen" style="min-height:640px;padding-bottom:72px;">
+          <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <div class="px" style="padding-top:52px;">
+            <!-- Hero row -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+              <div>
+                <div style="font-size:12px;color:var(--gray);">Good morning,</div>
+                <div style="font-size:26px;font-weight:700;color:var(--dark);line-height:1.2;">Student! 👋</div>
+                <div style="font-size:12px;color:var(--gray);margin-top:3px;">Ready to learn something new?</div>
+              </div>
+              <div class="avatar" style="margin-top:2px;">S</div>
+            </div>
+
+            <!-- Quick actions -->
+            <div style="display:flex;gap:10px;margin-bottom:20px;">
+              <div style="flex:1;background:var(--dark);border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span>📚</span><span style="font-size:12px;font-weight:700;color:var(--light);">Start Lesson</span>
+              </div>
+              <div style="flex:1;background:var(--primary);border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span>🧩</span><span style="font-size:12px;font-weight:700;color:var(--light);">Daily Puzzle</span>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:10px;">Your Progress</div>
+            <div style="display:flex;gap:8px;margin-bottom:18px;">
+              <div class="card" style="flex:1;text-align:center;padding:10px 6px;">
+                <div style="font-size:18px;margin-bottom:3px;">🌐</div>
+                <div style="font-size:17px;font-weight:700;color:var(--dark);">2.5</div>
+                <div style="font-size:9px;color:var(--muted);">hrs</div>
+                <div style="font-size:9px;font-weight:700;color:var(--gray);">Web Time</div>
+              </div>
+              <div class="card" style="flex:1;text-align:center;padding:10px 6px;">
+                <div style="font-size:18px;margin-bottom:3px;">📚</div>
+                <div style="font-size:17px;font-weight:700;color:var(--dark);">45</div>
+                <div style="font-size:9px;color:var(--muted);">min</div>
+                <div style="font-size:9px;font-weight:700;color:var(--gray);">Lessons</div>
+              </div>
+              <div class="card" style="flex:1;text-align:center;padding:10px 6px;">
+                <div style="font-size:18px;margin-bottom:3px;">🧩</div>
+                <div style="font-size:17px;font-weight:700;color:var(--dark);">12</div>
+                <div style="font-size:9px;color:var(--muted);">solved</div>
+                <div style="font-size:9px;font-weight:700;color:var(--gray);">Puzzles</div>
+              </div>
+            </div>
+
+            <!-- Activity -->
+            <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:10px;">Recent Activity</div>
+            <div class="card" style="padding:10px 12px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0;"></div>
+                <div style="flex:1;">
+                  <div style="font-size:12px;color:var(--dark);">Completed "How the Knight Moves"</div>
+                  <div style="font-size:10px;color:var(--muted);">2h ago</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0;"></div>
+                <div style="flex:1;">
+                  <div style="font-size:12px;color:var(--dark);">Solved puzzle #4821 — Mate in 2</div>
+                  <div style="font-size:10px;color:var(--muted);">3h ago</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0;"></div>
+                <div style="flex:1;">
+                  <div style="font-size:12px;color:var(--dark);">Earned "Quick Learner" badge 🏅</div>
+                  <div style="font-size:10px;color:var(--muted);">Yesterday</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="scroll-hint"></div>
+
+          <!-- Tab bar -->
+          <div class="tab-bar">
+            <div class="tab-item">
+              <div class="tab-icon active">🏠</div>
+              <div class="tab-name active">Home</div>
+            </div>
+            <div class="tab-item">
+              <div class="tab-icon">📚</div>
+              <div class="tab-name">Lessons</div>
+            </div>
+            <div class="tab-item" style="margin-top:-16px;">
+              <div class="tab-center">♟</div>
+              <div class="tab-name" style="margin-top:2px;">Play</div>
+            </div>
+            <div class="tab-item">
+              <div class="tab-icon">🧩</div>
+              <div class="tab-name">Puzzles</div>
+            </div>
+            <div class="tab-item">
+              <div class="tab-icon">👤</div>
+              <div class="tab-name">Profile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Home Screen</div>
+  </div>
+
+</div><!-- /gallery D1 -->
+
+
+<!-- ══════════════════════════════════════════════════ -->
+<!--  D2 — Lessons                                     -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="section-label">D2 — Lessons</div>
+<div class="gallery">
+
+  <!-- Lessons Selection -->
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D2</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen" style="min-height:640px;padding-bottom:80px;">
+          <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <div class="px" style="padding-top:52px;">
+            <div style="font-size:26px;font-weight:700;color:var(--dark);margin-bottom:10px;">Lessons</div>
+            <div class="progress-track" style="margin-bottom:5px;"><div class="progress-fill" style="width:22%;"></div></div>
+            <div style="font-size:11px;color:var(--gray);margin-bottom:16px;">5/22 lessons complete</div>
+          </div>
+
+          <!-- Piece scroll -->
+          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:0 20px;margin-bottom:10px;">Select a piece</div>
+          <div style="display:flex;gap:10px;overflow-x:auto;padding:0 20px 4px;scrollbar-width:none;">
+            <!-- King (selected) -->
+            <div style="width:78px;flex-shrink:0;background:var(--primaryFaint);border-radius:16px;border:2px solid var(--primary);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;">♔</div>
+              <div style="font-size:11px;font-weight:700;color:var(--primary);">King</div>
+              <div class="progress-track" style="width:100%;height:3px;"><div class="progress-fill" style="width:100%;"></div></div>
+              <div style="font-size:9px;color:var(--muted);">3/3</div>
+            </div>
+            <!-- Queen -->
+            <div style="width:78px;flex-shrink:0;background:var(--light);border-radius:16px;border:2px solid var(--borderLight);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--primaryFaint);display:flex;align-items:center;justify-content:center;font-size:18px;">♕</div>
+              <div style="font-size:11px;font-weight:700;color:var(--gray);">Queen</div>
+              <div class="progress-track" style="width:100%;height:3px;"><div class="progress-fill" style="width:50%;"></div></div>
+              <div style="font-size:9px;color:var(--muted);">2/4</div>
+            </div>
+            <!-- Rook -->
+            <div style="width:78px;flex-shrink:0;background:var(--light);border-radius:16px;border:2px solid var(--borderLight);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:18px;">♖</div>
+              <div style="font-size:11px;font-weight:700;color:var(--gray);">Rook</div>
+              <div class="progress-track" style="width:100%;height:3px;"><div class="progress-fill" style="width:0%;"></div></div>
+              <div style="font-size:9px;color:var(--muted);">0/3</div>
+            </div>
+          </div>
+
+          <!-- Lesson list -->
+          <div class="px" style="margin-top:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;">King Lessons</div>
+              <div class="badge">3/3 done</div>
+            </div>
+            <!-- Lessons -->
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="card" style="display:flex;align-items:center;gap:10px;">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--primaryFaint);display:flex;align-items:center;justify-content:center;font-size:13px;">✓</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--dark);">The Most Important Piece</div>
+                  <div style="display:flex;gap:8px;margin-top:3px;">
+                    <span style="font-size:10px;font-weight:700;color:var(--primary);background:var(--primaryFaint);padding:1px 6px;border-radius:999px;">Beginner</span>
+                    <span style="font-size:10px;color:var(--muted);">⏱ 5 min</span>
+                  </div>
+                </div>
+                <span style="font-size:18px;color:var(--muted);">›</span>
+              </div>
+              <div class="card" style="display:flex;align-items:center;gap:10px;">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--primaryFaint);display:flex;align-items:center;justify-content:center;font-size:13px;">✓</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--dark);">King Safety &amp; Castling</div>
+                  <div style="display:flex;gap:8px;margin-top:3px;">
+                    <span style="font-size:10px;font-weight:700;color:var(--primary);background:var(--primaryFaint);padding:1px 6px;border-radius:999px;">Beginner</span>
+                    <span style="font-size:10px;color:var(--muted);">⏱ 8 min</span>
+                  </div>
+                </div>
+                <span style="font-size:18px;color:var(--muted);">›</span>
+              </div>
+              <div class="card" style="display:flex;align-items:center;gap:10px;border-color:var(--primary);background:var(--primaryFaint);">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--primaryFaint);display:flex;align-items:center;justify-content:center;font-size:13px;">✓</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--dark);">King in the Endgame</div>
+                  <div style="display:flex;gap:8px;margin-top:3px;">
+                    <span style="font-size:10px;font-weight:700;color:var(--accent);background:var(--accentFaint);padding:1px 6px;border-radius:999px;">Intermediate</span>
+                    <span style="font-size:10px;color:var(--muted);">⏱ 10 min</span>
+                  </div>
+                </div>
+                <span style="font-size:18px;color:var(--muted);">›</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="scroll-hint"></div>
+
+          <!-- Sticky footer -->
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 20px 20px;background:var(--soft);border-top:1px solid var(--borderLight);">
+            <div class="btn-green">Start Lesson →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Lessons Selection</div>
+  </div>
+
+  <!-- Lesson Screen -->
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D2</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen" style="min-height:640px;padding-bottom:80px;">
+          <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <!-- Top bar -->
+          <div style="display:flex;align-items:center;gap:10px;padding:44px 20px 10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--dark);">‹</div>
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;">Knight Lesson</div>
+              <div style="font-size:13px;font-weight:700;color:var(--dark);">The L-Shape Move</div>
+            </div>
+            <div class="badge-dark badge" style="font-size:11px;">2/4</div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-track px" style="height:4px;margin-bottom:14px;">
+            <div class="progress-fill" style="width:50%;"></div>
+          </div>
+
+          <!-- Board -->
+          <div class="px" style="margin-bottom:14px;">
+            <div class="chess-board">
+              <!-- 8 rows -->
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-hl">♞</div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+            </div>
+          </div>
+
+          <!-- Instruction panel -->
+          <div class="px">
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <span style="font-size:22px;">♞</span>
+                <span style="font-size:15px;font-weight:700;color:var(--dark);">Knight</span>
+              </div>
+              <div class="body-text" style="margin-bottom:10px;">From e4, the Knight can jump to f6, g5, g3, f2, d2, c3, c5, or d6. That's up to 8 squares from the center!</div>
+              <div style="background:var(--accentFaint);border-radius:8px;border-left:3px solid var(--accent);padding:10px 12px;">
+                <div style="font-size:10px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:4px;">💡 Tip</div>
+                <div style="font-size:12px;color:var(--dark);">Center Knights are more powerful — they control more squares.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px;padding:10px 20px 20px;background:var(--soft);border-top:1px solid var(--borderLight);">
+            <div style="flex:1;height:48px;background:var(--light);border:2px solid var(--borderLight);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--dark);">‹ Back</div>
+            <div class="btn-green" style="flex:2;height:48px;">Next ›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Lesson Screen</div>
+  </div>
+
+</div><!-- /gallery D2 -->
+
+
+<!-- ══════════════════════════════════════════════════ -->
+<!--  D3 — Puzzles                                     -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="section-label">D3 — Puzzles</div>
+<div class="gallery">
+
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D3</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen" style="min-height:640px;padding-bottom:76px;">
+          <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <!-- Top bar -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:44px 20px 12px;">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Puzzle</div>
+              <div style="font-size:15px;font-weight:700;color:var(--dark);">#4821</div>
+            </div>
+            <div style="font-size:20px;font-weight:700;color:var(--dark);">Puzzles</div>
+            <div style="display:flex;align-items:center;gap:4px;background:var(--accentFaint);border:1px solid var(--accent);border-radius:999px;padding:5px 10px;">
+              <span>🔥</span><span style="font-size:14px;font-weight:700;color:var(--dark);">5</span>
+            </div>
+          </div>
+
+          <!-- Board -->
+          <div class="px" style="margin-bottom:10px;">
+            <div class="chess-board">
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l">♜</div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d">♞</div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l">♔</div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+            </div>
+            <div style="text-align:right;margin-top:5px;">
+              <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">⬜ White to move</span>
+            </div>
+          </div>
+
+          <!-- Info panel -->
+          <div class="card px" style="margin:0 20px;">
+            <div style="display:flex;gap:12px;margin-bottom:10px;">
+              <div style="background:var(--soft);border-radius:8px;padding:10px 14px;text-align:center;min-width:60px;">
+                <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">Rating</div>
+                <div style="font-size:20px;font-weight:700;color:var(--primary);">1287</div>
+              </div>
+              <div style="flex:1;display:flex;align-items:center;">
+                <div style="font-size:13px;color:var(--dark);line-height:1.5;">White to move. Find the move that wins material.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+              <div class="badge">Fork</div>
+              <div class="badge">Knight</div>
+              <div class="badge">Intermediate</div>
+            </div>
+            <!-- Hint box (shown) -->
+            <div style="background:var(--accentFaint);border-radius:8px;border-left:3px solid var(--accent);padding:10px 12px;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">💡 Hint</div>
+              <div style="font-size:12px;color:var(--dark);">Look for a Knight move that attacks two pieces at once.</div>
+            </div>
+          </div>
+
+          <div class="scroll-hint"></div>
+
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:10px 20px 20px;background:var(--soft);border-top:1px solid var(--borderLight);">
+            <div class="btn-green">New Puzzle ›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Puzzles Screen</div>
+  </div>
+
+</div><!-- /gallery D3 -->
+
+
+<!-- ══════════════════════════════════════════════════ -->
+<!--  D4 — Play vs Computer                            -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="section-label">D4 — Play vs Computer</div>
+<div class="gallery">
+
+  <!-- Play Setup -->
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D4</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen" style="min-height:640px;padding-bottom:80px;">
+          <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <!-- Top bar -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:44px 20px 16px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:20px;">‹</div>
+            <div style="font-size:18px;font-weight:700;color:var(--dark);">Play vs Computer</div>
+            <div style="width:36px;"></div>
+          </div>
+
+          <div class="px">
+            <!-- Color picker -->
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Choose your color</div>
+            <div style="display:flex;gap:12px;margin-bottom:22px;">
+              <!-- White (selected) -->
+              <div style="flex:1;border-radius:20px;border:2px solid var(--primary);background:var(--primaryFaint);padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;">
+                <div style="position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);">✓</div>
+                <span style="font-size:36px;">♔</span>
+                <span style="font-size:15px;font-weight:700;color:var(--dark);">White</span>
+                <span style="font-size:11px;color:var(--gray);">Moves first</span>
+              </div>
+              <!-- Black -->
+              <div style="flex:1;border-radius:20px;border:2px solid #444;background:#2A2A2A;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <span style="font-size:36px;">♚</span>
+                <span style="font-size:15px;font-weight:700;color:#fff;">Black</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.5);">Moves second</span>
+              </div>
+            </div>
+
+            <!-- Difficulty -->
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Choose difficulty</div>
+            <!-- Row 1 -->
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <div style="flex:1;background:var(--primaryFaint);border:2px solid var(--primary);border-radius:16px;padding:12px 6px;text-align:center;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary);border-radius:16px 16px 0 0;"></div>
+                <div style="margin-top:4px;font-size:20px;">🌱</div>
+                <div style="font-size:12px;font-weight:700;color:var(--primary);margin-top:4px;">Beginner</div>
+                <div style="font-size:9px;color:var(--muted);margin-top:2px;">For basics</div>
+                <div style="display:flex;gap:2px;justify-content:center;margin-top:5px;">
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--primary);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                </div>
+              </div>
+              <div style="flex:1;background:var(--light);border:2px solid var(--borderLight);border-radius:16px;padding:12px 6px;text-align:center;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--secondary);border-radius:16px 16px 0 0;"></div>
+                <div style="margin-top:4px;font-size:20px;">😊</div>
+                <div style="font-size:12px;font-weight:700;color:var(--dark);margin-top:4px;">Easy</div>
+                <div style="font-size:9px;color:var(--muted);margin-top:2px;">Gentle</div>
+                <div style="display:flex;gap:2px;justify-content:center;margin-top:5px;">
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--secondary);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--secondary);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                </div>
+              </div>
+              <div style="flex:1;background:var(--light);border:2px solid var(--borderLight);border-radius:16px;padding:12px 6px;text-align:center;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);border-radius:16px 16px 0 0;"></div>
+                <div style="margin-top:4px;font-size:20px;">🤔</div>
+                <div style="font-size:12px;font-weight:700;color:var(--dark);margin-top:4px;">Medium</div>
+                <div style="font-size:9px;color:var(--muted);margin-top:2px;">Real thinking</div>
+                <div style="display:flex;gap:2px;justify-content:center;margin-top:5px;">
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;">
+              <div style="width:calc(33.33% - 4px);background:var(--light);border:2px solid var(--borderLight);border-radius:16px;padding:12px 6px;text-align:center;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#FF8C42;border-radius:16px 16px 0 0;"></div>
+                <div style="margin-top:4px;font-size:20px;">😤</div>
+                <div style="font-size:12px;font-weight:700;color:var(--dark);margin-top:4px;">Hard</div>
+                <div style="font-size:9px;color:var(--muted);margin-top:2px;">Tactical</div>
+                <div style="display:flex;gap:2px;justify-content:center;margin-top:5px;">
+                  <div style="width:5px;height:5px;border-radius:50%;background:#FF8C42;"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:#FF8C42;"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:#FF8C42;"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:#FF8C42;"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--borderLight);"></div>
+                </div>
+              </div>
+              <div style="width:calc(33.33% - 4px);background:var(--light);border:2px solid var(--borderLight);border-radius:16px;padding:12px 6px;text-align:center;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);border-radius:16px 16px 0 0;"></div>
+                <div style="margin-top:4px;font-size:20px;">👑</div>
+                <div style="font-size:12px;font-weight:700;color:var(--dark);margin-top:4px;">Master</div>
+                <div style="font-size:9px;color:var(--muted);margin-top:2px;">Near-perfect</div>
+                <div style="display:flex;gap:2px;justify-content:center;margin-top:5px;">
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--red);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--red);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--red);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--red);"></div>
+                  <div style="width:5px;height:5px;border-radius:50%;background:var(--red);"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="card" style="display:flex;align-items:center;margin-bottom:4px;">
+              <div style="flex:1;text-align:center;">
+                <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">Playing as</div>
+                <div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:2px;">♔ White</div>
+              </div>
+              <div style="width:1px;height:36px;background:var(--borderLight);"></div>
+              <div style="flex:1;text-align:center;">
+                <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">Difficulty</div>
+                <div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:2px;">🌱 Beginner</div>
+              </div>
+              <div style="width:1px;height:36px;background:var(--borderLight);"></div>
+              <div style="flex:1;text-align:center;">
+                <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">Engine</div>
+                <div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:2px;">Lv 1</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:10px 20px 20px;background:var(--soft);border-top:1px solid var(--borderLight);">
+            <div class="btn-green">Let's Go! ♟</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Play Setup</div>
+  </div>
+
+  <!-- Play Game -->
+  <div class="phone-wrap">
+    <div class="phone-deliverable">D4</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="screen screen-dark" style="min-height:640px;padding-bottom:80px;">
+          <div class="status-bar status-dark"><span class="status-time">9:41</span><span class="status-icons">●●● 100%</span></div>
+
+          <!-- Top bar (dark) -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:44px 20px 10px;background:var(--dark);">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;">‹</div>
+            <div style="font-size:15px;font-weight:700;color:#fff;">vs Computer</div>
+            <div style="background:var(--primaryFaint);border-radius:999px;padding:4px 10px;">
+              <span style="font-size:11px;font-weight:700;color:var(--primary);">Beginner</span>
+            </div>
+          </div>
+
+          <!-- Rest of game screen on soft bg -->
+          <div style="background:var(--soft);padding:10px 20px 0;">
+            <!-- Opponent row -->
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;margin-bottom:8px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--soft);border:2px solid var(--borderLight);display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:700;color:var(--dark);">Computer (Beginner)</div>
+              </div>
+              <div style="background:var(--dark);padding:6px 10px;border-radius:8px;min-width:56px;text-align:center;">
+                <span style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px;">10:00</span>
+              </div>
+            </div>
+
+            <!-- Board -->
+            <div class="chess-board" style="margin-bottom:8px;">
+              <div class="sq sq-l"></div><div class="sq sq-d">♜</div><div class="sq sq-l"></div><div class="sq sq-d">♛</div><div class="sq sq-l">♚</div><div class="sq sq-d">♝</div><div class="sq sq-l"></div><div class="sq sq-d">♜</div>
+              <div class="sq sq-d">♟</div><div class="sq sq-l">♟</div><div class="sq sq-d">♟</div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l">♟</div><div class="sq sq-d">♟</div><div class="sq sq-l">♟</div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l">♞</div><div class="sq sq-d"></div><div class="sq sq-l">♟</div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l">♟</div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d">♝</div><div class="sq sq-l"></div>
+              <div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-hl">♙</div><div class="sq sq-hl"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div>
+              <div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d">♘</div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d"></div><div class="sq sq-l"></div>
+              <div class="sq sq-l">♙</div><div class="sq sq-d">♙</div><div class="sq sq-l">♙</div><div class="sq sq-d"></div><div class="sq sq-l"></div><div class="sq sq-d">♙</div><div class="sq sq-l">♙</div><div class="sq sq-d">♙</div>
+              <div class="sq sq-d">♖</div><div class="sq sq-l">♘</div><div class="sq sq-d">♗</div><div class="sq sq-l">♕</div><div class="sq sq-d">♔</div><div class="sq sq-l">♗</div><div class="sq sq-d"></div><div class="sq sq-l">♖</div>
+            </div>
+
+            <!-- Player row (active) -->
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:var(--primaryFaint);margin-bottom:10px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--primaryFaint);border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--primary);">S</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:700;color:var(--dark);">You</div>
+                <div style="font-size:10px;color:var(--muted);letter-spacing:2px;">♙ ♙</div>
+              </div>
+              <div style="background:var(--primary);padding:6px 10px;border-radius:8px;min-width:56px;text-align:center;">
+                <span style="font-size:13px;font-weight:700;color:var(--dark);letter-spacing:1px;">9:42</span>
+              </div>
+            </div>
+
+            <!-- Tutor panel -->
+            <div class="card" style="padding:0;overflow:hidden;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--accentFaint);">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span>🎓</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--dark);">Tutor</span>
+                  <span style="background:var(--primaryFaint);padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;color:var(--primary);">+0.3</span>
+                </div>
+                <span style="font-size:16px;color:var(--muted);">‹</span>
+              </div>
+              <div style="padding:10px 12px;">
+                <div style="font-size:12px;color:var(--dark);line-height:1.5;">The Ruy Lopez opening. Consider castling to protect your king before attacking.</div>
+              </div>
+            </div>
+
+            <!-- Move history -->
+            <div class="card" style="padding:0;overflow:hidden;">
+              <div style="display:flex;gap:6px;padding:8px 12px;overflow-x:auto;scrollbar-width:none;align-items:center;">
+                <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;">
+                  <span style="font-size:10px;color:var(--muted);">1.</span>
+                  <span style="background:var(--soft);padding:3px 6px;border-radius:4px;font-size:11px;font-weight:700;color:var(--dark);">e4</span>
+                  <span style="background:var(--dark);padding:3px 6px;border-radius:4px;font-size:11px;font-weight:700;color:#fff;">e5</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;">
+                  <span style="font-size:10px;color:var(--muted);">2.</span>
+                  <span style="background:var(--soft);padding:3px 6px;border-radius:4px;font-size:11px;font-weight:700;color:var(--dark);">Nf3</span>
+                  <span style="background:var(--dark);padding:3px 6px;border-radius:4px;font-size:11px;font-weight:700;color:#fff;">Nc6</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;">
+                  <span style="font-size:10px;color:var(--muted);">3.</span>
+                  <span style="background:var(--soft);padding:3px 6px;border-radius:4px;font-size:11px;font-weight:700;color:var(--dark);">Bb5</span>
+                  <span style="background:var(--dark);padding:3px 6px;border-radius:4px;font-size:11px;font-weight:700;color:#fff;">a6</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;">
+                  <span style="font-size:10px;color:var(--muted);">7.</span>
+                  <span style="background:var(--soft);padding:3px 6px;border-radius:4px;font-size:11px;font-weight:700;color:var(--dark);">Bb3</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls footer (dark) -->
+          <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:6px;padding:10px 16px 20px;background:var(--dark);">
+            <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;gap:3px;">
+              <span style="font-size:16px;">↩</span>
+              <span style="font-size:9px;font-weight:700;color:var(--white60);">Undo</span>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;gap:3px;">
+              <span style="font-size:16px;">⇅</span>
+              <span style="font-size:9px;font-weight:700;color:var(--white60);">Flip</span>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;gap:3px;">
+              <span style="font-size:16px;">🤝</span>
+              <span style="font-size:9px;font-weight:700;color:var(--white60);">Draw</span>
+            </div>
+            <div style="flex:1;background:rgba(214,69,69,0.15);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;gap:3px;">
+              <span style="font-size:16px;">🏳</span>
+              <span style="font-size:9px;font-weight:700;color:var(--red);">Resign</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Play Game Screen</div>
+  </div>
+
+</div><!-- /gallery D4 -->
+
+<!-- footer -->
+<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.2);font-size:12px;border-top:1px solid rgba(255,255,255,0.06);margin-top:24px;">
+  Y STEM and Chess · Mobile UI/UX · Designed by Sandith Hewage · PR <a href="https://github.com/YSTEMandChess/react/pull/246" style="color:var(--primary);">#246</a>
+</div>
+
+</body>
+</html>
