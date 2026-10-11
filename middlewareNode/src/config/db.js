@@ -1,94 +1,35 @@
 const mongoose = require("mongoose");
 const config = require("config");
-const crypto = require("crypto");
+const { isLocalEnvironment } = require("./validateEnvironment");
+
 let db = config.get("mongoURI");
 
 /**
- * Seed initial test users into the database
+ * Seed non-credential mock data into the database: activity types, mock
+ * activities, mock lessons, mock puzzles.
+ *
+ * Deliberately does NOT create the "mentor" / "student" demo accounts.
+ * Those are credential-bearing and are handled by the opt-in
+ * `npm run seed:dev` script (src/scripts/seedDevAccounts.js) instead,
+ * which generates a fresh random password every time it runs rather than
+ * a static, hardcoded one. See that file for why.
+ *
+ * If a demo student account already exists (created via seed:dev), mock
+ * activity data gets attached to it. If not, that one step is skipped,
+ * everything else here still seeds normally.
  */
 const seedTestUsers = async () => {
   try {
     const db = mongoose.connection.db;
 
-    // 1. Seed Users
+    // Look up the demo student account, if seed:dev has already created
+    // one, so mock activity data can be attached to it. This function
+    // never creates user accounts itself.
     const usersCollection = db.collection("users");
-    const count = await usersCollection.countDocuments({ username: { $in: ["mentor", "student"] } });
-    let studentId;
-    
-    const defaultLessonsCompleted = [
-      "Piece Checkmate 1 Basic checkmates",
-      "Checkmate Pattern 1 Recognize the patterns",
-      "Checkmate Pattern 2 Recognize the patterns",
-      "Checkmate Pattern 3 Recognize the patterns",
-      "Checkmate Pattern 4 Recognize the patterns",
-      "Piece checkmates 2 Challenging checkmates",
-      "Knight and Bishop Mate interactive lesson",
-      "The Pin Pin it to win it",
-      "The Skewer Yum - Skewers!",
-      "The Fork Use the fork, Luke",
-      "Discovered Attacks Including discovered checks",
-      "Double Check A very powerfull tactic",
-      "Overloaded Pieces They have too much work",
-      "Zwischenzug In-between moves",
-      "X-Ray Attacking through an enemy piece",
-      "Zugzwang Being forced to move",
-      "Interference Interpose a piece to great effect",
-      "Greek Gift Study the greek gift scrifice",
-      "Deflection Distracting a defender",
-      "Attraction Lure a piece to bad square",
-      "Underpromotion Promote - but not to a queen!",
-      "Desperado A piece is lost, but it can still help",
-      "Counter Check Respond to a check with a check",
-      "Undermining Remove the defending piece",
-      "Clearance Get out of the way!",
-      "Key Squares Reach the key square",
-      "Opposition take the opposition",
-      "7th-Rank Rook Pawn Versus a Queen",
-      "7th-Rank Rook Pawn And Passive Rook vs Rook",
-      "Basic Rook Endgames Lucena and Philidor"
-    ].map(piece => ({ piece, lessonNumber: 0 }));
+    const studentDoc = await usersCollection.findOne({ username: "student" });
+    const studentId = studentDoc ? studentDoc._id : undefined;
 
-    if (count === 0) {
-      console.log("Seeding test users into the database...");
-      const mentorPassword = crypto.createHash("sha384").update("123123123").digest("hex");
-      const mentor = {
-        username: "mentor",
-        password: mentorPassword,
-        firstName: "Test",
-        lastName: "Mentor",
-        email: "mentor@test.com",
-        role: "mentor",
-        mentorshipUsername: "student",
-        accountCreatedAt: new Date().toLocaleString(),
-        timePlayed: 0
-      };
-
-      const studentPassword = crypto.createHash("sha384").update("123123123").digest("hex");
-      const student = {
-        username: "student",
-        password: studentPassword,
-        firstName: "Test",
-        lastName: "Student",
-        email: "student@test.com",
-        role: "student",
-        mentorshipUsername: "mentor",
-        accountCreatedAt: new Date().toLocaleString(),
-        timePlayed: 0,
-        lessonsCompleted: defaultLessonsCompleted
-      };
-
-      const mentorResult = await usersCollection.insertOne(mentor);
-      const studentResult = await usersCollection.insertOne(student);
-      studentId = studentResult.insertedId;
-      console.log("✅ Test users seeded successfully!");
-    } else {
-      const studentDoc = await usersCollection.findOne({ username: "student" });
-      if (studentDoc) {
-        studentId = studentDoc._id;
-      }
-    }
-
-    // 2. Seed activityTypes
+    // 1. Seed activityTypes
     const activityTypesCollection = db.collection("activityTypes");
     const activityTypesCount = await activityTypesCollection.countDocuments({});
     if (activityTypesCount === 0) {
@@ -104,7 +45,7 @@ const seedTestUsers = async () => {
       console.log("✅ Activity types seeded successfully!");
     }
 
-    // 3. Seed activities for student
+    // 2. Seed activities for student
     if (studentId) {
       const activitiesCollection = db.collection("activities");
       const activitiesCount = await activitiesCollection.countDocuments({ userId: studentId });
@@ -125,7 +66,7 @@ const seedTestUsers = async () => {
       }
     }
 
-    // 4. Seed newLessons
+    // 3. Seed newLessons
     const lessonsCollection = db.collection("newLessons");
     const lessonsCount = await lessonsCollection.countDocuments({});
     if (lessonsCount === 0) {
@@ -186,7 +127,7 @@ const seedTestUsers = async () => {
       console.log("✅ Mock lessons seeded successfully!");
     }
 
-    // 5. Seed puzzles
+    // 4. Seed puzzles
     const puzzlesCollection = db.collection("puzzles");
     const puzzlesCount = await puzzlesCollection.countDocuments({});
     if (puzzlesCount === 0) {
@@ -249,7 +190,10 @@ async function ensureIndexes() {
   }
 }
 
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+// Any non-local NODE_ENV (production, but also staging, qa, or a typo like
+// "prod") is a real deployment: no mock-data seeding, no in-memory fallback,
+// and the longer connection timeout. Same rule validateEnvironment.js uses.
+const IS_DEPLOYED = !isLocalEnvironment();
 
 const connectDB = async () => {
   try {
@@ -270,24 +214,24 @@ const connectDB = async () => {
     await mongoose.connect(db, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      // Production has no fallback (a failure here calls process.exit(1)),
+      // Deployed environments have no fallback (a failure here calls process.exit(1)),
       // so it gets a longer timeout to ride out a network blip or an Atlas
       // cold-start during deploy. Dev/test fail fast to the in-memory
       // fallback below.
-      serverSelectionTimeoutMS: IS_PRODUCTION ? 10000 : 1000,
+      serverSelectionTimeoutMS: IS_DEPLOYED ? 10000 : 1000,
     });
     console.log("MongoDB Connected...");
     await ensureIndexes();
 
-    if (!IS_PRODUCTION) {
+    if (!IS_DEPLOYED) {
       await seedTestUsers();
     }
   } catch (err) {
     console.warn(`Connection to configured MongoDB failed: ${err.message}`);
 
-    if (IS_PRODUCTION) {
+    if (IS_DEPLOYED) {
       console.error(
-        "Refusing to fall back to in-memory MongoDB in production. Exiting."
+        `Refusing to fall back to in-memory MongoDB with NODE_ENV=${process.env.NODE_ENV}. Exiting.`
       );
       process.exit(1);
     }

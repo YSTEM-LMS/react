@@ -37,16 +37,20 @@
   },
   "scripts": {
     "start": "nodemon src/server.js",
-    "test": "jest --testPathPatterns=tests/"
+    "test": "jest --testPathPatterns=tests/",
+    "seed:dev": "node src/scripts/seedDevAccounts.js"
   },
   "author": "",
   "license": "ISC",
   "volta": {
-    "node": "20.19.0"
+    "node": "24.21.0"
   },
   "devDependencies": {
     "jest": "^30.3.0",
     "mongodb-memory-server": "^11.2.0",
     "supertest": "^7.2.2"
+  },
+  "engines": {
+    "node": ">=24 <25"
   }
 }
