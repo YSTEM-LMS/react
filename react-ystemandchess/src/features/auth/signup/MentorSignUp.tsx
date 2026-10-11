@@ -102,12 +102,11 @@ const MentorSignUp = () => {
         return;
       }
 
-      const loginResponse = await fetch(
-        `${environment.urls.middlewareURL}/auth/login?username=${encodeURIComponent(
-          formData.username
-        )}&password=${encodeURIComponent(formData.password)}`,
-        { method: "POST" }
-      );
+      const loginResponse = await fetch(`${environment.urls.middlewareURL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: formData.username, password: formData.password }),
+      });
 
       if (!loginResponse.ok) {
         setErrors((prev) => ({ ...prev, general: "Account created. Please log in to continue." }));
