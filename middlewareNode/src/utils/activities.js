@@ -6,6 +6,7 @@
  */
 
 const config = require("config");
+const fallbackDbName = require("../config/fallbackDbName");
 const { MongoClient } = require('mongodb');
 const { getActivityCatalogEntry } = require("../config/activityCatalog");
 require('dotenv').config();
@@ -27,7 +28,7 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  return cachedClient.db("ystem");
+  return cachedClient.db(fallbackDbName(config.get("mongoURI")));
 }
 
 /**
