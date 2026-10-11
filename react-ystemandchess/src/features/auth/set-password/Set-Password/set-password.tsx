@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
+import { environment } from '../../../../environments';
 
 const SetPassword = () => {
   const [password, setPassword] = useState('');
@@ -37,7 +38,7 @@ const SetPassword = () => {
     setIsLoading(true);
 
     try {
-      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const baseURL = environment.urls.middlewareURL;
       const response = await fetch(`${baseURL}/user/setPassword`, {
         method: 'POST',
         headers: {
