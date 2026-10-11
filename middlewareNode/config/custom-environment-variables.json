@@ -1,6 +1,5 @@
 {
   "mongoURI": "MONGO_URI",
-  "jwtSecret": "JWT_SECRET",
   "indexKey": "INDEX_KEY",
 
   "corsOptions": { "origin": "CORS_ORIGIN" },

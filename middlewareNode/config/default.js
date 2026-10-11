@@ -6,8 +6,9 @@ const path = require("path");
 // must have a value" in dev/test when INDEX_KEY isn't set — without checking
 // a fixed signing key into git history. custom-environment-variables.json
 // already maps INDEX_KEY onto this key, so any real deployment overrides it;
-// validateEnvironment.js still requires INDEX_KEY in production, and runs
-// before anything require()s this file, so this never touches disk in prod.
+// validateEnvironment.js requires INDEX_KEY in every non-local environment
+// (anything but NODE_ENV unset/development/test), and runs before anything
+// require()s this file, so this never touches disk in a real deployment.
 //
 // Persisted (gitignored) rather than regenerated per boot, so dev JWTs and
 // password-reset links survive a nodemon restart instead of invalidating on
@@ -44,7 +45,6 @@ if (!process.env.INDEX_KEY) {
 
 module.exports = {
   mongoURI: "",
-  jwtSecret: "",
   indexKey: devIndexKey,
 
   corsOptions: {

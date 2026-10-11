@@ -79,7 +79,7 @@ Before running any services, create the local development environment from the *
 ./create_dev_envs.sh
 ```
 
-A `default.json` file containing environment variables will be provided to contributors and should be placed in `middlewareNode/config`.
+Copy `middlewareNode/.env.example` to `middlewareNode/.env` and fill in your local values. A committed `middlewareNode/config/default.js` already provides safe, non-secret defaults, nothing needs to be handed to you separately.
 
 
 ## Running Each Service
@@ -98,10 +98,13 @@ npm start
 
 The server typically runs on port 8000. You should see `"MongoDB Connected..."` when it starts successfully.
 
-The following credentials can be used for testing mentor and student accounts:
+To create local mentor and student demo accounts, run:
 
-* **Mentor:** mentor / 123123123
-* **Student:** student / 123123123
+```bash
+npm run seed:dev
+```
+
+This generates a brand-new random password for both accounts every time it runs and prints them to your terminal. Passwords are never committed or written to a file, and re-running the command rotates both passwords. This only works outside of a production environment.
 
 ### Main React Application (Frontend)
 
