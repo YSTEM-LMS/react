@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import "./LeaderboardModal.scss";
-import { ReactComponent as LeaderboardIcon } from "../../../../assets/images/student/leaderboard_sidebar_icon.svg";
+import LeaderboardIcon from "../../../../assets/images/student/leaderboard_sidebar_icon.svg?react";
 import { environment } from "../../../../environments";
 
 import rank1Img from "../../../../assets/images/student/Leaderboard_rank_1.svg";

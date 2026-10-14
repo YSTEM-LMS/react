@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ReactComponent as RedoIcon } from "./icon_redo.svg";
-import { ReactComponent as BackIcon } from "./icon_back.svg";
-import { ReactComponent as BackIconInactive } from "./icon_back_inactive.svg";
-import { ReactComponent as NextIcon } from "./icon_next.svg";
-import { ReactComponent as NextIconInactive } from "./icon_next_inactive.svg";
+import RedoIcon from "./icon_redo.svg?react";
+import BackIcon from "./icon_back.svg?react";
+import BackIconInactive from "./icon_back_inactive.svg?react";
+import NextIcon from "./icon_next.svg?react";
+import NextIconInactive from "./icon_next_inactive.svg?react";
 import { getScenario, getScenarioByName } from "./Scenarios";
 import { useLocation } from "react-router";
 // @ts-ignore

@@ -32,10 +32,19 @@ test("renders the parent sign up form", () => {
   expect(screen.getByRole("button", { name: "Sign Up" })).toBeInTheDocument();
 });
 
+// These two specs exercise the component's own validate() path. They submit the
+// form directly rather than clicking the submit button, because the form's inputs
+// carry the native `required` attribute: in a real browser (and in jsdom >= 20)
+// interactive constraint validation blocks submission while those fields are empty,
+// so onSubmit would never fire. Clicking used to work only because jsdom 16, which
+// react-scripts pinned via Jest 27, did not implement constraint validation.
+const submitForm = () =>
+  fireEvent.submit(screen.getByRole("form", { name: "Parent Sign Up Form" }));
+
 test("requires accepting the terms before submitting", async () => {
   renderPage();
 
-  fireEvent.click(screen.getByRole("button", { name: "Sign Up" }));
+  submitForm();
 
   expect(
     await screen.findByText("Please accept the terms and conditions.")
@@ -47,7 +56,7 @@ test("shows a validation error for an invalid email", async () => {
 
   await userEvent.click(screen.getByLabelText(/I accept the terms and conditions/i));
   await userEvent.type(screen.getByPlaceholderText("you@example.com"), "not-an-email");
-  fireEvent.click(screen.getByRole("button", { name: "Sign Up" }));
+  submitForm();
 
   expect(await screen.findByText("Invalid Email")).toBeInTheDocument();
 });

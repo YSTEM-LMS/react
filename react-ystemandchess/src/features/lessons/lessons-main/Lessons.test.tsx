@@ -26,20 +26,25 @@ jest.mock("react-router", () => ({
 }));
 
 // Mock SVGs
-jest.mock("./icon_redo.svg", () => ({
-  ReactComponent: () => <svg data-testid="icon-redo" />,
+jest.mock("./icon_redo.svg?react", () => ({
+  __esModule: true,
+  default: () => <svg data-testid="icon-redo" />,
 }));
-jest.mock("./icon_back.svg", () => ({
-  ReactComponent: () => <svg data-testid="icon-back" />,
+jest.mock("./icon_back.svg?react", () => ({
+  __esModule: true,
+  default: () => <svg data-testid="icon-back" />,
 }));
-jest.mock("./icon_back_inactive.svg", () => ({
-  ReactComponent: () => <svg data-testid="icon-back-inactive" />,
+jest.mock("./icon_back_inactive.svg?react", () => ({
+  __esModule: true,
+  default: () => <svg data-testid="icon-back-inactive" />,
 }));
-jest.mock("./icon_next.svg", () => ({
-  ReactComponent: () => <svg data-testid="icon-next" />,
+jest.mock("./icon_next.svg?react", () => ({
+  __esModule: true,
+  default: () => <svg data-testid="icon-next" />,
 }));
-jest.mock("./icon_next_inactive.svg", () => ({
-  ReactComponent: () => <svg data-testid="icon-next-inactive" />,
+jest.mock("./icon_next_inactive.svg?react", () => ({
+  __esModule: true,
+  default: () => <svg data-testid="icon-next-inactive" />,
 }));
 
 // Mock PromotionPopup

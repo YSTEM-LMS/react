@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { environment } from '../../../../environments';
 
 const ResetPassword = () => {
   const [username, setUsername] = useState('');
@@ -14,7 +15,7 @@ const ResetPassword = () => {
     setError('');
 
     try {
-      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const baseURL = environment.urls.middlewareURL;
       const response = await fetch(
         `${baseURL}/user/sendMail?username=${encodeURIComponent(
           username

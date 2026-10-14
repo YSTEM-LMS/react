@@ -13,10 +13,10 @@ import BadgesModal from "./Modals/BadgesModal";
 import LeaderboardModal from "./Modals/LeaderboardModal";
 import Confetti from "../../../components/animations/Confetti/Confetti";
 import ChatWidget from '../../../components/ChatWidget/ChatWidget';
-import { ReactComponent as StreakIcon } from "../../../assets/images/student/streak_button.svg";
-import { ReactComponent as ActivitiesIcon } from "../../../assets/images/student/activities_button.svg";
-import { ReactComponent as BadgesIcon } from "../../../assets/images/student/badges_button.svg";
-import { ReactComponent as LeaderboardIcon } from "../../../assets/images/student/leaderboard_button.svg";
+import StreakIcon from "../../../assets/images/student/streak_button.svg?react";
+import ActivitiesIcon from "../../../assets/images/student/activities_button.svg?react";
+import BadgesIcon from "../../../assets/images/student/badges_button.svg?react";
+import LeaderboardIcon from "../../../assets/images/student/leaderboard_button.svg?react";
 
 import userPortraitCamera from "../../../assets/images/camera.svg";
 import activityIcon from "../../../assets/images/StudentInventoryIcons/activity-icon.svg";
