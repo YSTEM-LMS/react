@@ -90,29 +90,33 @@ class GameManager {
      * `game.isPvp` marks that the slot NAMES carry no meaning in this game.
      * See student-vs-student-design.md §5a.
      *
-     * The challenger takes white. Whichever client connects first creates the
-     * game; the second joins it by gameId. Reconnecting with the same username
-     * reclaims the original seat and color rather than creating a new game.
+     * `username`, `white` and `black` must come from the middleware's
+     * GET /challenge/game/:gameId response — never from the client socket
+     * message directly. The caller (EventHandlers' `newpvpgame` handler)
+     * verifies the joining socket against that response before calling this,
+     * so by the time this method runs, identity has already been checked.
+     * Whichever client connects first creates the game; the second joins it
+     * by gameId. Reconnecting with the same username reclaims the original
+     * seat and color rather than creating a new game.
      *
-     * Each seat also carries the joining client's `credentials` (bearer token).
-     * The result report at game end is sent to the middleware as one of the two
-     * players, and resign/disconnect endings are triggered by a socket event
-     * that carries no body — so the token has to be captured at join time.
+     * Seats no longer carry a player token: results are reported to the
+     * middleware with CHESS_SERVICE_KEY, not a player's bearer token, so
+     * there is nothing to capture here. See the PvP results plan (v2), T4.
      *
-     * @param {Object} param0 - Contains gameId, challenger, opponent, username, socketId, credentials
+     * @param {Object} param0 - Contains gameId, username, white, black, socketId
      * @returns {Object} Game object, assigned color, and new game status
      */
-    createOrJoinPvpGame({ gameId, challenger, opponent, username, socketId, credentials }) {
+    createOrJoinPvpGame({ gameId, username, white, black, socketId }) {
         if (!gameId) {
             throw new Error("A gameId is required to join a student-vs-student game!");
         }
-        if (!challenger || !opponent) {
-            throw new Error("Both challenger and opponent usernames are required!");
+        if (!white || !black) {
+            throw new Error("Both white and black usernames are required!");
         }
-        if (challenger === opponent) {
+        if (white === black) {
             throw new Error("A student cannot challenge themselves!");
         }
-        if (username !== challenger && username !== opponent) {
+        if (username !== white && username !== black) {
             throw new Error("You are not a player in this game!");
         }
 
@@ -125,30 +129,27 @@ class GameManager {
                 throw new Error("You are not a player in this game!");
             }
             seat.id = socketId;
-            if (credentials) seat.credentials = credentials;
             return { game, color: seat.color, newGame: false };
         }
 
         // First player in creates the game; both seats are known upfront from
-        // the accepted challenge, so the opponent's seat just waits for a socket.
+        // the accepted challenge, so the second player's seat just waits for a socket.
         const board = new Chess();
-        const challengerPlayer = {
-            username: challenger,
-            id: username === challenger ? socketId : null,
-            credentials: username === challenger ? credentials : null,
+        const whitePlayer = {
+            username: white,
+            id: username === white ? socketId : null,
             color: "white"
         };
-        const opponentPlayer = {
-            username: opponent,
-            id: username === opponent ? socketId : null,
-            credentials: username === opponent ? credentials : null,
+        const blackPlayer = {
+            username: black,
+            id: username === black ? socketId : null,
             color: "black"
         };
 
         const newGame = {
-            student: challengerPlayer,
-            mentor: opponentPlayer,
-            players: [challengerPlayer, opponentPlayer],
+            student: whitePlayer,
+            mentor: blackPlayer,
+            players: [whitePlayer, blackPlayer],
             gameId,
             isPvp: true,
             boardState: board,
@@ -159,7 +160,7 @@ class GameManager {
 
         return {
             game: newGame,
-            color: username === challenger ? "white" : "black",
+            color: username === white ? "white" : "black",
             newGame: true
         };
     }
