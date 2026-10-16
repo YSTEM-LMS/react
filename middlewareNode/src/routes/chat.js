@@ -13,6 +13,7 @@ const passport = require('passport');
 const Guardrail = require('../models/Guardrail');
 const requireAuth = require('../middleware/requireAuth');
 const { isLocalEnvironment } = require('../config/validateEnvironment');
+const { emitChatMilestone } = require('../services/currencyEvents');
 
 // Same gate as config/db.js's seedTestUsers: config-template seeding, not
 // credential-bearing, but still a side effect on import that should only
@@ -714,6 +715,14 @@ router.post('/session/:sessionId/end', requireAuth, async (req, res) => {
 
     session.status = 'completed';
     await session.save();
+
+    emitChatMilestone({
+      userId: session.userId,
+      sessionId: session._id,
+      topic: session.topic,
+    }).catch((err) => {
+      console.error('currencyEvents: failed to emit chat.milestone:', err.message);
+    });
 
     res.json({ session });
   } catch (error) {

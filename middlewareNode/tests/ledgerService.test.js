@@ -17,7 +17,9 @@ jest.setTimeout(60000);
 let mongod;
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 30000 } });
+  mongod = await MongoMemoryServer.create({
+    instance: { launchTimeout: 30000 },
+  });
   await mongoose.connect(mongod.getUri() + "ystem");
 });
 
@@ -35,6 +37,7 @@ const ActionRule = require("../src/models/actionRule");
 const ActionEvent = require("../src/models/actionEvent");
 const LedgerEntry = require("../src/models/ledgerEntry");
 const UserBalance = require("../src/models/userBalance");
+const { emitChatMilestone } = require("../src/services/currencyEvents");
 const {
   processEvent,
   applyLedgerEntry,
@@ -72,7 +75,11 @@ describe("getLifetimeEarnedMap", () => {
   it("returns a Map keyed by userId string for every user with a balance document", async () => {
     const alice = new mongoose.Types.ObjectId();
     const bob = new mongoose.Types.ObjectId();
-    await UserBalance.create({ userId: alice, balance: 10, lifetimeEarned: 10 });
+    await UserBalance.create({
+      userId: alice,
+      balance: 10,
+      lifetimeEarned: 10,
+    });
     await UserBalance.create({ userId: bob, balance: 25, lifetimeEarned: 25 });
 
     const map = await getLifetimeEarnedMap([alice, bob]);
@@ -172,7 +179,10 @@ describe("applyLedgerEntry idempotency", () => {
 
     // Fire the same event twice "at once" — this is the scenario a
     // reconnect/retry actually produces, not just a sequential re-call.
-    const [a, b] = await Promise.all([applyLedgerEntry(args), applyLedgerEntry(args)]);
+    const [a, b] = await Promise.all([
+      applyLedgerEntry(args),
+      applyLedgerEntry(args),
+    ]);
     const outcomes = [a.duplicate, b.duplicate].sort();
 
     expect(outcomes).toEqual([false, true]); // exactly one applied, one duplicate
@@ -182,8 +192,20 @@ describe("applyLedgerEntry idempotency", () => {
   });
 
   it("accumulates balance and lifetimeEarned together across distinct events", async () => {
-    await applyLedgerEntry({ eventId: "evt-a", userId, actionKey: "lesson.completed", amount: 10, occurredAt: new Date() });
-    await applyLedgerEntry({ eventId: "evt-b", userId, actionKey: "puzzle.solved", amount: 5, occurredAt: new Date() });
+    await applyLedgerEntry({
+      eventId: "evt-a",
+      userId,
+      actionKey: "lesson.completed",
+      amount: 10,
+      occurredAt: new Date(),
+    });
+    await applyLedgerEntry({
+      eventId: "evt-b",
+      userId,
+      actionKey: "puzzle.solved",
+      amount: 5,
+      occurredAt: new Date(),
+    });
 
     const balance = await UserBalance.findOne({ userId });
     expect(balance.balance).toBe(15);
@@ -217,6 +239,55 @@ describe("processEvent — rules engine", () => {
     expect(await LedgerEntry.countDocuments({})).toBe(0);
   });
 
+  it("supports a new chat.milestone action through an event and rule config alone", async () => {
+    const sessionId = new mongoose.Types.ObjectId();
+
+    // Adding a new earning action requires a rule, not new ledger logic.
+    await makeRule({
+      actionKey: "chat.milestone",
+      currencyAmount: 15,
+    });
+
+    // Use the same event producer as the chat route.
+    await emitChatMilestone({
+      userId,
+      sessionId,
+      topic: "algebra",
+    });
+
+    const event = await ActionEvent.findOne({
+      eventId: `chat:milestone:${sessionId}`,
+    });
+
+    expect(event).not.toBeNull();
+    expect(event.actionKey).toBe("chat.milestone");
+
+    // The existing rules engine handles the new action.
+    const result = await processEvent({
+      eventId: event.eventId,
+      userId: event.userId,
+      actionKey: event.actionKey,
+      occurredAt: event.occurredAt,
+    });
+
+    expect(result).toMatchObject({
+      outcome: "awarded",
+      amount: 15,
+    });
+
+    expect(
+      await LedgerEntry.countDocuments({
+        eventId: event.eventId,
+        actionKey: "chat.milestone",
+        userId,
+      }),
+    ).toBe(1);
+
+    const balance = await UserBalance.findOne({ userId });
+    expect(balance.balance).toBe(15);
+    expect(balance.lifetimeEarned).toBe(15);
+  });
+
   it("awards currency and returns the amount when a rule is active and clear", async () => {
     await makeRule({ currencyAmount: 25 });
     const result = await processEvent({
@@ -233,7 +304,12 @@ describe("processEvent — rules engine", () => {
 
   it("returns duplicate (not awarded) on a re-processed eventId", async () => {
     await makeRule();
-    const event = { eventId: "evt-1", userId, actionKey: "lesson.completed", occurredAt: new Date() };
+    const event = {
+      eventId: "evt-1",
+      userId,
+      actionKey: "lesson.completed",
+      occurredAt: new Date(),
+    };
 
     await processEvent(event);
     const second = await processEvent(event);
@@ -247,11 +323,21 @@ describe("processEvent — rules engine", () => {
       await makeRule({ cooldownSeconds: 3600 });
       const now = new Date();
 
-      const first = await processEvent({ eventId: "evt-1", userId, actionKey: "lesson.completed", occurredAt: now });
+      const first = await processEvent({
+        eventId: "evt-1",
+        userId,
+        actionKey: "lesson.completed",
+        occurredAt: now,
+      });
       expect(first.outcome).toBe("awarded");
 
       const secondTime = new Date(now.getTime() + 60 * 1000); // 1 min later, inside a 1h cooldown
-      const second = await processEvent({ eventId: "evt-2", userId, actionKey: "lesson.completed", occurredAt: secondTime });
+      const second = await processEvent({
+        eventId: "evt-2",
+        userId,
+        actionKey: "lesson.completed",
+        occurredAt: secondTime,
+      });
       expect(second.outcome).toBe("cooldown");
 
       expect(await LedgerEntry.countDocuments({})).toBe(1);
@@ -261,10 +347,20 @@ describe("processEvent — rules engine", () => {
       await makeRule({ cooldownSeconds: 60 });
       const now = new Date();
 
-      await processEvent({ eventId: "evt-1", userId, actionKey: "lesson.completed", occurredAt: now });
+      await processEvent({
+        eventId: "evt-1",
+        userId,
+        actionKey: "lesson.completed",
+        occurredAt: now,
+      });
 
       const laterTime = new Date(now.getTime() + 61 * 1000);
-      const second = await processEvent({ eventId: "evt-2", userId, actionKey: "lesson.completed", occurredAt: laterTime });
+      const second = await processEvent({
+        eventId: "evt-2",
+        userId,
+        actionKey: "lesson.completed",
+        occurredAt: laterTime,
+      });
       expect(second.outcome).toBe("awarded");
 
       expect(await LedgerEntry.countDocuments({})).toBe(2);
@@ -275,8 +371,18 @@ describe("processEvent — rules engine", () => {
       const otherUser = new mongoose.Types.ObjectId();
       const now = new Date();
 
-      await processEvent({ eventId: "evt-1", userId: otherUser, actionKey: "lesson.completed", occurredAt: now });
-      const result = await processEvent({ eventId: "evt-2", userId, actionKey: "lesson.completed", occurredAt: now });
+      await processEvent({
+        eventId: "evt-1",
+        userId: otherUser,
+        actionKey: "lesson.completed",
+        occurredAt: now,
+      });
+      const result = await processEvent({
+        eventId: "evt-2",
+        userId,
+        actionKey: "lesson.completed",
+        occurredAt: now,
+      });
 
       expect(result.outcome).toBe("awarded");
     });
@@ -287,7 +393,12 @@ describe("processEvent — rules engine", () => {
       await makeRule({ dailyCap: 2 });
       const day = new Date("2026-06-15T10:00:00.000Z");
 
-      const r1 = await processEvent({ eventId: "evt-1", userId, actionKey: "lesson.completed", occurredAt: day });
+      const r1 = await processEvent({
+        eventId: "evt-1",
+        userId,
+        actionKey: "lesson.completed",
+        occurredAt: day,
+      });
       const r2 = await processEvent({
         eventId: "evt-2",
         userId,
