@@ -5,10 +5,11 @@
  * DB access from the frontend test process — so specs stay black-box
  * against the actual API surface a real student session would use.
  *
- * NOTE: signup (POST /user), login (POST /auth/login), and
- * check-and-award (POST /badges/:userId/check-and-award) all read from
- * req.query, not a JSON body — matching routes/users.js and routes/auth.js
- * exactly, not REST convention. Getting this wrong silently 400s.
+ * NOTE: signup (POST /user) and check-and-award
+ * (POST /badges/:userId/check-and-award) both read from req.query, not a
+ * JSON body — matching routes/users.js and routes/badges.js exactly, not
+ * REST convention. Login (POST /auth/login) is the exception: it reads a
+ * JSON body. Getting either wrong silently 400s.
  */
 
 const MIDDLEWARE_URL = process.env.MIDDLEWARE_URL || 'http://localhost:8000';
@@ -36,8 +37,12 @@ export async function signupTestStudent(opts: {
 }
 
 export async function loginAndGetToken(username: string, password: string): Promise<string> {
-  const params = new URLSearchParams({ username, password });
-  const res = await fetch(`${MIDDLEWARE_URL}/auth/login?${params.toString()}`, { method: 'POST' });
+  // Unlike signup, /auth/login reads a JSON body (not req.query).
+  const res = await fetch(`${MIDDLEWARE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`Login failed (${res.status}): ${body}`);

@@ -79,6 +79,7 @@ test('incorrect credentials', async () => {
   // mock XHR object
   const mockXHR = {
     open: jest.fn(),
+    setRequestHeader: jest.fn(),
     send: jest.fn(),
     readyState: 4,
     status: 400,
@@ -124,6 +125,7 @@ test('correct credentials', async () => {
   // mock XHR object
   const mockXHR = {
     open: jest.fn(),
+    setRequestHeader: jest.fn(),
     send: jest.fn(),
     readyState: 4,
     status: 200, // success status
@@ -153,4 +155,12 @@ test('correct credentials', async () => {
 
   // navigate to corresponding profile page
   expect(window.location.pathname).toBe('/student-profile');
+
+  // /auth/login reads a JSON body; credentials must not be in the URL
+  const [method, url] = mockXHR.open.mock.calls[0];
+  expect(method).toBe('POST');
+  expect(url).toMatch(/\/auth\/login$/);
+  expect(url).not.toContain('123456789');
+  expect(mockXHR.setRequestHeader).toHaveBeenCalledWith('Content-Type', 'application/json');
+  expect(JSON.parse(mockXHR.send.mock.calls[0][0])).toEqual({ username: 'username', password: '123456789' });
 });
