@@ -20,9 +20,10 @@
 const { Chess, DEFAULT_POSITION } = require("chess.js");
 const Users = require("../models/users");
 
-// Caps are configurable until the per-student limit and retention decision
-// is made (plan: "Decisions for Devin"). 600 plies is far beyond any real
-// game; the PGN length cap stops oversized bodies before chess.js parses them.
+// Caps are configurable until the per-student limit is decided (plan:
+// "Decisions for Devin"); retention is decided and lives on the model (see
+// models/savedGame.js). 600 plies is far beyond any real game; the PGN
+// length cap stops oversized bodies before chess.js parses them.
 const LIMITS = {
   maxPlies: parseInt(process.env.SAVED_GAMES_MAX_PLIES) || 600,
   maxGamesPerUser: parseInt(process.env.SAVED_GAMES_MAX_PER_USER) || 100,

@@ -79,7 +79,18 @@ const SavedGameSchema = new mongoose.Schema(
 // A student's games, newest first: the only list query Phase A makes.
 SavedGameSchema.index({ userId: 1, updatedAt: -1 });
 
+// Games are kept for 3 months after they were last played (Devin, 10/17).
+// Every save bumps `updatedAt`, so a game a student keeps coming back to is
+// never deleted mid-play. MongoDB's TTL monitor does the deletion in the
+// background (it runs about once a minute), so no scheduler is needed.
+const RETENTION_DAYS = 90;
+SavedGameSchema.index(
+  { updatedAt: 1 },
+  { expireAfterSeconds: RETENTION_DAYS * 24 * 60 * 60 }
+);
+
 module.exports = mongoose.model("SavedGame", SavedGameSchema);
+module.exports.RETENTION_DAYS = RETENTION_DAYS;
 module.exports.GAME_TYPES = GAME_TYPES;
 module.exports.PLAYER_COLORS = PLAYER_COLORS;
 module.exports.STATUSES = STATUSES;

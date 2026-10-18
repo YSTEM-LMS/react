@@ -461,3 +461,27 @@ describe("resume", () => {
     expect(replayed.fen()).toBe(res.body.game.fen);
   });
 });
+
+describe("retention", () => {
+  test("games expire 3 months after they were last played", async () => {
+    await SavedGame.syncIndexes();
+    const indexes = await SavedGame.collection.indexes();
+    const ttl = indexes.find((i) => i.expireAfterSeconds !== undefined);
+
+    expect(ttl.key).toEqual({ updatedAt: 1 });
+    expect(ttl.expireAfterSeconds).toBe(90 * 24 * 60 * 60);
+  });
+
+  test("saving a move restarts the clock", async () => {
+    const token = await makeUser("alice");
+    const { uuid } = (await createGame(token)).body.game;
+    // Pretend the game was last played 80 days ago.
+    const old = new Date(Date.now() - 80 * 24 * 60 * 60 * 1000);
+    await SavedGame.collection.updateOne({ uuid }, { $set: { updatedAt: old } });
+
+    await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn: "1. e4" });
+
+    const game = await SavedGame.findOne({ uuid }).lean();
+    expect(game.updatedAt.getTime()).toBeGreaterThan(Date.now() - 60 * 1000);
+  });
+});
