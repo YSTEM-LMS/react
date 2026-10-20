@@ -1,28 +1,31 @@
 import React from "react";
-import "./MentoringBenefitPage.scss";
 import ImageOne from "../../../assets/images/mathArticle/computer.png";
 import ImageTwo from "../../../assets/images/mathArticle/Junechamp 2.png";
+import { cn } from "../../../core/utils/cn";
 
-const MathTutBenefitPage = () => {
+const sectionClasses = "bg-[#dff2c8] py-5";
+const paragraphClasses = "mx-auto max-w-[800px] px-5 text-[1.05rem] leading-[1.7] text-dark text-justify";
+
+const MentoringBenefitPage = () => {
   return (
-    <main id="main-content-mentor" role="main">
-      <section className="container-mentor" role="region" aria-label="Main mentoring benefit section" tabIndex={0}>
-        <div className="text-title-md-mentor txt-p">
-          <h1 style={{ fontWeight: "bold" }}>The Benefits of Mentoring</h1>
+    <main id="main-content-mentor" className="min-h-screen bg-[#dff2c8] font-sans text-dark" role="main">
+      <section className={sectionClasses} aria-label="Main mentoring benefit section" tabIndex={0}>
+        <div className="text-center">
+          <h1 className="pt-[10px] text-[2.2rem] font-black text-[#556b2f]">The Benefits of Mentoring</h1>
         </div>
 
-        <figure>
+        <figure className="mx-auto max-w-[800px]">
           <img
-            className="picture-mentor"
+            className="mx-auto mt-[15px] block w-[90%] max-w-[800px] rounded-[10px] object-cover"
             src={ImageOne}
             alt="Students practicing chess on computers"
           />
-          <figcaption className="text-caption-mentor txt-p">
+          <figcaption className="mt-[5px] text-center text-[0.85rem] text-muted">
             Students practicing their chess skills in the classroom
           </figcaption>
         </figure>
 
-        <div className="text-normal-mentor txt-p">
+        <div className={paragraphClasses}>
           <p>
             Mentors serve an important role in a student's growth, providing
             both encouragement and support. They are the examples that students
@@ -35,7 +38,7 @@ const MathTutBenefitPage = () => {
           </p>
         </div>
 
-        <div className="text-normal-mentor txt-p ">
+        <div className={cn(paragraphClasses, "mt-[15px]")}>
           <p>
             Underserved students are put at a disadvantage compared to those
             from more affluent neighborhoods when pursuing STEM careers. Poorer
@@ -53,17 +56,17 @@ const MathTutBenefitPage = () => {
           </p>
         </div>
       </section>
-      <section className="container rectdiv2-mentor" role="region" aria-label="Quote section" tabIndex={0}>
-        <div className="rectdiv2-wrapper-mentor">
-          <p className="recttext-mentor">
+      <section className="flex min-h-[160px] items-center justify-center bg-[#c1dcaf] px-5 py-5" aria-label="Quote section" tabIndex={0}>
+        <div className="max-w-[500px] text-center text-[1.2rem] font-bold leading-[1.7] text-dark">
+          <p>
             "Mentors give students the chance to explore what they can do and
             what they want to do, and when it comes to mentoring, personalized
             attention is important"
           </p>
         </div>
       </section>
-      <section className="container" role="region" aria-label="Mentoring benefit details section" tabIndex={0}>
-        <div className="text-normal-mentor txt-p">
+      <section className={sectionClasses} aria-label="Mentoring benefit details section" tabIndex={0}>
+        <div className={paragraphClasses}>
           <p>
             STEM can seem like a challenging field to go into for minority
             students in particular. The same USNews article states that less
@@ -77,7 +80,7 @@ const MathTutBenefitPage = () => {
           </p>
         </div>
 
-        <div className="text-normal-mentor txt-p">
+        <div className={cn(paragraphClasses, "mt-[15px]")}>
           <p>
             Mentors provide the encouragement and support that builds students'
             confidence. Mentors give students the chance to explore what they
@@ -94,18 +97,18 @@ const MathTutBenefitPage = () => {
           </p>
         </div>
 
-        <figure>
+        <figure className="mx-auto max-w-[800px]">
           <img
-            className="pictureMentor"
+            className="mx-auto mt-[15px] block h-[450px] w-[max(100%,300px)] object-contain"
             src={ImageTwo}
             alt="A student standing and holding a trophy alongside their mentor."
           />
-          <figcaption className="text-caption-mentor txt-p">
+          <figcaption className="mt-[5px] text-center text-[0.85rem] text-muted">
             A student with their mentor after winning an award.
           </figcaption>
         </figure>
 
-        <div className="text-normal-mentor txt-p">
+        <div className={cn(paragraphClasses, "mt-[15px]")}>
           <p>
             Y STEM and Chess provides one-on-one mentoring sessions to help
             build students' personal skills, in addition to tutoring in STEM and
@@ -122,4 +125,4 @@ const MathTutBenefitPage = () => {
     </main>
   );
 };
-export default MathTutBenefitPage;
+export default MentoringBenefitPage;

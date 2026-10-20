@@ -4,13 +4,13 @@ This is an educational platform combining chess instruction with STEM learning, 
 
 ## Development Environment Setup
 
-To run the platform, you’ll need **Node.js v18** installed. **Nodemon** is optional and can be used to automatically restart servers when code changes, which is convenient during development.
+To run the platform, you’ll need **Node.js v24** installed. **Nodemon** is optional and can be used to automatically restart servers when code changes, which is convenient during development.
 
 ### Node.js
 
 ---
 
-This project requires **Node.js v18.20.8**. Using a version manager ensures consistent Node versions across contributors.
+This project requires **Node.js v24.21.0**. Using a version manager ensures consistent Node versions across contributors.
 
 #### Option 1: Using [Volta](https://volta.sh) (recommended)
 
@@ -28,7 +28,7 @@ source ~/.bashrc  # or ~/.zshrc
 * **Windows**
   Download and run the installer from [volta.sh](https://volta.sh).
 
-Volta will automatically install and use **Node.js v18.20.8** when you cd into the project.
+Volta will automatically install and use **Node.js v24.21.0** when you cd into the project.
 
 #### Option 2: Using [nvm](https://github.com/nvm-sh/nvm)
 
@@ -39,17 +39,17 @@ If you prefer nvm:
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 source ~/.nvm/nvm.sh
-nvm install 18.20.8
-nvm use 18.20.8
-nvm alias default 18.20.8  # optional
+nvm install 24.21.0
+nvm use 24.21.0
+nvm alias default 24.21.0  # optional
 ```
 
 * **Windows**
   Use [nvm-windows](https://github.com/coreybutler/nvm-windows/releases).
 
 ```powershell
-nvm install 18.20.8
-nvm use 18.20.8
+nvm install 24.21.0
+nvm use 24.21.0
 ```
 
 ### Nodemon (Optional)
@@ -79,7 +79,7 @@ Before running any services, create the local development environment from the *
 ./create_dev_envs.sh
 ```
 
-A `default.json` file containing environment variables will be provided to contributors and should be placed in `middlewareNode/config`.
+Copy `middlewareNode/.env.example` to `middlewareNode/.env` and fill in your local values. A committed `middlewareNode/config/default.js` already provides safe, non-secret defaults, nothing needs to be handed to you separately.
 
 
 ## Running Each Service
@@ -98,10 +98,13 @@ npm start
 
 The server typically runs on port 8000. You should see `"MongoDB Connected..."` when it starts successfully.
 
-The following credentials can be used for testing mentor and student accounts:
+To create local mentor and student demo accounts, run:
 
-* **Mentor:** mentor / 123123123
-* **Student:** student / 123123123
+```bash
+npm run seed:dev
+```
+
+This generates a brand-new random password for both accounts every time it runs and prints them to your terminal. Passwords are never committed or written to a file, and re-running the command rotates both passwords. This only works outside of a production environment.
 
 ### Main React Application (Frontend)
 

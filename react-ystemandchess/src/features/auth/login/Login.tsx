@@ -54,7 +54,9 @@ const Login = () => {
       setLoginError("");
     }
 
-    let url = `${environment.urls.middlewareURL}/auth/login?username=${username}&password=${password}`;
+    // Credentials go in a JSON body: /auth/login only reads req.body, and a
+    // password in the URL ends up in server and proxy logs.
+    let url = `${environment.urls.middlewareURL}/auth/login`;
 
     const httpGetAsync = (theUrl: string, callback: any, onError: any) => {
       let xmlHttp = new XMLHttpRequest();
@@ -70,7 +72,8 @@ const Login = () => {
         }
       };
       xmlHttp.open("POST", theUrl, true);
-      xmlHttp.send(null);
+      xmlHttp.setRequestHeader("Content-Type", "application/json");
+      xmlHttp.send(JSON.stringify({ username, password }));
     };
 
     httpGetAsync(url, (response: any) => {

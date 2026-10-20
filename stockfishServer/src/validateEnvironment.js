@@ -5,8 +5,18 @@ function hasCorsConfiguration() {
   );
 }
 
+// Local-only environments skip validation. Anything else (production, but
+// also staging, qa, or a typo like "prod") is treated as a real deployment
+// and must be fully configured, instead of silently booting with dev
+// fallbacks such as middlewareNode's generated dev INDEX_KEY.
+const LOCAL_ENVIRONMENTS = new Set(["", "development", "test"]);
+
+function isLocalEnvironment() {
+  return LOCAL_ENVIRONMENTS.has((process.env.NODE_ENV || "").trim());
+}
+
 function validateEnvironment() {
-  if (process.env.NODE_ENV !== "production") {
+  if (isLocalEnvironment()) {
     return;
   }
 
@@ -18,12 +28,12 @@ function validateEnvironment() {
 
   if (missing.length > 0) {
     console.error(
-      `[stockfishServer] Missing required production environment variables: ${missing.join(", ")}`
+      `[stockfishServer] Missing required environment variables for NODE_ENV=${process.env.NODE_ENV}: ${missing.join(", ")}`
     );
     process.exit(1);
   }
 
-  console.log("[stockfishServer] Required production environment variables validated");
+  console.log("[stockfishServer] Required environment variables validated");
 }
 
 module.exports = validateEnvironment;

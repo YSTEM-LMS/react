@@ -1,12 +1,32 @@
 import React from 'react';
-import './CoachMascot.scss';
+import { cn } from '../../../core/utils/cn';
 
 export type CoachExpression = 'welcome' | 'thinking' | 'speaking' | 'happy' | 'thumbsup';
 
 export const CoachMascot = ({ expression }: { expression: CoachExpression }) => {
+  const containerClassName = cn(
+    'relative flex h-[140px] w-[140px] items-center justify-center overflow-visible rounded-full border-4 border-slate-700 bg-[radial-gradient(circle,_#334155_0%,_#1E293B_100%)] shadow-[0_10px_25px_rgba(0,0,0,0.3)] transition-all duration-300 max-[900px]:h-[60px] max-[900px]:w-[60px] max-[900px]:border-2',
+    expression === 'welcome' && 'border-[#8CC63F] animate-gentle-breathe-4',
+    expression === 'thinking' && 'border-amber-500',
+    expression === 'speaking' && 'border-[#8CC63F] animate-gentle-breathe-2',
+    expression === 'happy' && 'border-emerald-500 animate-happy-bounce',
+    expression === 'thumbsup' && 'border-blue-500 animate-gentle-breathe-3',
+  );
+
+  const auraFill =
+    expression === 'welcome'
+      ? 'rgba(140, 198, 63, 0.15)'
+      : expression === 'thinking'
+        ? 'rgba(245, 158, 11, 0.15)'
+        : expression === 'speaking'
+          ? 'rgba(140, 198, 63, 0.2)'
+          : expression === 'happy'
+            ? 'rgba(16, 185, 129, 0.25)'
+            : 'rgba(59, 130, 246, 0.2)';
+
   return (
-    <div className={`coach-mascot-container ${expression}`}>
-      <svg viewBox="0 0 120 120" className="mascot-svg" xmlns="http://www.w3.org/2000/svg">
+    <div className={containerClassName}>
+      <svg viewBox="0 0 120 120" className="h-[90%] w-[90%] overflow-visible" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="hairGrad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#3d2c20" />
@@ -23,7 +43,7 @@ export const CoachMascot = ({ expression }: { expression: CoachExpression }) => 
         </defs>
 
         {/* Background Aura */}
-        <circle cx="60" cy="60" r="50" className="aura-bg" />
+        <circle cx="60" cy="60" r="50" style={{ fill: auraFill, transition: 'fill 0.3s' }} />
 
         {/* Neck */}
         <path d="M52 65 C52 75, 68 75, 68 65 L68 85 L52 85 Z" fill="url(#skinGrad)" />
@@ -82,31 +102,33 @@ export const CoachMascot = ({ expression }: { expression: CoachExpression }) => 
         {/* Eyes */}
         {expression === 'thinking' && (
           <>
-            <ellipse cx="49" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" />
-            <circle cx="50" cy="43.8" r="2.5" fill="#5c3a21" />
-            <circle cx="50" cy="43.8" r="1.3" fill="#000000" />
-            <circle cx="49.5" cy="43.0" r="0.6" fill="#ffffff" />
+            <g className="animate-thinking-eyes">
+              <ellipse cx="49" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" />
+              <circle cx="50" cy="43.8" r="2.5" fill="#5c3a21" />
+              <circle cx="50" cy="43.8" r="1.3" fill="#000000" />
+              <circle cx="49.5" cy="43.0" r="0.6" fill="#ffffff" />
 
-            <ellipse cx="71" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" />
-            <circle cx="72" cy="43.8" r="2.5" fill="#5c3a21" />
-            <circle cx="72" cy="43.8" r="1.3" fill="#000000" />
-            <circle cx="71.5" cy="43.0" r="0.6" fill="#ffffff" />
+              <ellipse cx="71" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" />
+              <circle cx="72" cy="43.8" r="2.5" fill="#5c3a21" />
+              <circle cx="72" cy="43.8" r="1.3" fill="#000000" />
+              <circle cx="71.5" cy="43.0" r="0.6" fill="#ffffff" />
+            </g>
           </>
         )}
         {expression === 'happy' && (
           <>
-            <path d="M44 46 Q49 41 54 46" stroke="#2c1e15" strokeWidth="2.5" fill="none" strokeLinecap="round" className="eyes happy-eyes" />
-            <path d="M66 46 Q71 41 76 46" stroke="#2c1e15" strokeWidth="2.5" fill="none" strokeLinecap="round" className="eyes happy-eyes" />
+            <path d="M44 46 Q49 41 54 46" stroke="#2c1e15" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            <path d="M66 46 Q71 41 76 46" stroke="#2c1e15" strokeWidth="2.5" fill="none" strokeLinecap="round" />
           </>
         )}
         {(expression === 'welcome' || expression === 'speaking' || expression === 'thumbsup') && (
           <>
-            <ellipse cx="49" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" className="eyes normal-eyes" />
+            <ellipse cx="49" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" />
             <circle cx="49" cy="45" r="2.5" fill="#5c3a21" />
             <circle cx="49" cy="45" r="1.3" fill="#000000" />
             <circle cx="48.2" cy="44.2" r="0.6" fill="#ffffff" />
 
-            <ellipse cx="71" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" className="eyes normal-eyes" />
+            <ellipse cx="71" cy="45" rx="5" ry="3.2" fill="#ffffff" stroke="#2c1e15" strokeWidth="1" />
             <circle cx="71" cy="45" r="2.5" fill="#5c3a21" />
             <circle cx="71" cy="45" r="1.3" fill="#000000" />
             <circle cx="70.2" cy="44.2" r="0.6" fill="#ffffff" />
@@ -119,24 +141,24 @@ export const CoachMascot = ({ expression }: { expression: CoachExpression }) => 
 
         {/* Mouth */}
         {expression === 'speaking' && (
-          <g className="mouth speaking-mouth">
+          <g className="origin-[60px_54px] animate-mouth-talk">
             <path d="M52 58 C50 58, 52 70, 60 70 C68 70, 70 58, 68 58 Z" fill="#4d120f" stroke="#2c1e15" strokeWidth="1" />
             <path d="M53 59 C55 61, 65 61, 67 59 Z" fill="#ffffff" />
             <path d="M55 67 C57 65, 63 65, 65 67 Z" fill="#c0392b" />
           </g>
         )}
         {expression === 'thinking' && (
-          <path d="M52 61 Q60 58 68 61" stroke="#2c1e15" strokeWidth="2.5" fill="none" strokeLinecap="round" className="mouth thinking-mouth" />
+          <path d="M52 61 Q60 58 68 61" stroke="#2c1e15" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         )}
         {(expression === 'welcome' || expression === 'thumbsup') && (
-          <g className="mouth smiling-mouth">
+          <g>
             <path d="M50 59 C50 59, 52 68, 60 68 C68 68, 70 59, 70 59 Z" fill="#4d120f" stroke="#2c1e15" strokeWidth="1" />
             <path d="M51 60 C53 62, 67 62, 69 60 L68 59 C65 59, 55 59, 52 59 Z" fill="#ffffff" />
             <path d="M54 66 C57 63, 63 63, 66 66 Z" fill="#c0392b" />
           </g>
         )}
         {expression === 'happy' && (
-          <g className="mouth smiling-mouth">
+          <g>
             <path d="M48 58 C48 58, 50 71, 60 71 C70 71, 72 58, 72 58 Z" fill="#4d120f" stroke="#2c1e15" strokeWidth="1.5" />
             <path d="M49 59 C51 62, 69 62, 71 59 Z" fill="#ffffff" />
             <path d="M53 67 C57 64, 63 64, 67 67 Z" fill="#c0392b" />
@@ -162,14 +184,14 @@ export const CoachMascot = ({ expression }: { expression: CoachExpression }) => 
 
         {/* Dynamic accessory elements */}
         {expression === 'thinking' && (
-          <g className="thought-dots">
-            <circle cx="95" cy="30" r="2" fill="#8CC63F" className="dot-1" />
-            <circle cx="102" cy="23" r="3" fill="#8CC63F" className="dot-2" />
-            <circle cx="110" cy="14" r="4.5" fill="#8CC63F" className="dot-3" />
+          <g>
+            <circle cx="95" cy="30" r="2" fill="#8CC63F" className="animate-thought-dot-1" />
+            <circle cx="102" cy="23" r="3" fill="#8CC63F" className="animate-thought-dot-2" />
+            <circle cx="110" cy="14" r="4.5" fill="#8CC63F" className="animate-thought-dot-3" />
           </g>
         )}
         {expression === 'thumbsup' && (
-          <g className="thumbsup-hand">
+          <g className="origin-[95px_65px] animate-hand-wave">
             <circle cx="95" cy="65" r="12" fill="#f5cbb5" stroke="#2c1e15" strokeWidth="2" />
             <path d="M95 58 C93 48, 88 52, 91 58 Z" fill="#f5cbb5" stroke="#2c1e15" strokeWidth="2" />
             <path d="M98 62 C102 62, 102 65, 98 65" stroke="#2c1e15" strokeWidth="2" fill="none" />
@@ -178,7 +200,7 @@ export const CoachMascot = ({ expression }: { expression: CoachExpression }) => 
           </g>
         )}
         {expression === 'happy' && (
-          <g className="celebration-sparkles">
+          <g className="origin-[60px_60px] animate-rotate-sparkles">
             <path d="M20 25 L24 29 M20 29 L24 25" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
             <path d="M100 25 L104 29 M100 29 L104 25" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" />
           </g>

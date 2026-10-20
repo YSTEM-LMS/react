@@ -1,28 +1,34 @@
 /**
  * Leaderboard Routes  —  /leaderboard
  *
- * Student-facing endpoint returning ranked students by a composite score.
- * Protected by requireAuth (valid JWT, any role) — NOT admin-only, unlike
- * /analytics, since students need to view the leaderboard themselves.
+ * Student-facing endpoint returning ranked students by their currency
+ * ledger standing. Protected by requireAuth (valid JWT, any role) — NOT
+ * admin-only, unlike /analytics, since students need to view the
+ * leaderboard themselves.
  *
- * Score is computed on read from existing per-student stats (time played,
- * streak, activities completed, badges earned) via utils/studentStats —
- * the same helpers the admin analytics dashboard uses, so the two features
- * can never silently disagree about a student's numbers.
+ * `score` reads UserBalance.lifetimeEarned (services/ledgerService.js),
+ * not the spendable `balance` field — lifetimeEarned is monotonic (a sum
+ * of positive LedgerEntry amounts only), so it can never go down. Ranking
+ * by spendable balance instead would mean the day a currency store ships,
+ * the top of the leaderboard becomes whoever has redeemed the least —
+ * rewarding declining to use the system. See the currency rollout plan,
+ * "Rank by lifetime earned, not balance."
  *
- * Score weights are configurable via env vars so they can be tuned per
- * environment without a deploy:
- *   LEADERBOARD_WEIGHT_TIME     (default 1)   — per hour of puzzle+lesson time
- *   LEADERBOARD_WEIGHT_STREAK   (default 5)   — per consecutive-day streak
- *   LEADERBOARD_WEIGHT_BADGE    (default 10)  — per badge earned
- *   LEADERBOARD_WEIGHT_ACTIVITY (default 3)   — per activity completed
+ * This replaces the previous engagement formula computed on read from
+ * time/streak/activities/badges (utils/studentStats) — that formula is
+ * still used elsewhere (e.g. admin analytics) but is no longer this
+ * route's score source. A student with no UserBalance document yet (has
+ * never earned any currency) reads as lifetimeEarned: 0, not undefined —
+ * see the `|| 0` at the score assignment below; without it the sort
+ * comparator would produce undefined ordering instead of placing that
+ * student last.
  *
- * `score` above measures ENGAGEMENT. Student-vs-student chess results are a
- * different signal (competitive skill), so they are reported alongside it as a
- * separate `chess_score` / `chess_record` and are deliberately NOT added into
- * `score` — blending them would make one number mean two things, and would
- * compound one open weighting question into two. Chess weights live in
- * utils/studentStats (PVP_WEIGHT_WIN / _DRAW / _LOSS).
+ * `score` above measures ENGAGEMENT (via currency earned for engaging
+ * actions). Student-vs-student chess results are a different signal
+ * (competitive skill), so they are reported alongside it as a separate
+ * `chess_score` / `chess_record` and are deliberately NOT added into
+ * `score` — blending them would make one number mean two things. Chess
+ * weights live in utils/studentStats (PVP_WEIGHT_WIN / _DRAW / _LOSS).
  *
  * Response contract matches LeaderboardModal.tsx exactly:
  *   GET /leaderboard/schools    -> { success, schools: string[] }
@@ -39,21 +45,9 @@
 const express = require("express");
 const router = express.Router();
 const Users = require("../models/users");
-const {
-  getUserTimeStats,
-  getUserStreak,
-  getActivitiesCompleted,
-  getBadgesEarned,
-  getChessRecords,
-} = require("../utils/studentStats");
+const { getChessRecords } = require("../utils/studentStats");
 const { getAvatarUrl } = require("../utils/avatars");
-
-const WEIGHTS = {
-  time: parseFloat(process.env.LEADERBOARD_WEIGHT_TIME) || 1,
-  streak: parseFloat(process.env.LEADERBOARD_WEIGHT_STREAK) || 5,
-  badge: parseFloat(process.env.LEADERBOARD_WEIGHT_BADGE) || 10,
-  activity: parseFloat(process.env.LEADERBOARD_WEIGHT_ACTIVITY) || 3,
-};
+const { getLifetimeEarnedMap } = require("../services/ledgerService");
 
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 10;
@@ -79,29 +73,11 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/**
- * Computes the composite ENGAGEMENT score for one student from existing stat
- * helpers. Placeholder weighting — confirm with product before treating as final.
- *
- * Chess results are intentionally absent here; they are surfaced as their own
- * column (see the module header) rather than folded into this number.
- */
-async function computeScore(user) {
-  const [timeStats, streak, activitiesCompleted, badgesEarned] = await Promise.all([
-    getUserTimeStats(user.username),
-    getUserStreak(user.username),
-    getActivitiesCompleted(user._id),
-    getBadgesEarned(user.username),
-  ]);
-
-  const timeComponent = (timeStats.puzzleTimeHours + timeStats.lessonTimeHours) * WEIGHTS.time;
-  const streakComponent = streak * WEIGHTS.streak;
-  const badgeComponent = badgesEarned * WEIGHTS.badge;
-  const activityComponent = activitiesCompleted * WEIGHTS.activity;
-
-  const score = Math.round(timeComponent + streakComponent + badgeComponent + activityComponent);
-  return score;
-}
+// computeScore() (the old time/streak/badge/activity weighted formula)
+// was removed here — score now comes from getLifetimeEarnedMap (see the
+// module header). utils/studentStats' getUserTimeStats/getUserStreak/
+// getActivitiesCompleted/getBadgesEarned still exist and are still used
+// elsewhere (e.g. admin analytics); only this route's score source changed.
 
 /**
  * Builds a GET /leaderboard/<field>s handler returning distinct, non-empty
@@ -171,22 +147,26 @@ router.get("/", async (req, res) => {
       candidates = candidates.slice(0, MAX_UNFILTERED_CANDIDATES);
     }
 
-    // One batched query for every candidate's chess record, rather than a
-    // fifth per-student round trip inside the map below.
+    // One batched query for every candidate's chess record and lifetime-
+    // earned currency, rather than a per-student round trip inside the
+    // map below for either.
     const chessRecords = await getChessRecords(candidates.map((u) => u.username));
+    const lifetimeEarnedMap = await getLifetimeEarnedMap(candidates.map((u) => u._id));
 
-    const scored = await Promise.all(
-      candidates.map(async (user) => ({
-        id: String(user._id),
-        username: user.username,
-        school: user.school || null,
-        country: user.country || null,
-        state: user.state || null,
-        avatarUrl: getAvatarUrl(user.avatarKey),
-        score: await computeScore(user),
-        chess: chessRecords.get(user.username),
-      }))
-    );
+    const scored = candidates.map((user) => ({
+      id: String(user._id),
+      username: user.username,
+      school: user.school || null,
+      country: user.country || null,
+      state: user.state || null,
+      avatarUrl: getAvatarUrl(user.avatarKey),
+      // A user with no UserBalance document yet (never earned any
+      // currency) must read as 0, not undefined — an undefined score
+      // would make the sort comparator below produce undefined ordering
+      // instead of placing that student last.
+      score: lifetimeEarnedMap.get(String(user._id)) || 0,
+      chess: chessRecords.get(user.username),
+    }));
 
     const direction = sortDir === "asc" ? 1 : -1;
     if (sortBy === "name") {

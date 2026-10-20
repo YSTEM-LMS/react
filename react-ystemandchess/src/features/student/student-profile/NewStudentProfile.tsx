@@ -699,7 +699,7 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
     </section>
 
     {/* Modals */}
-    {activeModal === "streak" && <StreakModal onClose={() => setActiveModal(null)} />}
+    {activeModal === "streak" && <StreakModal onClose={() => setActiveModal(null)} username={username} />}
     {activeModal === "activities" && <ActivitiesModal onClose={() => setActiveModal(null)} username={username} />}
     {activeModal === "badges" && <BadgesModal onClose={() => setActiveModal(null)} username={username} />}
     {activeModal === "leaderboard" && <LeaderboardModal onClose={() => setActiveModal(null)} />}
