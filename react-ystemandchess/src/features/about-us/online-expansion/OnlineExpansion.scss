@@ -1,0 +1,111 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap");
+
+$caption-color: #535353;
+$brand-color-primary: #dff2c8;
+$brand-color-secondary: #bfd99e;
+$text-color: #333;
+$highlight-color: #556b2f;
+$quote-bg-color: #c1dcaf;
+
+$font-size-base: 16px;
+$font-family-base: "Roboto", Arial, sans-serif;
+$font-weight-base: 400;
+$line-height-base: 1.6;
+$body-color: #333;
+$body-bg: #dff2c8;
+
+@mixin font-size($size) {
+  font-size: $size;
+  line-height: $line-height-base;
+}
+
+body {
+  margin: 0;
+  font-family: $font-family-base;
+  @include font-size($font-size-base);
+  font-weight: $font-weight-base;
+  color: $body-color;
+  text-align: center; // Center-align body content
+  background-color: $body-bg;
+}
+
+.container-online {
+  background-color: $brand-color-primary;
+  padding: 20px 0;
+}
+
+#main-content-online {
+  background-color: $brand-color-primary;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.text-title-md-online {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: $highlight-color;
+  padding-top: 10px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.picture-online,
+.picture {
+  width: 90%;
+  max-width: 800px;
+  height: auto;
+  margin: 15px auto;
+  display: block;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.text-caption-online,
+.text-caption {
+  color: $caption-color;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.text-normal-online,
+.text-normal {
+  max-width: 800px; // Limit the width of the paragraph
+  margin: 0 auto 15px; // Center align with auto margins
+  padding: 0 20px; // Add padding to avoid edges
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: $text-color;
+  text-align: justify;
+  text-indent: 2em; // Add a tab space at the beginning, like MLA format
+}
+
+.rectdiv2Online {
+  background-color: $quote-bg-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  min-height: 160px;
+  padding: 20px 0; // padding top/bottom only to let it stretch naturally edge-to-edge
+  width: 100%;
+}
+
+.recttextonline {
+  max-width: 800px; // Increase max-width to allow the quote to fill up more of its container
+  margin: 0 auto; // Center align
+  font-size: 1.50rem; // Slightly larger to fill the space well
+  line-height: 1.7;
+  color: $text-color;
+  text-align: center;
+  font-weight: bold;
+}
+
+.pictureOnline {
+  object-fit: contain;
+  width: max(100%, 300px);
+  height: 450px;
+  display: block;
+  margin: 15px auto;
+  border-radius: 10px;
+} 
