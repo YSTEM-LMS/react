@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "dependencies": {
     "@azure/storage-blob": "^12.24.0",
-    "axios": "^0.21.1",
+    "axios": "^0.33.0",
     "config": "^3.3.12",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
