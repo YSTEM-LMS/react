@@ -14,17 +14,7 @@ const express = require('express');
 const router = express.Router();
 const TimeTracking = require('../models/timeTracking');
 const requireAuth = require('../middleware/requireAuth');
-
-/**
- * Checks if a day's activities meet completion requirements
- * 
- * @param {Array} events - Array of event types completed on a day
- * @returns {boolean} True if both 'lesson' and 'puzzle' are present
- */
-function dayCompleted(events) {
-  const required = ['lesson', 'puzzle'];
-  return required.every((r) => events.includes(r));
-}
+const { dayCompleted, bucketEventsByDay, calculateStreaks } = require('../utils/streak');
 
 /**
  * Checks if the user is authorized to access the requested user's streak.
@@ -67,38 +57,11 @@ router.get('/', requireAuth, checkStreakAccess, async (req, res) => {
 
     console.log(`Fetched ${userEvents.length} events for: ${username}`);
 
-    const daysMap = {};
-    userEvents.forEach((e) => {
-      if (!e.startTime || !e.eventType) return; // Skip incomplete records
-
-      const date = new Date(e.startTime).toISOString().slice(0, 10);
-      console.log("Event:", e.eventType, "| Date:", date);
-
-      if (!daysMap[date]) daysMap[date] = [];
-      daysMap[date].push(e.eventType);
-    });
+    const daysMap = bucketEventsByDay(userEvents);
 
     console.log("daysMap:", daysMap);
 
-    const allDates = Object.keys(daysMap).sort();
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let running = 0;
-    let lastCompletedDate = null;
-
-    allDates.forEach((date) => {
-      if (dayCompleted(daysMap[date])) {
-        running++;
-        longestStreak = Math.max(longestStreak, running);
-        lastCompletedDate = date;
-      } else {
-        running = 0;
-      }
-    });
-
-    currentStreak = running;
-
-    res.json({ currentStreak, longestStreak, lastCompletedDate });
+    res.json(calculateStreaks(daysMap));
   } catch (err) {
     console.error('Error in /streak:', err);
     res.status(500).json({ error: 'Server error' });
@@ -127,14 +90,7 @@ router.get('/calendar', requireAuth, checkStreakAccess, async (req, res) => {
 
     console.log(`Calendar events for ${username} in ${month}: ${userEvents.length}`);
 
-    const daysMap = {};
-    userEvents.forEach((e) => {
-      if (!e.startTime || !e.eventType) return;
-
-      const date = new Date(e.startTime).toISOString().slice(0, 10);
-      if (!daysMap[date]) daysMap[date] = [];
-      daysMap[date].push(e.eventType);
-    });
+    const daysMap = bucketEventsByDay(userEvents);
 
     const days = Object.keys(daysMap).map((date) => ({
       date,
