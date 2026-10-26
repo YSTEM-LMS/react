@@ -4,16 +4,28 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Chess as ChessClass } from 'chess.js';
 import { io } from 'socket.io-client';
 import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import { Move } from '../../core/types/chess';
+import { SavedGame } from '../../core/types/savedGame';
 import ChessBoard, { ChessBoardRef } from '../../components/ChessBoard/ChessBoard';
 import { environment } from "../../environments";
 import { cn } from '../../core/utils/cn';
+import { createSavedGame, getSavedGame, updateSavedGame } from '../../core/services/savedGamesApi';
 import StockfishTutor from './StockfishTutor';
 
 // chess.js exposes a named export `Chess`; normalize to a local constructor variable.
 const Chess: any = ChessClass;
 
 type Difficulty = 1 | 5 | 10 | 15 | 20;
+
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+// Saves wait this long after the last move, so a player move and the
+// computer's reply go out as one request.
+export const SAVE_DEBOUNCE_MS = 800;
+
+type SaveState = 'off' | 'saving' | 'saved' | 'error';
 
 // SVG Icons matching user mock-up
 const CpuIcon = () => (
@@ -115,10 +127,102 @@ const PlayComputer: React.FC = () => {
   const [tutorMoveUci, setTutorMoveUci] = useState<string | undefined>(undefined);
   const [tutorFenAfter, setTutorFenAfter] = useState<string | undefined>(undefined);
 
+  // ---- Saved games (logged-in players only) ----
+  // The game is saved as PGN; the server replays it and decides the result.
+  const [cookies] = useCookies(['login']);
+  const token: string | undefined = cookies.login || undefined;
+  const tokenRef = useRef<string | undefined>(token);
+  const savedUuidRef = useRef<string | null>(null);
+  const startFenRef = useRef<string>(START_FEN);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Saves run one at a time, in order, so an older save can't land last.
+  const saveChainRef = useRef<Promise<void>>(Promise.resolve());
+  const [saveState, setSaveState] = useState<SaveState>('off');
+  const [saveError, setSaveError] = useState('');
+  const resumeUuid: string | undefined = (location.state as any)?.resumeUuid;
+  const [resumeReady, setResumeReady] = useState(false);
+
+  useEffect(() => { tokenRef.current = token; }, [token]);
+
+  // Captures the uuid and PGN now, then queues the request behind any save
+  // already in flight.
+  const flushSave = useCallback((extra?: { resign?: true }) => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    const uuid = savedUuidRef.current;
+    const tok = tokenRef.current;
+    if (!uuid || !tok) return saveChainRef.current;
+    const changes = { pgn: gameRef.current.pgn(), ...extra };
+    setSaveState('saving');
+    saveChainRef.current = saveChainRef.current.then(async () => {
+      try {
+        await updateSavedGame(tok, uuid, changes);
+        setSaveState('saved');
+        setSaveError('');
+      } catch (err: any) {
+        setSaveState('error');
+        setSaveError(err?.message || 'Save failed');
+      }
+    });
+    return saveChainRef.current;
+  }, []);
+
+  const scheduleSave = useCallback(() => {
+    if (!savedUuidRef.current) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => { flushSave(); }, SAVE_DEBOUNCE_MS);
+  }, [flushSave]);
+
+  // The game just ended: save the final moves (and a resignation, if any),
+  // then stop saving. The server locks a finished game's moves, so an undo
+  // after this only changes the board, not the saved record.
+  const finishSavedGame = useCallback((extra?: { resign?: true }) => {
+    flushSave(extra);
+    savedUuidRef.current = null;
+  }, [flushSave]);
+
+  // Saves any pending moves, then detaches from the saved game so the next
+  // game starts a new record.
+  const detachSavedGame = useCallback(() => {
+    if (saveTimerRef.current) flushSave();
+    savedUuidRef.current = null;
+    startFenRef.current = START_FEN;
+    setSaveState('off');
+    setSaveError('');
+  }, [flushSave]);
+
+  // Logged-in players get a saved record for each new game.
+  const startSavingNewGame = useCallback(() => {
+    const tok = tokenRef.current;
+    if (!tok) return;
+    setSaveState('saving');
+    createSavedGame(tok, {
+      playerColor: playerColorRef.current,
+      computerLevel: difficultyRef.current,
+    })
+      .then((game) => {
+        savedUuidRef.current = game.uuid;
+        setSaveState('saved');
+        setSaveError('');
+        // Save any moves made while the game was being created.
+        if (gameRef.current.history().length > 0) scheduleSave();
+      })
+      .catch((err: any) => {
+        setSaveState('error');
+        setSaveError(err?.message || 'Could not start saving this game');
+      });
+  }, [scheduleSave]);
+
+  // Don't drop a pending save when the player leaves the page.
+  useEffect(() => () => { if (saveTimerRef.current) flushSave(); }, [flushSave]);
+
 
   // When the user clicks "Play" in the navbar while a game is active, reset to settings
   useEffect(() => {
     if (!sessionStartedRef.current) return;
+    detachSavedGame();
     socketRef.current?.emit('end-session');
     gameRef.current.reset();
     setFen(gameRef.current.fen());
@@ -129,7 +233,7 @@ const PlayComputer: React.FC = () => {
     setShowSettings(true);
     setSessionStarted(false);
     sessionStartedRef.current = false;
-  }, [location.key]);
+  }, [location.key, detachSavedGame]);
 
   useEffect(() => { playerColorRef.current = playerColor; }, [playerColor]);
   useEffect(() => { sessionStartedRef.current = sessionStarted; }, [sessionStarted]);
@@ -166,7 +270,10 @@ const PlayComputer: React.FC = () => {
     socket.on('session-started', ({ success }) => {
       setSessionStarted(true);
       sessionStartedRef.current = true;
-      if (success && playerColorRef.current === 'black') {
+      // The computer moves first if it's its turn: a new game as black, or a
+      // resumed game saved on the computer's move.
+      const sideToMove = gameRef.current.turn() === 'w' ? 'white' : 'black';
+      if (success && sideToMove !== playerColorRef.current) {
         requestComputerMove(gameRef.current.fen());
       }
     });
@@ -189,7 +296,8 @@ const PlayComputer: React.FC = () => {
               chessBoardRef.current.setPosition(updatedFen);
               chessBoardRef.current.highlightMove(moveResult.from, moveResult.to);
             }
-            checkGameStatus();
+            if (checkGameStatus()) finishSavedGame();
+            else scheduleSave();
             // Trigger tutor to analyze the player's move now that the computer has responded
             setTutorTrigger(t => t + 1);
           }
@@ -206,9 +314,9 @@ const PlayComputer: React.FC = () => {
     });
 
     return () => { socket.disconnect(); };
-  }, [requestComputerMove]);
+  }, [requestComputerMove, finishSavedGame, scheduleSave]);
 
-  const startSession = useCallback(() => {
+  const startSession = useCallback((options?: { resuming?: boolean }) => {
     if (!connected || !socketRef.current) {
       alert('Not connected to server');
       return;
@@ -218,7 +326,80 @@ const PlayComputer: React.FC = () => {
       fen: gameRef.current.fen(),
     });
     setShowSettings(false);
-  }, [connected]);
+
+    // A resumed game already has a saved record.
+    if (!options?.resuming) startSavingNewGame();
+  }, [connected, startSavingNewGame]);
+
+  // Resume: SelectGame navigates here with { resumeUuid }. Load the saved
+  // PGN, restore the settings, then start the engine from that position.
+  const loadSavedGame = useCallback((game: SavedGame) => {
+    const restored = new Chess(game.startFen);
+    if (game.pgn) restored.loadPgn(game.pgn);
+
+    const replay = new Chess(game.startFen);
+    const fens = [replay.fen()];
+    const ucis: string[] = [];
+    const moves: string[] = [];
+    for (const m of restored.history({ verbose: true })) {
+      replay.move(m.san);
+      fens.push(replay.fen());
+      ucis.push(`${m.from}${m.to}${m.promotion ?? ''}`);
+      moves.push(`${m.from} -> ${m.to}`);
+    }
+
+    gameRef.current = restored;
+    startFenRef.current = game.startFen;
+    savedUuidRef.current = game.uuid;
+    playerColorRef.current = game.playerColor;
+    setPlayerColor(game.playerColor);
+    if (game.computerLevel !== null) {
+      difficultyRef.current = game.computerLevel as Difficulty;
+      setDifficulty(game.computerLevel as Difficulty);
+    }
+    setFen(restored.fen());
+    setMoveHistory(moves);
+    setFenHistory(fens);
+    setUciHistoryArr(ucis);
+    const last = ucis[ucis.length - 1];
+    setHighlightSquares(last ? [last.slice(0, 2), last.slice(2, 4)] : []);
+    setSaveState('saved');
+    setSaveError('');
+    setResumeReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!resumeUuid) return;
+    if (!token) {
+      setSaveState('error');
+      setSaveError('Log in to resume a saved game.');
+      return;
+    }
+    let cancelled = false;
+    getSavedGame(token, resumeUuid)
+      .then((game) => {
+        if (cancelled) return;
+        if (game.status !== 'ongoing') {
+          setSaveState('error');
+          setSaveError('That game is finished, so it can’t be resumed.');
+          return;
+        }
+        loadSavedGame(game);
+      })
+      .catch((err: any) => {
+        if (cancelled) return;
+        setSaveState('error');
+        setSaveError(err?.message || 'Could not load that game');
+      });
+    return () => { cancelled = true; };
+  }, [resumeUuid, token, loadSavedGame]);
+
+  // Start the engine once the resumed game is loaded and the socket is up.
+  useEffect(() => {
+    if (!resumeReady || !connected) return;
+    setResumeReady(false);
+    startSession({ resuming: true });
+  }, [resumeReady, connected, startSession]);
 
   const handleMove = useCallback((move: Move) => {
     try {
@@ -249,8 +430,10 @@ const PlayComputer: React.FC = () => {
       if (checkGameStatus()) {
         // Trigger tutor immediately if the game ends because the computer won't make a move
         setTutorTrigger(t => t + 1);
+        finishSavedGame();
         return;
       }
+      scheduleSave();
 
       if (socketRef.current) {
         socketRef.current.emit('update-fen', { fen: newFen });
@@ -259,7 +442,7 @@ const PlayComputer: React.FC = () => {
     } catch (error) {
       console.error('Error handling move:', error);
     }
-  }, [requestComputerMove]);
+  }, [requestComputerMove, finishSavedGame, scheduleSave]);
 
   const checkGameStatus = useCallback((): boolean => {
     const game = gameRef.current;
@@ -288,7 +471,7 @@ const PlayComputer: React.FC = () => {
   }, []);
 
   const resetGame = useCallback(() => {
-    gameRef.current.reset();
+    gameRef.current = new Chess(startFenRef.current);
     const startFen = gameRef.current.fen();
     setFen(startFen);
     setMoveHistory([]);
@@ -298,6 +481,7 @@ const PlayComputer: React.FC = () => {
     setTutorMoveUci(undefined);
     setFenHistory([startFen]);
     setUciHistoryArr([]);
+    setGameStatus('');
 
     if (chessBoardRef.current) chessBoardRef.current.reset();
     if (socketRef.current && sessionStartedRef.current) {
@@ -306,19 +490,36 @@ const PlayComputer: React.FC = () => {
         setTimeout(() => requestComputerMove(startFen), 500);
       }
     }
-  }, [requestComputerMove]);
+    // A saved game that's reset keeps its record, with no moves. If the last
+    // game already finished (and was detached), the replay is a new game.
+    if (savedUuidRef.current) scheduleSave();
+    else if (sessionStartedRef.current) startSavingNewGame();
+  }, [requestComputerMove, scheduleSave, startSavingNewGame]);
 
   const newGame = useCallback(() => {
     if (socketRef.current && sessionStartedRef.current) {
       socketRef.current.emit('end-session');
     }
-    resetGame();
-    setShowSettings(true);
+    detachSavedGame();
+    // Mark the session ended first, so resetGame doesn't open a new record.
     setSessionStarted(false);
     sessionStartedRef.current = false;
+    resetGame();
+    setShowSettings(true);
     setTutorFenBefore(undefined);
     setTutorMoveUci(undefined);
-  }, [resetGame]);
+  }, [resetGame, detachSavedGame]);
+
+  // Resigning is the one result the browser is allowed to report; the
+  // server decides checkmate and draws itself from the saved moves.
+  const resign = useCallback(() => {
+    if (!window.confirm('Resign this game? The computer will win.')) return;
+    const message = 'You resigned. The computer wins!';
+    setGameStatus(message);
+    setGameEndMessage(message);
+    setShowGameEndModal(true);
+    finishSavedGame({ resign: true });
+  }, [finishSavedGame]);
 
   const undoMove = useCallback(() => {
     if (moveHistory.length < 2) return;
@@ -344,27 +545,24 @@ const PlayComputer: React.FC = () => {
       setFenHistory(prev => prev.slice(0, -2));
       setUciHistoryArr(prev => prev.slice(0, -2));
     } catch (e) {}
-  }, [moveHistory.length]);
+    scheduleSave();
+  }, [moveHistory.length, scheduleSave]);
 
   const gotoPly = useCallback((plyIndex: number) => {
     try {
       const targetFen = fenHistory[plyIndex + 1];
       const uci = uciHistoryArr[plyIndex];
       if (!targetFen) return;
-      // Load the target FEN into the game engine so subsequent moves continue from here
+      // Rebuild the game by replaying the moves up to this ply. Loading the
+      // target FEN directly would wipe chess.js's move history, and the
+      // saved PGN (which the server replays from the start) needs it.
       try {
-        if (gameRef.current && typeof gameRef.current.load === 'function') {
-          gameRef.current.load(targetFen);
-        } else {
-          // Some builds of chess.js may not expose a .load method on the instance; recreate the game from FEN
-          try {
-            // eslint-disable-next-line new-cap
-            gameRef.current = new Chess(targetFen);
-          } catch (e) {
-            // As a last resort, leave the engine as-is; the board UI will still reflect the chosen FEN
-          }
+        const rebuilt = new Chess(startFenRef.current);
+        for (const u of uciHistoryArr.slice(0, plyIndex + 1)) {
+          rebuilt.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u.slice(4) || undefined });
         }
-      } catch (e) { /* ignore load errors */ }
+        gameRef.current = rebuilt;
+      } catch (e) { /* leave the engine as-is; the board UI still shows the chosen FEN */ }
 
       setFen(targetFen);
       if (uci && uci.length >= 4) {
@@ -395,8 +593,9 @@ const PlayComputer: React.FC = () => {
       try {
         if (socketRef.current) socketRef.current.emit('update-fen', { fen: targetFen });
       } catch (e) {}
+      scheduleSave();
     } catch (e) { console.error('gotoPly failed', e); }
-  }, [fenHistory, uciHistoryArr]);
+  }, [fenHistory, uciHistoryArr, scheduleSave]);
 
   const difficulties: { label: string; value: Difficulty }[] = [
     { label: 'Easy', value: 1 },
@@ -462,11 +661,23 @@ const PlayComputer: React.FC = () => {
 
           <button
             className="mt-4 w-full rounded-2xl border-[3px] border-[#1F1F1F] bg-[#7FCC26] px-0 py-4 text-[20px] font-extrabold text-[#1F1F1F] shadow-[4px_4px_0_#1F1F1F] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#1F1F1F] active:translate-y-0 active:shadow-[2px_2px_0_#1F1F1F] disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={startSession}
+            onClick={() => startSession()}
             disabled={!connected}
           >
             {connected ? 'Start Game' : 'Connecting...'}
           </button>
+
+          {saveState === 'error' && saveError && (
+            <p className="mt-4 text-center text-[14px] font-bold text-[#C53030]">{saveError}</p>
+          )}
+          {token && (
+            <Link
+              to="/select-game"
+              className="mt-5 block text-center text-[15px] font-bold text-[#5A991E] underline-offset-4 hover:underline"
+            >
+              Your saved games →
+            </Link>
+          )}
         </div>
       ) : (
         <div className="flex w-full max-w-[1300px] gap-6 rounded-[24px] border-2 border-[#1F1F1F] bg-white p-6 shadow-[10px_10px_0_#7FCC26] box-border max-[840px]:flex-col max-[840px]:items-center">
@@ -579,6 +790,20 @@ const PlayComputer: React.FC = () => {
                   <div className="text-[24px] font-black text-[#1F1F1F]">{moveHistory.length}</div>
                 </div>
               </div>
+              <p
+                data-testid="save-status"
+                className={cn('mt-4 text-center text-[12px] font-bold', saveState === 'error' ? 'text-[#C53030]' : 'text-slate-500')}
+              >
+                {!token
+                  ? 'Log in to save your games'
+                  : saveState === 'saving'
+                    ? 'Saving…'
+                    : saveState === 'saved'
+                      ? 'Game saved'
+                      : saveState === 'error'
+                        ? `Not saved: ${saveError}`
+                        : ''}
+              </p>
             </div>
 
             <div className="w-full rounded-[20px] border-2 border-[#1F1F1F] bg-white p-5">
@@ -618,6 +843,13 @@ const PlayComputer: React.FC = () => {
                   <span>Flip Board</span>
                 </button>
               </div>
+              <button
+                className="mt-3 flex w-full items-center justify-center rounded-xl border border-[#FC8181] bg-[#FFF5F5] px-3 py-3 text-[13px] font-bold text-[#C53030] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#C53030] disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={resign}
+                disabled={moveHistory.length === 0 || gameStatus.includes('wins') || showGameEndModal}
+              >
+                Resign
+              </button>
             </div>
 
             <div className="w-full rounded-[20px] border-2 border-[#1F1F1F] bg-white p-5">
