@@ -6,12 +6,22 @@ services:
       - "27017:27017"
     volumes:
       - dev-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
   middlewarenode:
     environment:
       - MONGO_URI=mongodb://mongo:27017/ystem_dev
+    # Wait until Mongo answers, not just until its container starts:
+    # middleware exits if its first connection fails.
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    restart: on-failure
 
 volumes:
   dev-mongo-data:

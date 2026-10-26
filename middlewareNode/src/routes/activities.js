@@ -11,6 +11,7 @@
  */
 
 const config = require("config");
+const fallbackDbName = require("../config/fallbackDbName");
 const express = require('express');
 const router = express.Router({mergeParams: true});
 const { MongoClient, ObjectId } = require('mongodb');
@@ -34,7 +35,7 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  return cachedClient.db("ystem");
+  return cachedClient.db(fallbackDbName(config.get("mongoURI")));
 }
 
 /**

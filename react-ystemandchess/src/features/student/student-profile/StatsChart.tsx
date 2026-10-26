@@ -73,6 +73,11 @@ const StatsChart: React.FC<StatsChartProps> = ({ monthAxis, dataAxis }) => {
   data={data}
   options={{
     maintainAspectRatio: false,
+    // Time spent is never negative. Without a floor, Chart.js pads an
+    // all-zero series (a new student) to -1..1.
+    scales: {
+      y: { beginAtZero: true, min: 0 },
+    },
     plugins: {
       legend: {
         position: 'top',
