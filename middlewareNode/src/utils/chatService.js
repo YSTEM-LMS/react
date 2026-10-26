@@ -11,18 +11,27 @@ trainingData.forEach(item => {
   });
 });
 
-let isTrained = false;
+let trainingPromise = null;
 
 /**
- * Trains the local NLP model at server startup (takes < 100ms)
+ * Trains the local NLP model the first time it's needed. Messages that
+ * arrive while training share the same run; a failed run is retried on
+ * the next message.
  */
-const trainModel = async () => {
-  if (isTrained) return;
-  console.log('Training local AI Chatbot model...');
-  const start = Date.now();
-  await manager.train();
-  isTrained = true;
-  console.log(`AI Chatbot trained successfully in ${Date.now() - start}ms!`);
+const trainModel = () => {
+  if (!trainingPromise) {
+    console.log('Training local AI Chatbot model...');
+    const start = Date.now();
+    trainingPromise = manager.train()
+      .then(() => {
+        console.log(`AI Chatbot trained successfully in ${Date.now() - start}ms!`);
+      })
+      .catch((err) => {
+        trainingPromise = null;
+        throw err;
+      });
+  }
+  return trainingPromise;
 };
 
 /**
@@ -169,8 +178,9 @@ const generateSessionSummary = (messages, topic) => {
   return { summary, actions };
 };
 
-// Initialize training in the background on load
-trainModel().catch(console.error);
+// No training on load: requiring this module (including Jest's automock,
+// which runs it once to read its exports) must stay cheap. processMessage
+// trains on first use.
 
 module.exports = {
   processMessage,
