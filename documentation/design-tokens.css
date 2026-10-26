@@ -1,0 +1,954 @@
+/**
+ * Y STEM and Chess — Design Tokens
+ * ============================================================
+ * Standalone CSS stylesheet for use by AI coding agents and any
+ * environment that does NOT have access to the Tailwind CSS build.
+ *
+ * No build step required. Link directly:
+ *   <link rel="stylesheet" href="design-tokens.css">
+ *
+ * Or reference the raw GitHub URL for external agents.
+ *
+ * Mirrors the design token system in tailwind.config.js and index.css.
+ * See design.md for usage rules and anti-patterns.
+ * ============================================================
+ */
+
+
+/* ============================================================
+   SECTION 1: CSS Custom Properties (Design Tokens)
+   ============================================================ */
+
+:root {
+
+  /* ----------------------------------------------------------
+     1.1 Color Palette
+     Source: tailwind.config.js → theme.extend.colors
+     ---------------------------------------------------------- */
+
+  /* Brand greens */
+  --color-primary:      #7FCC26; /* Main brand green — CTAs, active states, focus rings */
+  --color-secondary:    #BFD99E; /* Muted green — hover states on icons, supporting accents */
+  --color-soft:         #E5F3D2; /* Light green — page background, icon containers, card tints */
+
+  /* Accent */
+  --color-accent:       #EAD94C; /* Yellow — gamification highlights, active toolbar icons, badge borders */
+
+  /* Neutrals */
+  --color-dark:         #1F1F1F; /* Near-black — primary text, borders, btn-primary background */
+  --color-gray:         #5C5C5C; /* Secondary text — body copy, nav links, dropdown items */
+  --color-muted:        #8A8A8A; /* Placeholder text, disabled states, metadata labels */
+  --color-border-light: #D6D6D6; /* Borders, dividers */
+  --color-light:        #F9FAF7; /* Off-white — surfaces: navbar, footer, forms, modals, dropdowns */
+
+  /* Semantic / Error */
+  --color-red:          #D64545; /* Errors, destructive actions, invalid input borders */
+  --color-red-light:    #F5E9E9; /* Error backgrounds */
+
+
+  /* ----------------------------------------------------------
+     1.2 Typography
+     Source: Google Fonts — Lato (400, 500, 700)
+     ---------------------------------------------------------- */
+
+  --font-family-base:    'Lato', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --font-weight-normal:  400;
+  --font-weight-medium:  500;
+  --font-weight-bold:    700;
+
+  /* Type scale — pixel equivalents of Tailwind's rem scale */
+  --text-xs:   0.75rem;    /* 12px — captions, metadata, copyright */
+  --text-sm:   0.875rem;   /* 14px — labels, timestamps, small body */
+  --text-base: 1rem;       /* 16px — default body text */
+  --text-lg:   1.125rem;   /* 18px — nav links, slightly larger body */
+  --text-xl:   1.25rem;    /* 20px — large body, card descriptions */
+  --text-2xl:  1.5rem;     /* 24px — footer wordmark, sub-headings */
+  --text-3xl:  1.875rem;   /* 30px — section headings */
+  --text-4xl:  2.25rem;    /* 36px — hero headings (desktop) */
+
+  /* Line heights */
+  --leading-tight:   1.25;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;  /* Default for body text blocks */
+
+
+  /* ----------------------------------------------------------
+     1.3 Spacing Scale (4px base)
+     Mirrors Tailwind's default spacing scale
+     ---------------------------------------------------------- */
+
+  --space-0:   0;
+  --space-1:   0.25rem;   /* 4px */
+  --space-2:   0.5rem;    /* 8px */
+  --space-3:   0.75rem;   /* 12px */
+  --space-4:   1rem;      /* 16px */
+  --space-5:   1.25rem;   /* 20px */
+  --space-6:   1.5rem;    /* 24px */
+  --space-8:   2rem;      /* 32px */
+  --space-10:  2.5rem;    /* 40px */
+  --space-12:  3rem;      /* 48px */
+  --space-16:  4rem;      /* 64px */
+  --space-20:  5rem;      /* 80px */
+  --space-24:  6rem;      /* 96px */
+
+
+  /* ----------------------------------------------------------
+     1.4 Border Radius
+     ---------------------------------------------------------- */
+
+  --radius-sm:   0.125rem;  /* 2px — rarely used */
+  --radius-md:   0.375rem;  /* 6px — small elements */
+  --radius-lg:   0.5rem;    /* 8px — rounded-lg — dropdowns, icon containers */
+  --radius-xl:   0.75rem;   /* 12px — rounded-xl — btn-green, inputs */
+  --radius-2xl:  1rem;      /* 16px — rounded-2xl — modals, forms */
+  --radius-3xl:  1.5rem;    /* 24px — rounded-3xl — brand tier cards */
+  --radius-full: 9999px;    /* Full pill — btn-primary, avatar circles, dots */
+
+
+  /* ----------------------------------------------------------
+     1.5 Shadows
+     Source: tailwind.config.js → theme.extend.boxShadow
+     ---------------------------------------------------------- */
+
+  --shadow-sm:          0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md:          0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:          0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl:          0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Brand card shadows — the most visually distinctive pattern */
+  --shadow-card-yellow: 1.25rem 1.25rem 0.063rem rgb(209, 230, 28);  /* Free card — offset yellow */
+  --shadow-card-green:  1.25rem 1.25rem 0.063rem rgb(115, 179, 19);  /* Premium card — offset green */
+
+
+  /* ----------------------------------------------------------
+     1.6 Animation
+     ---------------------------------------------------------- */
+
+  --duration-fast:   150ms;  /* Modals, snappy micro-interactions */
+  --duration-base:   300ms;  /* Nav links, dropdowns, card hovers */
+  --duration-slow:   500ms;  /* Button color transitions */
+
+  --easing-default:  ease;
+  --easing-out:      ease-out;
+
+
+  /* ----------------------------------------------------------
+     1.7 Z-Index Scale
+     ---------------------------------------------------------- */
+
+  --z-base:    0;
+  --z-above:   10;
+  --z-dropdown: 20;   /* Dropdowns and nav menus */
+  --z-sticky:  50;    /* Sticky navbar */
+  --z-modal:   50;    /* Modals and overlays */
+}
+
+
+/* ============================================================
+   SECTION 2: Base Reset & Body Defaults
+   Mirrors src/index.css base styles
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-dark);
+  background-color: var(--color-soft);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   SECTION 3: Component Classes
+   Mirrors @layer components in src/index.css
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   3.1 Button: Primary
+   Dark pill CTA. Use on light/soft backgrounds.
+   Example: "Donate", "Join Now!", "Get Started!"
+   ---------------------------------------------------------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--color-dark);
+  color: var(--color-light);
+  font-family: var(--font-family-base);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);  /* semibold approximated as bold */
+  line-height: var(--leading-relaxed);
+
+  padding: var(--space-3) var(--space-8);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-dark);
+
+  cursor: pointer;
+  transition:
+    transform var(--duration-slow) var(--easing-default),
+    background-color var(--duration-slow) var(--easing-default);
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  background-color: #000;
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+
+/* ----------------------------------------------------------
+   3.2 Button: Green
+   Primary brand green rounded button. Use inside forms, modals.
+   Example: "Enter", "OK", "Confirm"
+   ---------------------------------------------------------- */
+.btn-green {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--color-primary);
+  color: var(--color-light);
+  font-family: var(--font-family-base);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+
+  padding: var(--space-3) var(--space-8);
+  border-radius: var(--radius-xl);
+  border: none;
+  box-shadow: var(--shadow-md);
+
+  cursor: pointer;
+  transition:
+    opacity var(--duration-base) var(--easing-default),
+    transform var(--duration-base) var(--easing-default);
+}
+
+.btn-green:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.btn-green:active {
+  transform: scale(0.95);
+}
+
+.btn-green:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-green:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(127, 204, 38, 0.5);
+}
+
+
+/* ----------------------------------------------------------
+   3.3 Button: Toolbar
+   Transparent icon-only button for the student dashboard toolbar.
+   Must contain only an SVG element as a child.
+   ---------------------------------------------------------- */
+.btn-toolbar {
+  position: relative;
+  flex: 1;
+  max-width: 20rem;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition:
+    transform var(--duration-base) var(--easing-default);
+}
+
+.btn-toolbar:hover {
+  transform: scale(1.05);
+}
+
+.btn-toolbar:active {
+  transform: scale(0.95);
+}
+
+.btn-toolbar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+
+/* ----------------------------------------------------------
+   3.4 Scrollbar: Activity Feed
+   Custom green scrollbar for the activity timeline container.
+   ---------------------------------------------------------- */
+.activity-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-soft);
+}
+
+.activity-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.activity-scrollbar::-webkit-scrollbar-track {
+  background: var(--color-soft);
+}
+
+.activity-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+
+/* ============================================================
+   SECTION 4: Layout Utilities
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   4.1 Page Container
+   Standard section container with horizontal padding.
+   ---------------------------------------------------------- */
+.container-page {
+  width: 100%;
+  max-width: 80rem; /* max-w-7xl = 1280px */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .container-page {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+/* ----------------------------------------------------------
+   4.2 Dashboard Container
+   Wider container for full-width dashboard layouts.
+   ---------------------------------------------------------- */
+.container-dashboard {
+  width: 100%;
+  max-width: 96rem; /* max-w-screen-2xl = 1536px */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+}
+
+
+/* ============================================================
+   SECTION 5: Card Components
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   5.1 Standard Content Card
+   Subtle bordered card for list items and content blocks.
+   ---------------------------------------------------------- */
+.card {
+  background-color: var(--color-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-base) var(--easing-default);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+
+/* ----------------------------------------------------------
+   5.2 Brand Card — Green (Free tier)
+   Large rounded card with offset yellow shadow.
+   ---------------------------------------------------------- */
+.card-brand-green {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-color: var(--color-primary);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-card-yellow);
+  padding: var(--space-8);
+  gap: var(--space-4);
+
+  width: 100%;
+}
+
+
+/* ----------------------------------------------------------
+   5.3 Brand Card — Light (Premium tier)
+   Large rounded card with offset green shadow.
+   ---------------------------------------------------------- */
+.card-brand-light {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-color: var(--color-light);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-card-green);
+  padding: var(--space-8);
+  gap: var(--space-4);
+
+  width: 100%;
+}
+
+
+/* ----------------------------------------------------------
+   5.4 Auth / Form Card
+   Centered form panel. Max width 384px (max-w-sm).
+   ---------------------------------------------------------- */
+.card-form {
+  width: 100%;
+  max-width: 24rem; /* 384px */
+  background-color: var(--color-light);
+  border-radius: var(--radius-2xl);
+  border: 2px solid var(--color-dark);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+
+/* ----------------------------------------------------------
+   5.5 CTA Box
+   Full-width bordered call-to-action block.
+   ---------------------------------------------------------- */
+.card-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+
+  border: 4px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-12) var(--space-6);
+}
+
+
+/* ============================================================
+   SECTION 6: Modal Components
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   6.1 Modal Overlay
+   Full-screen dark backdrop. Centers modal content.
+   ---------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: rgba(31, 31, 31, 0.5); /* dark/50 */
+}
+
+
+/* ----------------------------------------------------------
+   6.2 Modal Content Panel
+   The white card that slides in on top of the overlay.
+   ---------------------------------------------------------- */
+.modal-content {
+  background-color: var(--color-light);
+  width: 100%;
+  max-width: 24rem; /* 384px */
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-8);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+
+  animation: modal-in var(--duration-fast) var(--easing-out);
+}
+
+
+/* ----------------------------------------------------------
+   6.3 Modal Icon Containers
+   ---------------------------------------------------------- */
+.modal-icon-success {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full);
+  background-color: rgba(127, 204, 38, 0.2); /* primary/20 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon-error {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-spinner {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full);
+  border: 4px solid var(--color-soft);
+  border-top-color: var(--color-primary);
+  animation: spin 1s linear infinite;
+}
+
+
+/* ============================================================
+   SECTION 7: Form Elements
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   7.1 Standard Input
+   Rounded input with brand focus state.
+   ---------------------------------------------------------- */
+.input-base {
+  width: 100%;
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--color-border-light);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family-base);
+  font-size: var(--text-sm);
+  color: var(--color-dark);
+  background-color: #fff;
+  caret-color: var(--color-dark);
+  transition: border-color var(--duration-base) var(--easing-default);
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+
+/* ----------------------------------------------------------
+   7.2 Input — Error State
+   ---------------------------------------------------------- */
+.input-error {
+  border-color: var(--color-red);
+}
+
+.input-error:focus {
+  border-color: var(--color-red);
+}
+
+
+/* ----------------------------------------------------------
+   7.3 Form Label
+   ---------------------------------------------------------- */
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-dark);
+  margin-bottom: var(--space-1);
+}
+
+
+/* ----------------------------------------------------------
+   7.4 Error / Alert Text
+   ---------------------------------------------------------- */
+.error-text {
+  color: var(--color-red);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+
+/* ============================================================
+   SECTION 8: Navigation
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   8.1 NavBar Shell
+   Sticky top navigation bar.
+   ---------------------------------------------------------- */
+.navbar {
+  background-color: var(--color-light);
+  border-bottom: 2px solid var(--color-dark);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  height: 6rem; /* h-24 */
+}
+
+/* ----------------------------------------------------------
+   8.2 Nav Link
+   Standard navigation link — text, hover to primary.
+   ---------------------------------------------------------- */
+.nav-link {
+  padding: 0 var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-dark);
+  transition: color var(--duration-base) var(--easing-default);
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: var(--color-primary);
+}
+
+/* ----------------------------------------------------------
+   8.3 Dropdown Panel
+   Floating dropdown menu for nav sections.
+   ---------------------------------------------------------- */
+.nav-dropdown {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  margin-top: var(--space-3);
+  width: 16rem; /* w-64 */
+  border-radius: var(--radius-md);
+  background-color: var(--color-light);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+}
+
+.nav-dropdown-header {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-dark);
+  margin-bottom: var(--space-2);
+}
+
+.nav-dropdown-link {
+  font-size: var(--text-base);
+  color: var(--color-gray);
+  transition: color var(--duration-base) var(--easing-default);
+  text-decoration: none;
+  display: block;
+}
+
+.nav-dropdown-link:hover {
+  color: var(--color-primary);
+}
+
+
+/* ============================================================
+   SECTION 9: Footer
+   ============================================================ */
+
+.footer {
+  width: 100%;
+  background-color: var(--color-light);
+  border-top: 2px solid var(--color-dark);
+  padding-top: var(--space-10);
+  padding-bottom: var(--space-8);
+}
+
+.footer-icon-container {
+  width: 2.5rem;  /* 40px */
+  height: 2.5rem;
+  background-color: var(--color-soft);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(127, 204, 38, 0.2); /* primary/20 */
+  transition: background-color var(--duration-base), color var(--duration-base);
+}
+
+.footer-icon-container:hover {
+  background-color: var(--color-primary);
+  color: var(--color-light);
+}
+
+.footer-social-btn {
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  transition: background-color var(--duration-base) var(--easing-default);
+  display: inline-flex;
+}
+
+.footer-social-btn:hover {
+  background-color: var(--color-soft);
+}
+
+
+/* ============================================================
+   SECTION 10: Activity Timeline
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   10.1 Timeline Container
+   Scrollable feed with dotted left border.
+   ---------------------------------------------------------- */
+.timeline-container {
+  position: relative;
+  max-height: 700px;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+}
+
+/* Apply activity-scrollbar styles */
+.timeline-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-soft);
+}
+
+/* ----------------------------------------------------------
+   10.2 Timeline Track
+   The vertical dotted line.
+   ---------------------------------------------------------- */
+.timeline-track {
+  position: absolute;
+  left: 1rem; /* left-4 */
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 3px dotted var(--color-gray);
+}
+
+/* ----------------------------------------------------------
+   10.3 Timeline Dot
+   Green circle marker for each activity.
+   ---------------------------------------------------------- */
+.timeline-dot {
+  position: absolute;
+  left: -2.25rem; /* -left-9 */
+  top: 1.5rem;    /* top-6 */
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-light);
+  box-shadow: var(--shadow-sm);
+}
+
+
+/* ============================================================
+   SECTION 11: Loading Spinner
+   ============================================================ */
+
+.spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 3px solid rgba(127, 204, 38, 0.3);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+.spinner-lg {
+  width: 4rem;
+  height: 4rem;
+  border-width: 4px;
+}
+
+
+/* ============================================================
+   SECTION 12: Typography Utility Classes
+   ============================================================ */
+
+.text-hero {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-dark);
+  line-height: var(--leading-relaxed);
+}
+
+@media (min-width: 768px) {
+  .text-hero {
+    font-size: var(--text-4xl);
+  }
+}
+
+.text-section-heading {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-dark);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .text-section-heading {
+    font-size: var(--text-4xl);
+  }
+}
+
+.text-body-large {
+  font-size: var(--text-xl);
+  color: var(--color-gray);
+  line-height: var(--leading-relaxed);
+}
+
+.text-body {
+  font-size: var(--text-base);
+  color: var(--color-dark);
+  line-height: var(--leading-relaxed);
+}
+
+.text-body-secondary {
+  font-size: var(--text-base);
+  color: var(--color-gray);
+  line-height: var(--leading-relaxed);
+}
+
+.text-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+}
+
+.text-error {
+  color: var(--color-red);
+  font-weight: var(--font-weight-bold);
+}
+
+.text-accent-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color var(--duration-base) var(--easing-default);
+}
+
+.text-accent-link:hover {
+  color: var(--color-secondary);
+}
+
+
+/* ============================================================
+   SECTION 13: Avatar / Profile Picture
+   ============================================================ */
+
+.avatar {
+  position: relative;
+  width: 3.5rem;   /* 56px */
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-light);
+  border: 2px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform var(--duration-base) var(--easing-default);
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.avatar:active {
+  transform: scale(0.95);
+}
+
+
+/* ============================================================
+   SECTION 14: Keyframe Animations
+   Mirrors tailwind.config.js → theme.extend.keyframes
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   Modal entry — scale + fade in
+   Usage: apply animation: modal-in 0.15s ease-out
+   ---------------------------------------------------------- */
+@keyframes modal-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ----------------------------------------------------------
+   Fade out — for toast/notification dismissal
+   Usage: apply animation: fade-out 0.4s ease 2.1s forwards
+   ---------------------------------------------------------- */
+@keyframes fade-out {
+  to {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+/* ----------------------------------------------------------
+   Shake — for form validation errors
+   Usage: apply animation: shake 0.5s ease
+   ---------------------------------------------------------- */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-5px); }
+  75%       { transform: translateX(5px); }
+}
+
+/* ----------------------------------------------------------
+   Spin — for loading states
+   Usage: apply animation: spin 1s linear infinite
+   ---------------------------------------------------------- */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Convenience animation classes */
+.animate-modal-in {
+  animation: modal-in 150ms ease-out;
+}
+
+.animate-fade-out {
+  animation: fade-out 0.4s ease 2.1s forwards;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
