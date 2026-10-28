@@ -175,6 +175,21 @@ describe("PUT /meetings/endMeeting", () => {
     expect(meeting.save).toHaveBeenCalled();
   });
 
+  test("finds the meeting by username, like inMeeting, so a name change can't strand it", async () => {
+    // The meeting copies names from the waiting-queue entry; if the account's
+    // name changed since, matching on names made the session impossible to end.
+    mockCurrentAuthUser = MENTOR;
+    meetings.findOne.mockResolvedValue(ongoingMeeting());
+
+    const res = await request(app).put("/meetings/endMeeting");
+
+    expect(res.status).toBe(200);
+    expect(meetings.findOne).toHaveBeenCalledWith({
+      CurrentlyOngoing: true,
+      mentorUsername: "bob",
+    });
+  });
+
   test("stops the recording when one is running", async () => {
     mockCurrentAuthUser = MENTOR;
     meetings.findOne.mockResolvedValue(ongoingMeeting({ resourceId: "res-1", sid: "sid-1" }));

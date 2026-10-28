@@ -416,16 +416,14 @@ router.post("/pairUp", passport.authenticate("jwt", { session: false }), async (
 // @access  Public with jwt Authentication
 router.put("/endMeeting", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
-    const { role, username, firstName, lastName } = req.user; //retrieve jwt info
+    const { role, username } = req.user; //retrieve jwt info
+    // Match by username only, like inMeeting: the meeting's names are copied
+    // from the queue entry and go stale if the account is renamed.
     let filters = { CurrentlyOngoing: true };
     if (role === "student") {
       filters.studentUsername = username;
-      filters.studentFirstName = firstName;
-      filters.studentLastName = lastName;
     } else if (role === "mentor") {
       filters.mentorUsername = username;
-      filters.mentorFirstName = firstName;
-      filters.mentorLastName = lastName;
     } else {
       return res
         .status(404)
