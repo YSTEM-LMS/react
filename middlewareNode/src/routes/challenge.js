@@ -13,30 +13,10 @@
  */
 
 const express = require('express');
-const crypto = require('crypto');
+const router = express.Router({ mergeParams: true });
 const requireAuth = require('../middleware/requireAuth');
 const PvpGame = require('../models/PvpGame');
-const router = express.Router({ mergeParams: true });
-
-// challengeId -> { id, gameId, fromUsername, toUsername, status, createdAt }
-// status: "pending" | "accepted" | "declined"
-const challenges = new Map();
-
-// How long a pending/answered challenge lives before it's swept (ms).
-const CHALLENGE_TTL_MS = 2 * 60 * 1000;
-
-/**
- * Drops challenges older than the TTL so the map can't grow without bound.
- * Called opportunistically on each request — no background timer to leak.
- */
-function sweepExpired() {
-    const cutoff = Date.now() - CHALLENGE_TTL_MS;
-    for (const [id, c] of challenges) {
-        if (c.createdAt < cutoff) {
-            challenges.delete(id);
-        }
-    }
-}
+const challengeStore = require('../utils/challengeStore');
 
 /**
  * POST /challenge
@@ -44,7 +24,6 @@ function sweepExpired() {
  * Creates a pending challenge and returns its id + the reserved gameId.
  */
 router.post('/', requireAuth, (req, res) => {
-    sweepExpired();
     const { fromUsername, toUsername } = req.body || {};
 
     if (!fromUsername || !toUsername) {
@@ -59,28 +38,8 @@ router.post('/', requireAuth, (req, res) => {
         return res.status(403).json({ error: 'Forbidden: cannot create challenge for another user' });
     }
 
-    // Prevent stacking duplicate live challenges between the same pair.
-    for (const c of challenges.values()) {
-        if (
-            c.status === 'pending' &&
-            c.fromUsername === fromUsername &&
-            c.toUsername === toUsername
-        ) {
-            return res.status(200).json({ challengeId: c.id, gameId: c.gameId });
-        }
-    }
-
-    const challenge = {
-        id: crypto.randomUUID(),
-        gameId: crypto.randomUUID(),
-        fromUsername,
-        toUsername,
-        status: 'pending',
-        createdAt: Date.now(),
-    };
-    challenges.set(challenge.id, challenge);
-
-    return res.status(201).json({ challengeId: challenge.id, gameId: challenge.gameId });
+    const { challenge, created } = challengeStore.create(fromUsername, toUsername);
+    return res.status(created ? 201 : 200).json({ challengeId: challenge.id, gameId: challenge.gameId });
 });
 
 /**
@@ -88,7 +47,6 @@ router.post('/', requireAuth, (req, res) => {
  * Pending challenges addressed to this user (recipient short-poll).
  */
 router.get('/incoming/:username', requireAuth, (req, res) => {
-    sweepExpired();
     const { username } = req.params;
 
     // Enforce identity: caller can only inspect their own incoming challenges unless admin
@@ -96,13 +54,7 @@ router.get('/incoming/:username', requireAuth, (req, res) => {
         return res.status(403).json({ error: "Forbidden: cannot read another user's challenges" });
     }
 
-    const incoming = [];
-    for (const c of challenges.values()) {
-        if (c.status === 'pending' && c.toUsername === username) {
-            incoming.push({ challengeId: c.id, fromUsername: c.fromUsername, gameId: c.gameId });
-        }
-    }
-    return res.status(200).json({ challenges: incoming });
+    return res.status(200).json({ challenges: challengeStore.listIncoming(username) });
 });
 
 /**
@@ -110,8 +62,7 @@ router.get('/incoming/:username', requireAuth, (req, res) => {
  * Current status of a challenge (challenger short-polls for acceptance).
  */
 router.get('/:id', requireAuth, (req, res) => {
-    sweepExpired();
-    const challenge = challenges.get(req.params.id);
+    const challenge = challengeStore.get(req.params.id);
     if (!challenge) {
         return res.status(404).json({ error: 'Challenge not found or expired' });
     }
@@ -145,8 +96,7 @@ router.get('/:id', requireAuth, (req, res) => {
  * results plan (v2), target design.
  */
 router.post('/:id/accept', requireAuth, async (req, res) => {
-    sweepExpired();
-    const challenge = challenges.get(req.params.id);
+    const challenge = challengeStore.get(req.params.id);
     if (!challenge) {
         return res.status(404).json({ error: 'Challenge not found or expired' });
     }
@@ -177,12 +127,17 @@ router.post('/:id/accept', requireAuth, async (req, res) => {
         }
     }
 
-    challenge.status = 'accepted';
-
+    const acceptedChallenge = challengeStore.accept(challenge.id);
+    if (!acceptedChallenge) {
+        // An overlapping accept may have won the race while PvpGame.create() was awaited.
+        return challengeStore.get(challenge.id)
+            ? res.status(409).json({ error: 'Challenge already accepted' })
+            : res.status(404).json({ error: 'Challenge not found or expired' });
+    }
     return res.status(200).json({
-        gameId: challenge.gameId,
-        challenger: challenge.fromUsername,
-        opponent: challenge.toUsername,
+        gameId: acceptedChallenge.gameId,
+        challenger: acceptedChallenge.fromUsername,
+        opponent: acceptedChallenge.toUsername,
     });
 });
 
@@ -214,8 +169,7 @@ router.get('/game/:gameId', requireAuth, async (req, res) => {
  * POST /challenge/:id/decline
  */
 router.post('/:id/decline', requireAuth, (req, res) => {
-    sweepExpired();
-    const challenge = challenges.get(req.params.id);
+    const challenge = challengeStore.get(req.params.id);
     if (!challenge) {
         return res.status(404).json({ error: 'Challenge not found or expired' });
     }
@@ -232,10 +186,10 @@ router.post('/:id/decline', requireAuth, (req, res) => {
     if (challenge.status !== 'pending') {
         return res.status(409).json({ error: `Challenge already ${challenge.status}` });
     }
-    challenge.status = 'declined';
+    challengeStore.decline(challenge.id);
     return res.status(200).json({ message: 'declined' });
 });
 
 module.exports = router;
 // Exported for unit tests — resets the in-memory store between cases.
-module.exports._reset = () => challenges.clear();
+module.exports._reset = () => challengeStore.reset();
