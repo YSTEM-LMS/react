@@ -42,15 +42,33 @@ router.get("/list", async (req, res) => {
  *
  * Query Parameters:
  * - limit: Number of random puzzles to return (default: 20)
+ * - minRating: Minimum puzzle difficulty (default: 0)
+ * - maxRating: Maximum puzzle difficulty (default: 4000)
  *
  * @returns {Array} Array of randomly selected puzzles
  */
 router.get("/random", async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
-    const puzzlesArray = await puzzles.aggregate([
-      { $sample: { size: limit } },
-    ]);
+    const theme = typeof req.query.theme === "string" ? req.query.theme.trim() : "";
+    const minRating = parseInt(req.query.minRating) || 0;
+    const maxRating = parseInt(req.query.maxRating) || 4000;
+
+    const pipeline = [
+      { $match: { Rating: { $gte: minRating, $lte: maxRating } } },
+    ];
+
+    if (theme) {
+      // Themes is a space-separated token string; match on a whole token so
+      // "pin" doesn't also match "pinPossible", etc.
+      const escapedTheme = theme.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const themeTokenRegex = new RegExp(`(^|\\s)${escapedTheme}(\\s|$)`, "i");
+      pipeline.push({ $match: { Themes: themeTokenRegex } });
+    }
+
+    pipeline.push({ $sample: { size: limit } });
+
+    const puzzlesArray = await puzzles.aggregate(pipeline);
     res.status(200).json(puzzlesArray);
   } catch (error) {
     console.error(error.message);
@@ -140,7 +158,7 @@ router.post(
         });
       }
 
-      const puzzle = await puzzles.findOne({ puzzleId });
+      const puzzle = await puzzles.findOne({ PuzzleId: puzzleId });
 
       if (!puzzle) {
         return res.status(404).json({
@@ -148,7 +166,7 @@ router.post(
         });
       }
 
-      if (!movesMatch(moves, puzzle.moves)) {
+      if (!movesMatch(moves, puzzle.Moves)) {
         return res.status(400).json({
           error: "Submitted moves do not match the puzzle's solution",
         });

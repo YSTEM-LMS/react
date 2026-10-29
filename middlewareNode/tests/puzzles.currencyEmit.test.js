@@ -87,10 +87,13 @@ async function waitForActionEvent(query, timeoutMs = 2000) {
 const SOLUTION_MOVES = "e1g1 e8g8";
 
 async function seedPuzzle(puzzleId, moves = SOLUTION_MOVES) {
+  // Real documents use the capitalized schema field names (PuzzleId, Moves —
+  // see src/models/puzzles.js) — using the lowercase request-body names here
+  // instead would silently fail Mongoose's required-field validation.
   await puzzles.create({
-    puzzleId,
+    PuzzleId: puzzleId,
     FEN: "r3k2r/ppp2ppp/2n5/1B1p4/3P4/2P5/PP3PPP/R3K2R w KQkq - 0 1",
-    moves,
+    Moves: moves,
   });
 }
 
@@ -277,5 +280,43 @@ describe("POST /puzzles/solved — currency emit", () => {
     await new Promise((resolve) => setImmediate(resolve));
 
     expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
+  // Regression test for a casing bug: the route looked up puzzles by a
+  // lowercase `puzzleId` field and read a lowercase `moves` field back off
+  // the found document, but the real schema (src/models/puzzles.js) uses
+  // PuzzleId / Moves. That made puzzles.findOne() never match (always a
+  // false 404) and, separately, would have made movesMatch() always see an
+  // empty expected-move list (always a false 400) even if the lookup were
+  // fixed in isolation. This test builds the puzzle document directly with
+  // the real capitalized fields and checks both outcomes of the full path.
+  it("finds a real (PuzzleId/Moves) document, credits currency on a correct solve, and rejects a wrong one", async () => {
+    const puzzleId = "test-puzzle-real-casing";
+    await puzzles.create({
+      PuzzleId: puzzleId,
+      FEN: "r3k2r/ppp2ppp/2n5/1B1p4/3P4/2P5/PP3PPP/R3K2R w KQkq - 0 1",
+      Moves: SOLUTION_MOVES,
+    });
+
+    const userId = new mongoose.Types.ObjectId();
+    const correct = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: ["e1g1", "e8g8"] })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "regression-tester");
+
+    expect(correct.status).toBe(200);
+    const credited = await waitForActionEvent({ actionKey: "puzzle.solved" });
+    expect(credited).not.toBeNull();
+    expect(credited.userId.toString()).toBe(userId.toString());
+
+    const otherUserId = new mongoose.Types.ObjectId();
+    const wrong = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: ["a1a2", "a7a8"] })
+      .set("x-test-user-id", otherUserId.toString())
+      .set("x-test-username", "regression-tester-2");
+
+    expect(wrong.status).toBe(400);
   });
 });

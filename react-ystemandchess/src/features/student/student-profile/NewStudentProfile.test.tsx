@@ -53,10 +53,15 @@ jest.mock('react-chartjs-2', () => ({
   Line: () => <div data-testid="mock-line-chart" />,
 }));
 
-// mock Puzzles component to avoid SweetAlert2 CSS parsing issues
+// mock Puzzles component to avoid SweetAlert2 CSS parsing issues.
+// Forwards the `student` prop onto the stub so tests can assert on it
+// (React omits the data-student attribute entirely when the prop is
+// undefined, so its presence/absence is directly observable).
 jest.mock('../../puzzles/Puzzles', () => ({
   __esModule: true,
-  default: () => <div data-testid="mock-puzzles" />,
+  default: (props: { student?: string }) => (
+    <div data-testid="mock-puzzles" data-student={props.student} />
+  ),
 }));
 
 // ------------- HELPER FUNCTIONS -------------
@@ -214,5 +219,46 @@ describe('NewStudentProfile', () => {
       expect(dates.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText(time)).toBeInTheDocument();
     }
+  });
+
+  test('passes the student prop through when viewing your own profile', async () => {
+    await renderProfile();
+
+    const puzzlesTab = await screen.findByLabelText(/puzzles/i);
+    await act(async () => puzzlesTab.click());
+
+    const mockPuzzles = await screen.findByTestId('mock-puzzles');
+    expect(mockPuzzles).toHaveAttribute('data-student', 'username');
+  });
+
+  test('omits the student prop when a parent views a different username via ?student=', async () => {
+    // Logged-in user is the parent, not the profile being viewed.
+    (SetPermissionLevel as jest.Mock).mockResolvedValue({
+      username: 'parent_username',
+      firstName: 'Mock',
+      lastName: 'Name',
+      error: false,
+    });
+
+    // The component reads window.location.search directly (not a router
+    // hook), so MemoryRouter's initialEntries alone wouldn't reach it —
+    // set the real jsdom URL via history.pushState instead.
+    window.history.pushState({}, '', '/student-profile?student=someone_else');
+
+    await act(async () =>
+      render(
+        <MemoryRouter>
+          <NewStudentProfile />
+        </MemoryRouter>
+      )
+    );
+
+    const puzzlesTab = await screen.findByLabelText(/puzzles/i);
+    await act(async () => puzzlesTab.click());
+
+    const mockPuzzles = await screen.findByTestId('mock-puzzles');
+    expect(mockPuzzles).not.toHaveAttribute('data-student');
+
+    window.history.pushState({}, '', '/'); // reset so later tests see a clean URL
   });
 });

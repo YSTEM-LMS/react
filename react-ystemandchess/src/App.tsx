@@ -141,7 +141,12 @@ function App() {
    * - Footer: Bottom footer component
    */
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <div className="App flex flex-col min-h-screen">
         <NavBar />
         <main className="flex-1">
