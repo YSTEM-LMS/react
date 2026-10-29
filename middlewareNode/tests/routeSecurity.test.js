@@ -353,6 +353,67 @@ describe("Security Audit Regression: Role & Ownership Authorization (403 Forbidd
     }
   });
 
+  test("POST /chat/session/:sessionId/end retries a failed milestone write for a completed session", async () => {
+    mockAuthUser = { _id: "u1", username: "student1", role: "student" };
+
+    const session = {
+      _id: "session-retry-123",
+      userId: "u1",
+      topic: "algebra",
+      status: "active",
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+
+    const messages = [
+      { role: "user", content: "What is algebra?" },
+      { role: "assistant", content: "Algebra uses symbols." },
+      { role: "user", content: "Can you give me an example?" },
+    ];
+
+    ChatSession.findById.mockResolvedValue(session);
+    ChatMessage.find.mockReturnValue({
+      sort: jest.fn().mockResolvedValue(messages),
+    });
+
+    // Simulate a failed first write. The default mock resolves on retry.
+    emitChatMilestone.mockRejectedValueOnce(
+      new Error("Simulated currency event write failure")
+    );
+
+    const fetchSpy = jest
+      .spyOn(global, "fetch")
+      .mockRejectedValue(new Error("Test: skip external LLM request"));
+
+    try {
+      // First attempt completes the session, but the event write fails.
+      const firstRes = await request(app)
+        .post("/chat/session/session-retry-123/end");
+
+      expect(firstRes.status).toBe(500);
+      expect(session.status).toBe("completed");
+      expect(session.save).toHaveBeenCalledTimes(1);
+      expect(emitChatMilestone).toHaveBeenCalledTimes(1);
+
+      // Retry should emit the event without regenerating the summary.
+      const retryRes = await request(app)
+        .post("/chat/session/session-retry-123/end");
+
+      expect(retryRes.status).toBe(200);
+      expect(retryRes.body.session.status).toBe("completed");
+      expect(session.save).toHaveBeenCalledTimes(1);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(emitChatMilestone).toHaveBeenCalledTimes(2);
+
+      expect(emitChatMilestone).toHaveBeenLastCalledWith({
+        userId: "u1",
+        sessionId: "session-retry-123",
+        topic: "algebra",
+      });
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
   test("403 — Student cannot view details/messages of another user's chat session", async () => {
     mockAuthUser = { _id: "u1", username: "student1", role: "student" };
     ChatSession.findById.mockResolvedValue({
