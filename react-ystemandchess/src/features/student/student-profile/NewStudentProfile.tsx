@@ -7,6 +7,7 @@ import StatsChart from "./StatsChart";
 import Puzzles from "../../puzzles/Puzzles";
 import PlayComputer from "../../engine/PlayComputer";
 import PlayStudent from "./PlayStudent";
+import { LiveSessionProvider, MentorSessionPanel, SharedScreenView } from "../../meeting";
 import StreakModal from "./Modals/StreakModal";
 import ActivitiesModal from "./Modals/ActivitiesModal";
 import BadgesModal from "./Modals/BadgesModal";
@@ -34,7 +35,7 @@ const TABS = {
     icon: activityIcon,
   },
   mentor: {
-    label: "Mentor",
+    label: "Mentor Session",
     icon: mentorIcon,
   },
   prodev: {
@@ -428,8 +429,7 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
     case "mentor":
       return (
         <div className="w-full h-full">
-          <h2 className="text-2xl font-bold text-dark mb-4">Mentor</h2>
-          <p className="text-gray">This is the content for the Mentor tab.</p>
+          <MentorSessionPanel />
         </div>
       );
     
@@ -526,6 +526,7 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
   const tabContent = useMemo(() => renderTabContent(), [activeTab, lessonSelected, piece, lessonNum, events, loading, hasMore]);
 
   return (
+  <LiveSessionProvider role="student">
   <main className="bg-soft min-h-screen relative mb-12">
     {/* Toolbar with modal triggers */}
     <section className="w-full bg-primary py-4">
@@ -682,6 +683,7 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
           </nav>
           
           <div className="bg-light p-8 overflow-y-auto min-h-[600px]">
+            <SharedScreenView />
             {tabContent}
           </div>
         </div>
@@ -695,6 +697,7 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
     {activeModal === "leaderboard" && <LeaderboardModal onClose={() => setActiveModal(null)} />}
     <ChatWidget />
   </main>
+  </LiveSessionProvider>
 );
 };
 

@@ -10,6 +10,7 @@ import Lessons from "../../lessons/lessons-main/Lessons";
 import LessonSelection from "../../lessons/lessons-selection/LessonsSelection";
 import LessonOverlay from "../../lessons/piece-lessons/lesson-overlay/Lesson-overlay";
 import Puzzles from "../../puzzles/Puzzles";
+import { LiveSessionProvider, MentorSessionPanel, SharedScreenView } from "../../meeting";
 
 interface NewMentorProfileProps {
   userPortraitSrc: string;
@@ -412,6 +413,8 @@ ${session.actions && session.actions.length > 0 ? session.actions.map((act: any,
       case "mentor":
         return (
           <div id="inventory-content-mentor" className="inventory-content active-content">
+            <MentorSessionPanel />
+
             <div className="inventory-content-headingbar">
               <h2>Student Completed AI Coaching</h2>
               <h4>Recent completed sessions & committed plans</h4>
@@ -569,6 +572,7 @@ ${session.actions && session.actions.length > 0 ? session.actions.map((act: any,
   const tabContent = useMemo(() => renderTabContent(), [activeTab, events, loading, hasMore]);
 
   return (
+    <LiveSessionProvider role="mentor">
     <main id="main-inventory-content">
       <section className="inv-intro">
         <div className="inv-intro-portrait">
@@ -615,7 +619,9 @@ ${session.actions && session.actions.length > 0 ? session.actions.map((act: any,
                 "chessLessons", "games", "puzzles",
                 "playComputer", "recordings", "backpack"].map((tab) => { 
                     const displayName =
-                    tab === "chessLessons"
+                    tab === "mentor"
+                      ? "Mentor Session"
+                      : tab === "chessLessons"
                       ? "Chess Lessons"
                       : tab === "playComputer"
                         ? "Play with Computer"
@@ -635,7 +641,10 @@ ${session.actions && session.actions.length > 0 ? session.actions.map((act: any,
             </ul>
           </nav>
 
-          <div className="inv-inventory-content-content">{tabContent}</div>
+          <div className="inv-inventory-content-content">
+            <SharedScreenView />
+            {tabContent}
+          </div>
         </div>
       </section>
       ) : (
@@ -794,6 +803,7 @@ ${session.actions && session.actions.length > 0 ? session.actions.map((act: any,
         </div>
       )}
     </main>
+    </LiveSessionProvider>
   );
 };
 

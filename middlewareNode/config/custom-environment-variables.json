@@ -25,6 +25,7 @@
   "azureStorageRegion": "AZURE_STORAGE_REGION",
 
   "appID": "AGORA_APP_ID",
+  "appCertificate": "AGORA_APP_CERTIFICATE",
   "uid": "AGORA_UID",
   "customerId": "AGORA_CUSTOMER_ID",
   "customerCertificate": "AGORA_CUSTOMER_CERT",

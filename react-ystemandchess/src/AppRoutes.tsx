@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { SetPermissionLevel } from "./globals";
+import { environment } from "./environments";
+import AgoraTestPage from "./features/dev/AgoraTestPage";
 
 import AnalyticsLayout from "./Pages/Analytics/AnalyticsLayout";
 import Home from "./features/home/Home";
@@ -124,6 +126,11 @@ const AppRoutes = () => {
       <Route path="/analytics" element={<AdminRoute />}>
         <Route index element={<AnalyticsLayout />} />
       </Route>
+
+      {/* DEV/TEST harness for the Agora video port — not registered in prod. */}
+      {environment.productionType !== "production" && (
+        <Route path="/agora-test" element={<AgoraTestPage />} />
+      )}
     </Routes>
   );
 };

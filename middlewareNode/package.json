@@ -5,6 +5,7 @@
   "main": "src/server.js",
   "dependencies": {
     "@azure/storage-blob": "^12.24.0",
+    "agora-token": "2.0.5",
     "axios": "^0.21.1",
     "config": "^3.3.12",
     "cors": "^2.8.5",
