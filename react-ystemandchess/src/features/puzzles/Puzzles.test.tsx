@@ -757,6 +757,80 @@ describe("Puzzles Component", () => {
     jest.useRealTimers();
   });
 
+  test("does not report to /puzzles/solved when studentId is guest-prefixed, even with a login cookie present", async () => {
+    jest.useFakeTimers();
+
+    // Puzzle fixture includes a real PuzzleId this time — if the guest
+    // check in reportPuzzleSolved() were missing or checking the wrong
+    // thing, this test would actually reach and fire the /puzzles/solved
+    // fetch below, since nothing else would stop it.
+    global.fetch = jest.fn((url) => {
+      if (typeof url === "string" && url.includes("puzzles/random")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              {
+                PuzzleId: "guest-check-puzzle",
+                FEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Moves: "e2e4 e7e5",
+                Themes: "theme1",
+                Rating: 1500,
+              },
+            ]),
+        });
+      }
+      if (typeof url === "string" && url.includes("timeTracking")) {
+        return Promise.resolve({
+          status: 200,
+          json: () =>
+            Promise.resolve({ eventId: "123", startTime: new Date().toISOString() }),
+        });
+      }
+      if (typeof url === "string" && url.includes("auth/validate")) {
+        return Promise.resolve({
+          status: 200,
+          json: () => Promise.resolve({ username: "test-user", role: "student" }),
+          text: () =>
+            Promise.resolve(JSON.stringify({ username: "test-user", role: "student" })),
+        });
+      }
+      return Promise.reject(new Error(`Unhandled fetch: ${url}`));
+    }) as jest.Mock;
+
+    // No `student` prop is passed — Puzzles.tsx falls back to a
+    // "guest:"-prefixed studentId — even though useCookies (mocked in
+    // beforeEach) still returns a real-looking login cookie. This mirrors
+    // a parent viewing a child's profile: a real cookie, but not a
+    // verified real student identity for the puzzle being played.
+    await renderPuzzlesWithTheme();
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(600);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("mock-final-move-btn"));
+    });
+
+    expect(mockSocket.sendMessage).toHaveBeenCalledWith("puzzle completed");
+
+    // Let any in-flight microtasks — including a wrongly-fired fetch —
+    // settle before asserting on the full call history.
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const solvedCalls = (global.fetch as jest.Mock).mock.calls.filter(
+      ([url]) => typeof url === "string" && url.includes("/puzzles/solved")
+    );
+    expect(solvedCalls).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
   test("disables controls and board when socket is disconnected", async () => {
     const disconnectedSocket = { ...mockSocket, connected: false };
     (useChessSocket as jest.Mock).mockImplementation((props) => {

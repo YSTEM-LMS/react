@@ -158,7 +158,7 @@ router.post(
         });
       }
 
-      const puzzle = await puzzles.findOne({ puzzleId });
+      const puzzle = await puzzles.findOne({ PuzzleId: puzzleId });
 
       if (!puzzle) {
         return res.status(404).json({
@@ -166,7 +166,7 @@ router.post(
         });
       }
 
-      if (!movesMatch(moves, puzzle.moves)) {
+      if (!movesMatch(moves, puzzle.Moves)) {
         return res.status(400).json({
           error: "Submitted moves do not match the puzzle's solution",
         });

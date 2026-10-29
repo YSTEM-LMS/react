@@ -414,9 +414,9 @@ const Puzzles: React.FC<PuzzlesProps> = ({
    * is skipped entirely for them rather than sent and rejected.
    */
   const reportPuzzleSolved = async () => {
-    if (status === "guest" || !cookies.login) return;
+    if (!cookies.login || /^guest:/i.test(studentId)) return;
 
-    const puzzleId = currentPuzzleRef.current?.puzzleId;
+    const puzzleId = currentPuzzleRef.current?.PuzzleId;
     if (!puzzleId) return;
 
     try {
