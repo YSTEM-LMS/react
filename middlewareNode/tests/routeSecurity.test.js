@@ -46,6 +46,7 @@ jest.mock("../src/models/users");
 jest.mock("../src/models/timeTracking");
 jest.mock("../src/models/puzzles");
 jest.mock("../src/models/categorys");
+jest.mock("../src/models/PvpGame");
 
 const express = require("express");
 const request = require("supertest");
