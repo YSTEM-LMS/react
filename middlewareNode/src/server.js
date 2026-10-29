@@ -20,6 +20,7 @@ const streakRoutes = require("./routes/streak");
 const adminGuard   = require("./middleware/adminGuard");
 const requireAuth  = require("./middleware/requireAuth");
 const rateLimit    = require("express-rate-limit");
+const currencyEventLimiter = require("./middleware/currencyEventLimiter");
 const currencyConsumer = require("./services/currencyConsumer");
 
 const analyticsLimiter = rateLimit({
@@ -33,22 +34,6 @@ const analyticsLimiter = rateLimit({
 const leaderboardLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: parseInt(process.env.LEADERBOARD_RATE_LIMIT_MAX) || 60,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many requests, please try again later" },
-});
-
-// Currency rollout, Week 3 hardening: rate limit on event-triggering
-// endpoints — currently just /gameResults, the one endpoint that can
-// produce a currency-earning ActionEvent today. Cooldowns/daily caps
-// (ledgerService.js) already cap how much a legitimate flood of requests
-// can earn, but a limiter stops the flood itself from reaching the DB at
-// all. Reused as-is once Jimmy's lesson/puzzle producer endpoints land —
-// same limiter, mounted on whatever routes end up calling into the
-// currency pipeline.
-const currencyEventLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: parseInt(process.env.CURRENCY_EVENT_RATE_LIMIT_MAX) || 30,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later" },

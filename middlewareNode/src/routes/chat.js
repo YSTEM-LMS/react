@@ -12,7 +12,9 @@ const { detectCrisis, getCrisisResponse } = require('../utils/guardrails');
 const passport = require('passport');
 const Guardrail = require('../models/Guardrail');
 const requireAuth = require('../middleware/requireAuth');
+const currencyEventLimiter = require('../middleware/currencyEventLimiter');
 const { isLocalEnvironment } = require('../config/validateEnvironment');
+const { emitChatMilestone } = require('../services/currencyEvents');
 
 // Same gate as config/db.js's seedTestUsers: config-template seeding, not
 // credential-bearing, but still a side effect on import that should only
@@ -149,7 +151,7 @@ const rateLimiter = (req, res, next) => {
   }
   // Filter out timestamps older than 60s
   rateLimitCache[ip] = rateLimitCache[ip].filter(t => now - t < 60000);
-  
+
   const limit = parseInt(process.env.CHAT_RATE_LIMIT, 10) || 30;
   if (rateLimitCache[ip].length >= limit) {
     chatMetrics.totalErrors++;
@@ -207,10 +209,10 @@ router.get('/educator/sessions', authorizeTutorAdmin, async (req, res) => {
     // Filter by student details if specified (name or username)
     if (student) {
       const regex = new RegExp(student, 'i');
-      sessions = sessions.filter(s => 
+      sessions = sessions.filter(s =>
         s.userId && (
-          regex.test(s.userId.username) || 
-          regex.test(s.userId.firstName) || 
+          regex.test(s.userId.username) ||
+          regex.test(s.userId.firstName) ||
           regex.test(s.userId.lastName)
         )
       );
@@ -242,7 +244,7 @@ router.get('/educator/session/:sessionId/transcript', authorizeTutorAdmin, async
 });
 
 // 1. Create a new session
-router.post('/session', requireAuth, async (req, res) => {
+router.post('/session', requireAuth, currencyEventLimiter, async (req, res) => {
   try {
     let { userId, topic } = req.body;
     if (!userId && req.user) {
@@ -265,12 +267,12 @@ router.post('/session', requireAuth, async (req, res) => {
 
     // Resolve matching template
     const cleanTopic = (topic || '').trim().toLowerCase();
-    let template = await CoachTemplate.findOne({ 
+    let template = await CoachTemplate.findOne({
       $or: [
         { topic: cleanTopic },
         { topic: new RegExp('^' + cleanTopic + '$', 'i') }
       ],
-      isEnabled: true 
+      isEnabled: true
     });
     if (!template) {
       template = await CoachTemplate.findOne({ name: 'General Tutoring' }) || await CoachTemplate.findOne({ name: 'General Coaching' });
@@ -355,7 +357,7 @@ router.post('/message', requireAuth, rateLimiter, async (req, res) => {
   chatMetrics.totalRequests++;
   const start = Date.now();
   const { sessionId, message } = req.body;
-  
+
   try {
     if (!sessionId || !message) return res.status(400).json({ error: 'sessionId and message are required' });
 
@@ -392,18 +394,18 @@ router.post('/message', requireAuth, rateLimiter, async (req, res) => {
     let crisisResponse = '';
     try {
       const dbGuardrail = await Guardrail.findOne();
-      const keywords = dbGuardrail && dbGuardrail.keywords.length > 0 
-        ? dbGuardrail.keywords 
+      const keywords = dbGuardrail && dbGuardrail.keywords.length > 0
+        ? dbGuardrail.keywords
         : [
-            'suicide', 'kill myself', 'wanna die', 'want to die', 'cut myself', 
-            'hurt myself', 'hurting myself', 'end my life', 'commit suicide', 'hanging myself', 
+            'suicide', 'kill myself', 'wanna die', 'want to die', 'cut myself',
+            'hurt myself', 'hurting myself', 'end my life', 'commit suicide', 'hanging myself',
             'overdosing', 'self-harm', 'self harm', 'kill me', 'abuse me',
             'hitting me', 'hurting me', 'beat me', 'abused'
           ];
-      crisisResponse = dbGuardrail && dbGuardrail.responseMessage 
-        ? dbGuardrail.responseMessage 
+      crisisResponse = dbGuardrail && dbGuardrail.responseMessage
+        ? dbGuardrail.responseMessage
         : "I hear you, and I want to make sure you are safe. Please know you are not alone, and there is support available. You can connect with someone who can support you 24/7 by calling or texting the Suicide & Crisis Lifeline at 988, or reaching out to a trusted teacher, parent, or adult. I'm going to notify our support team to check in and see how we can help you.";
-      
+
       const normalizedMsg = message.toLowerCase();
       isCrisis = keywords.some(keyword => normalizedMsg.includes(keyword.toLowerCase()));
     } catch (dbErr) {
@@ -504,10 +506,10 @@ router.post('/message', requireAuth, rateLimiter, async (req, res) => {
         console.log("LLM API failed. Falling back to local NLP AI Coach...");
         const analysis = await chatService.processMessage(message);
         const localResponse = chatService.getCoachingResponse(session.topic, session.phase, analysis.intent, message);
-        
+
         // Save assistant message to DB
         await ChatMessage.create({ sessionId, role: 'assistant', content: localResponse });
-        
+
         // Simple heuristic to advance phase
         const messageCount = previousMessages.length + 2; // + user + assistant
         if (session.phase === 'warm-up' && messageCount >= 4) session.phase = 'explore';
@@ -520,7 +522,7 @@ router.post('/message', requireAuth, rateLimiter, async (req, res) => {
         res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: localResponse } }] })}\n\n`);
         res.write('data: [DONE]\n\n');
         res.end();
-        
+
         logLlmCall({
           timestamp: new Date().toISOString(),
           sessionId,
@@ -538,7 +540,7 @@ router.post('/message', requireAuth, rateLimiter, async (req, res) => {
       res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: errorResponse } }] })}\n\n`);
       res.write('data: [DONE]\n\n');
       res.end();
-      
+
       logLlmCall({
         timestamp: new Date().toISOString(),
         sessionId,
@@ -641,18 +643,19 @@ router.post('/message', requireAuth, rateLimiter, async (req, res) => {
 });
 
 // 5. End session and generate summary/actions
-router.post('/session/:sessionId/end', requireAuth, async (req, res) => {
+router.post('/session/:sessionId/end', requireAuth, currencyEventLimiter, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const session = await ChatSession.findById(sessionId);
-    if (!session || session.status !== 'active') {
+    if (!session) {
       return res.status(400).json({ error: 'Invalid or inactive session' });
     }
 
-    // Enforce ownership: only session owner or admin can end session
+    // Enforce ownership: only session owner or admin can end or retry a session
     const callerId = (req.user._id || req.user.id || '').toString();
     const callerUsername = req.user.username || '';
     const sessionOwner = (session.userId || '').toString();
+
     if (
       req.user.role !== 'admin' &&
       sessionOwner !== callerId &&
@@ -661,14 +664,37 @@ router.post('/session/:sessionId/end', requireAuth, async (req, res) => {
       return res.status(403).json({ error: "Forbidden: cannot end another user's session" });
     }
 
+    // A completed session may be retried to recover a failed milestone write.
+    // The deterministic event ID makes a repeated emission idempotent.
+    if (session.status === 'completed') {
+      const messages = await ChatMessage.find({ sessionId }).sort({ createdAt: 1 });
+      const studentMessageCount = messages.filter(
+        (message) => message.role === 'user'
+      ).length;
+
+      if (studentMessageCount >= 2) {
+        await emitChatMilestone({
+          userId: session.userId,
+          sessionId: session._id,
+          topic: session.topic,
+        });
+      }
+
+      return res.json({ session });
+    }
+
+    if (session.status !== 'active') {
+      return res.status(400).json({ error: 'Invalid or inactive session' });
+    }
+
     // Fetch all messages in this session to extract the user's committed plan
     const messages = await ChatMessage.find({ sessionId }).sort({ createdAt: 1 });
-    
+
     // Call Gemini to summarize and generate actions dynamically
     try {
       const historyText = messages.map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.content}`).join('\n');
       const prompt = `Here is the transcript of a coaching session on the topic "${session.topic}":\n\n${historyText}\n\n${getSummaryPrompt()}`;
-      
+
       const { apiKey, baseUrl, model } = getLlmApiConfig();
       const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
       const url = `${cleanBaseUrl}/chat/completions`;
@@ -688,7 +714,7 @@ router.post('/session/:sessionId/end', requireAuth, async (req, res) => {
       if (apiResponse.ok) {
         const data = await apiResponse.json();
         const content = data.choices?.[0]?.message?.content || '{}';
-        
+
         // Clean markdown block wrappers if present (e.g. ```json ... ```)
         let cleanedContent = content.trim();
         if (cleanedContent.startsWith('```json')) {
@@ -714,6 +740,18 @@ router.post('/session/:sessionId/end', requireAuth, async (req, res) => {
 
     session.status = 'completed';
     await session.save();
+
+    const studentMessageCount = messages.filter(
+      (message) => message.role === 'user'
+    ).length;
+
+    if (studentMessageCount >= 2) {
+      await emitChatMilestone({
+        userId: session.userId,
+        sessionId: session._id,
+        topic: session.topic,
+      });
+    }
 
     res.json({ session });
   } catch (error) {
@@ -832,7 +870,7 @@ router.get('/educator/logs', authorizeTutorAdmin, async (req, res) => {
 // User: Get AI-driven Socratic feedback for a chess move played
 router.post('/chess-feedback', requireAuth, async (req, res) => {
   const { fenBefore, fenAfter, moveUci, bestMove, score, moveIndicator, nextStepHint } = req.body;
-  
+
   try {
     const { apiKey, baseUrl, model } = getLlmApiConfig();
     const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
@@ -879,7 +917,7 @@ Rules:
 
     const data = await apiResponse.json();
     const feedback = data?.choices?.[0]?.message?.content;
-    
+
     if (!feedback) {
       throw new Error('No feedback content returned from LLM');
     }
