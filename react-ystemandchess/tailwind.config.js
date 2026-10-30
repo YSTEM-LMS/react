@@ -34,6 +34,11 @@ module.exports = {
           "sans-serif",
         ],
       },
+
+      fontSize: {
+        "2xs": "10px",
+        "3xs": "8px",
+      },
       
       boxShadow: {
         'card-yellow': '1.25rem 1.25rem 0.063rem rgb(209, 230, 28)',
