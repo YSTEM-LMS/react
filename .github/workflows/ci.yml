@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MONGOMS_VERSION: 8.2.6
 
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +26,12 @@ jobs:
           cache: 'npm'
 
       # middlewareNode
+      - name: Cache MongoDB binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongodb-${{ env.MONGOMS_VERSION }}
+
       - name: Install dependencies (middlewareNode)
         run: npm ci
         working-directory: ./middlewareNode
@@ -33,7 +41,7 @@ jobs:
         working-directory: ./middlewareNode
 
       - name: Test middlewareNode
-        run: npm test
+        run: npm test -- --testTimeout=30000
         working-directory: ./middlewareNode
 
       # chessServer

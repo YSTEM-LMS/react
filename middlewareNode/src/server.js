@@ -10,6 +10,7 @@ validateEnvironment();
 
 const express = require("express");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const connectDB = require("./config/db");
 const passport = require("passport");
 require("./config/passport.js");
@@ -120,6 +121,11 @@ app.use(
         : undefined),
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: config.get("mongoURI"),
+      collectionName: "sessions",
+      ttl: 14 * 24 * 60 * 60, // 14 days, in seconds
+    }),
   })
 );
 
