@@ -24,7 +24,7 @@ env:
 jobs:
   deploy:
     if: >
-      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
       (github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.event == 'push' &&
        github.event.workflow_run.head_branch == 'main')
@@ -52,6 +52,8 @@ jobs:
           context: ./middlewareNode
           platforms: linux/amd64
           push: true
+          cache-from: type=gha,scope=middlewareNode
+          cache-to: type=gha,mode=max,scope=middlewareNode
           tags: |
             ${{ env.IMAGE_PREFIX }}/middlewarenode:${{ env.DEPLOY_SHA }}
             ${{ env.IMAGE_PREFIX }}/middlewarenode:latest
@@ -62,6 +64,8 @@ jobs:
           context: ./chessServer
           platforms: linux/amd64
           push: true
+          cache-from: type=gha,scope=chessServer
+          cache-to: type=gha,mode=max,scope=chessServer
           tags: |
             ${{ env.IMAGE_PREFIX }}/chessserver:${{ env.DEPLOY_SHA }}
             ${{ env.IMAGE_PREFIX }}/chessserver:latest
@@ -72,6 +76,8 @@ jobs:
           context: ./stockfishServer
           platforms: linux/amd64
           push: true
+          cache-from: type=gha,scope=stockfishServer
+          cache-to: type=gha,mode=max,scope=stockfishServer
           tags: |
             ${{ env.IMAGE_PREFIX }}/stockfishserver:${{ env.DEPLOY_SHA }}
             ${{ env.IMAGE_PREFIX }}/stockfishserver:latest
@@ -82,6 +88,8 @@ jobs:
           context: ./chessclient
           platforms: linux/amd64
           push: true
+          cache-from: type=gha,scope=chessclient
+          cache-to: type=gha,mode=max,scope=chessclient
           tags: |
             ${{ env.IMAGE_PREFIX }}/chessclient:${{ env.DEPLOY_SHA }}
             ${{ env.IMAGE_PREFIX }}/chessclient:latest
@@ -92,6 +100,8 @@ jobs:
           context: ./react-ystemandchess
           platforms: linux/amd64
           push: true
+          cache-from: type=gha,scope=react-ystemandchess
+          cache-to: type=gha,mode=max,scope=react-ystemandchess
           build-args: |
             REACT_APP_MIDDLEWARE_URL=${{ secrets.MIDDLEWARE_URL }}
             REACT_APP_STOCKFISH_SERVER_URL=${{ secrets.STOCKFISH_URL }}
