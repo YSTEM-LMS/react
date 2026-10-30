@@ -13,6 +13,11 @@ const registerSocketHandlers = require("./managers/EventHandlers");
 const app = express();
 const server = http.createServer(app);
 
+// Registered before morgan so platform probes do not flood the request log.
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 // Add logging functionaility to the server
 app.use(morgan("dev")); // dev -> preset format
 
