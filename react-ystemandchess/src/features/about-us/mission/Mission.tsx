@@ -1,10 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import ImageOne from "../../../assets/images/mission-image.png";
 import LogoLineBreak from "../../../assets/images/LogoLineBreak.png";
 import FounderStory from "../../../assets/images/founder-story.png";
 import Images from "../../../assets/images/imageImporter";
 
 const Mission = () => {
+  const navigate = useNavigate();
+
   return (
     <main role="main" className="w-full h-auto mt-5 p-5 font-sans text-dark md:p-10 lg:p-12">
       <section role="region" aria-label="Mission statement header section" className="w-[85%] mx-auto mb-10 flex flex-col md:flex-row items-center gap-10" tabIndex={0}>
@@ -49,7 +52,7 @@ const Mission = () => {
           <br />
           Our lessons are free.
           </p>
-          <button className="relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50" aria-label="Join now for free button">      
+          <button className="relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50" aria-label="Join now for free button" onClick={() => navigate("/signup/parent")}>      
             <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-5 py-1 text-lg font-medium text-white backdrop-blur-3xl">
               Join Now !
             </span>
@@ -63,7 +66,7 @@ const Mission = () => {
             <br />
             $25 / Week <br /> First lesson is FREE. <br /> Cancel anytime.
             </p>
-            <button className="relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50" aria-label="Join now premium button">
+            <button className="relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50" aria-label="Join now premium button" onClick={() => navigate("/signup/parent")}>
             <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-5 py-1 text-lg font-medium text-white backdrop-blur-3xl">
               Join Now !
             </span>

@@ -47,6 +47,18 @@ it("navigates to the play page when Get Started is clicked", () => {
     expect(mockedNavigate).toHaveBeenCalledWith("./play");
 });
 
+it("navigates to signup when Join Now is clicked", () => {
+  render(
+    <MemoryRouter>
+      <Home />
+    </MemoryRouter>
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /join now for free/i }));
+
+  expect(mockedNavigate).toHaveBeenCalledWith("/signup/parent");
+});
+
 // check if books are being rendered
 it("renders both book titles", () => {
   render(
