@@ -87,6 +87,15 @@ describe("PUT /user/profile", () => {
     );
   });
 
+  test("200 — gender: \"\" is accepted and saves as null, like the other fields", async () => {
+    const res = await request(app).put("/user/profile").send({ gender: "" });
+    expect(res.status).toBe(200);
+    expect(Users.updateOne).toHaveBeenCalledWith(
+      { username: "alice" },
+      { $set: { gender: null } }
+    );
+  });
+
   test("only sends the fields actually provided in the request", async () => {
     await request(app).put("/user/profile").send({ school: "Pine View School" });
     expect(Users.updateOne).toHaveBeenCalledWith(
