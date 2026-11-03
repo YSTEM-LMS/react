@@ -19,20 +19,31 @@ engagement score — see the design doc §1). Three layers cooperate:
 Student A profile ──"Challenge cara"──▶ middleware /challenge ──▶ B's incoming list
         (PlayStudent.tsx)                    (in-memory)                (B short-polls)
                                                                             │ Accept
-        both sides now hold the same gameId ◀───────────────────────────────┘
+        both sides now hold the same gameId, and the middleware
+        saves a PvpGame {gameId, white: A, black: B, status: "active"} ◀───┘
                                     │
-   each client ─"newpvpgame {gameId, challenger, opponent, username, credentials}"─▶ chessServer
-                                    │  (createOrJoinPvpGame pairs them: challenger = white)
+   each client ─"newpvpgame {gameId, username, credentials}"─▶ chessServer
+                                    │  chessServer calls GET /challenge/game/:gameId
+                                    │  with the player's own JWT, gets back {you, white, black}
+                                    │  from the MIDDLEWARE's auth — never trusts the client's
+                                    │  own claim. Mismatch → rejected, nobody seated.
+                                    │  createOrJoinPvpGame pairs them from that response: white = white seat.
                         ...moves sync over sockets...
                                     │
         a move causes checkmate ──▶ detectOutcome() resolves winner BY COLOR
                                     │
         chessServer emits "gameover" {winnerUsername, loserUsername, reason} to BOTH
                                     │
-        POST /gameResults ──▶ one immutable record, idempotent on gameId
+        POST /internal/gameResults (X-Service-Key: CHESS_SERVICE_KEY) ──▶
+          middleware checks winner/loser match the saved PvpGame, then stores
+          one immutable record, idempotent on gameId, source: "chessServer"
                                     │
         leaderboard / analytics compute W-D-L + chessScore on read
 ```
+
+Players never write their own result — only the chess server can, and only
+for a game the middleware already knows two real players accepted. See the
+design doc §7 and §10.
 
 ### Key files
 
@@ -40,12 +51,16 @@ Student A profile ──"Challenge cara"──▶ middleware /challenge ──�
 |---|---|
 | `react-ystemandchess/src/features/student/student-profile/PlayStudent.tsx` | "Play a Student" tab: send challenge, poll for acceptance, accept/decline incoming |
 | `react-ystemandchess/.../Modals/LeaderboardModal.tsx` | Sortable **Chess** column (score + W–D–L), separate from Score |
-| `middlewareNode/src/routes/challenge.js` | Challenge handshake endpoints (in-memory, TTL-swept) |
-| `middlewareNode/src/routes/gameResults.js` | `POST /gameResults` (idempotent, participant-only), `GET /gameResults/:username` |
-| `middlewareNode/src/models/gameResults.js` | One immutable record per finished game; `gameId` unique |
+| `middlewareNode/src/routes/challenge.js` | Challenge handshake endpoints (in-memory, TTL-swept); accept also saves a `PvpGame`; `GET /challenge/game/:gameId` lets the chess server verify a joining player |
+| `middlewareNode/src/models/PvpGame.js` | The middleware's record of who the two real players in a `gameId` are; `active` → `finished` |
+| `middlewareNode/src/middleware/requireServiceKey.js` | Gates `/internal/gameResults` on `CHESS_SERVICE_KEY` instead of a player JWT |
+| `middlewareNode/src/routes/internalGameResults.js` | `POST /internal/gameResults` — the chess server's only write path, validated against the saved `PvpGame` |
+| `middlewareNode/src/routes/gameResults.js` | `GET /gameResults/:username` only — no player-facing POST |
+| `middlewareNode/src/models/gameResults.js` | One immutable record per finished game; `gameId` unique; `source: "chessServer" \| "legacy-unverified"` |
 | `middlewareNode/src/utils/studentStats.js` | `getChessRecord` / `getChessRecords` / `chessScoreFrom` — the single scoring source |
-| `chessServer/src/managers/GameManager.js` | `createOrJoinPvpGame`, `detectOutcome`, `resign`, the `isOver` latch |
-| `chessServer/src/managers/EventHandlers.js` | `newpvpgame` / `resign` socket events, `emitGameOver` + `reportGameResult` |
+| `chessServer/src/managers/GameManager.js` | `createOrJoinPvpGame` (seats from `white`/`black` only), `detectOutcome`, `resign`, the `isOver` latch |
+| `chessServer/src/managers/EventHandlers.js` | `newpvpgame` (verifies identity via the middleware) / `resign` socket events, `emitGameOver` + `reportGameResult` |
+| `chessServer/src/reporting/resultRequest.js` | Pure function building the `{path, headers, body}` the chess server sends; imported directly by the middleware's contract test |
 
 ---
 
@@ -55,14 +70,18 @@ Student A profile ──"Challenge cara"──▶ middleware /challenge ──�
 
 ```bash
 cd chessServer && npx jest src/tests/GameManager.test.js
-# → Tests: 17 passed
+cd chessServer && npx jest src/tests/EventHandlers.pvp.test.js   # identity verification + one report
 ```
 
-### Result API — idempotency, participant guard, scoring
+### Result API — service-key auth, idempotency, scoring
 
 ```bash
-cd middlewareNode && npx jest tests/gameResults.test.js
-# → Tests: 16 passed
+cd middlewareNode && npx jest tests/internalGameResults.test.js   # the chess server's write path
+cd middlewareNode && npx jest tests/gameResults.test.js           # read path + legacy POST is gone
+cd middlewareNode && npx jest tests/challenge.pvpgame.test.js     # accept persists a PvpGame
+
+# Cross-service: the chess server's actual request shape against the real route
+cd middlewareNode && npx jest tests/contract.chessServerReport.test.js
 
 # The separation guarantee (chess results never move the engagement score):
 cd middlewareNode && npx jest tests/leaderboard.test.js
@@ -114,30 +133,37 @@ curl -sX POST localhost:8000/challenge -H 'Content-Type: application/json' \
   -d '{"fromUsername":"alice","toUsername":"cara"}'          # → {challengeId, gameId}
 curl -s localhost:8000/challenge/incoming/cara               # cara sees it
 curl -sX POST localhost:8000/challenge/<challengeId>/accept  # → {gameId, challenger, opponent}
+                                                               #   (also saves a PvpGame)
+
+# either player can verify the game — this is what the chess server calls on join
+curl -s localhost:8000/challenge/game/<gameId> -H "Authorization: Bearer $ALICE_TOKEN"
+# → {gameId, you: "alice", white: "alice", black: "cara", status: "active"}
 ```
 
 ### Watch the result API (no browser)
 
-```bash
-TOKEN=<a player's JWT>
+Only the chess server can write a result now — a player's own token can't.
 
-# record a game (as one of the two players)
-curl -sX POST localhost:8000/gameResults \
-  -H 'Content-Type: application/json' -H "Authentication: Bearer $TOKEN" \
+```bash
+# record a game — chess server identity, not a player's token
+curl -sX POST localhost:8000/internal/gameResults \
+  -H 'Content-Type: application/json' -H "X-Service-Key: $CHESS_SERVICE_KEY" \
   -d '{"gameId":"g1","result":"win","reason":"checkmate",
        "winnerUsername":"alice","loserUsername":"cara"}'   # → 201 {duplicate:false}
+# (requires a PvpGame already saved for "g1" — i.e. a real accepted challenge)
 
 # report it again — idempotent, nothing changes
-curl -sX POST localhost:8000/gameResults \
-  -H 'Content-Type: application/json' -H "Authentication: Bearer $TOKEN" \
+curl -sX POST localhost:8000/internal/gameResults \
+  -H 'Content-Type: application/json' -H "X-Service-Key: $CHESS_SERVICE_KEY" \
   -d '{"gameId":"g1","result":"win","reason":"checkmate",
        "winnerUsername":"alice","loserUsername":"cara"}'   # → 200 {duplicate:true}
 
-curl -s localhost:8000/gameResults/alice -H "Authentication: Bearer $TOKEN"
+# a player's own token no longer works for writing — only reading
+curl -s localhost:8000/gameResults/alice -H "Authorization: Bearer $TOKEN"
 # → {wins, draws, losses, gamesPlayed, chessScore}
 
 # the leaderboard shows it as its own column, and can rank by it
-curl -s 'localhost:8000/leaderboard?sortBy=chess' -H "Authentication: Bearer $TOKEN"
+curl -s 'localhost:8000/leaderboard?sortBy=chess' -H "Authorization: Bearer $TOKEN"
 ```
 
 ---
@@ -149,9 +175,12 @@ curl -s 'localhost:8000/leaderboard?sortBy=chess' -H "Authentication: Bearer $TO
 | Winner resolved correctly (by color, both game types) | unit: Fool's-mate → `cara` wins |
 | Draws detected, no winner | unit: insufficient-material |
 | Resign / disconnect forfeit to opponent | unit + E2E |
-| Both seats keep their own token for the end-of-game report | unit: per-seat credentials |
+| A joining player is seated under their own verified identity, not a client-claimed username | `EventHandlers.pvp.test.js` — mismatch rejected, seat comes from the middleware response only |
 | No double-count after a decided game | unit: "cannot be resigned again" + `gameId` idempotency tests |
-| A non-participant cannot report a game | `gameResults.test.js` — 403 |
+| Only the chess server (service key) can report a result | `internalGameResults.test.js` — 401 without/with wrong key |
+| A result is only accepted for a real accepted game, with matching players | `internalGameResults.test.js` — 404 unknown gameId, 400 player mismatch |
+| The two services agree on the report's shape without being mocked at each other | `contract.chessServerReport.test.js` |
+| A player can no longer write their own result | `gameResults.test.js` — legacy POST returns 404 |
 | Chess results never move the engagement score | `leaderboard.test.js` — separation tests |
 | Full handshake → paired game → gameover on both clients | E2E 11/11 |
 
@@ -162,8 +191,11 @@ curl -s 'localhost:8000/leaderboard?sortBy=chess' -H "Authentication: Bearer $TO
 **Works end-to-end today:** the entire **challenge handshake** — send / accept /
 decline, live polling, self-challenge rejection, duplicate dedup — all of the
 **game and outcome logic** (pairing by `gameId`, move sync, checkmate/draw/resign/
-disconnect detection, single-count guarantee), and **result recording + scoring**
-(`POST /gameResults` → leaderboard Chess column and analytics `chess` block).
+disconnect detection, single-count guarantee), **server-authoritative result
+recording** (`POST /internal/gameResults`, service-key gated, validated against
+the accepted `PvpGame` → leaderboard Chess column and analytics `chess` block),
+and **identity verification on join** (a player is seated under the username
+the middleware's own auth resolves, never a client-supplied one).
 
 **Pending:**
 
@@ -171,6 +203,10 @@ disconnect detection, single-count guarantee), and **result recording + scoring*
   chess client; embedding the board in the profile via `postMessage` waits on the
   chess-client refactor. Until a client emits `newpvpgame`, the reporting path is
   exercised by tests and the E2E driver rather than by real browser play.
-- **Trust model.** The reporting client is a player, so a determined student
-  could report a loss as a win. See the design doc §10 — the fix is a chessServer
-  service credential instead of a relayed player token.
+- **Deploy.** `CHESS_SERVICE_KEY` needs to exist as a matching secret on both
+  services in production before this reaches real traffic — see the PvP results
+  plan (v2), T5. Until then, reports fail exactly as they do today (no regression,
+  just no fix yet).
+- **Win trading.** The v1 trust gap (a player reporting their own result) is
+  closed, but two cooperating real accounts can still play and throw real games
+  to farm chess score — see the separate "PvP follow-ups" plan.
