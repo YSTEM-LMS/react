@@ -172,25 +172,37 @@ The `gameover` event triggers one side-effect: the chessServer reports the
 finished game to the middleware. No balance is credited — the result is stored
 and the score is derived from it.
 
+**v2 update** ("PvP game results: server-authoritative reporting"): there is
+no player-facing write anymore. Only the chess server can report a result,
+authenticated with its own service credential, and only for a game the
+middleware already knows was accepted by two real players. See §10 for why.
+
 ### Route naming
 
-`POST /gameResults` — plural, resource-first, matching the existing
-`/leaderboard`, `/badges`, `/activities` convention.
+`/gameResults` — plural, resource-first, matching the existing `/leaderboard`,
+`/badges`, `/activities` convention. The chess server's own write path is
+nested under `/internal` to mark it as not player-facing.
 
 ### Contract
 
 ```
-POST /gameResults          (requireAuth; caller must be one of the two players)
+POST /internal/gameResults   (requireServiceKey — X-Service-Key: CHESS_SERVICE_KEY)
 
   win:   { gameId, result: "win",  reason: "checkmate"|"resign"|"disconnect",
            winnerUsername, loserUsername, playedAt? }
   draw:  { gameId, result: "draw", reason: "draw", players: [a, b], playedAt? }
 
-  -> 201 { success, duplicate: false, gameResult }
+  -> 201 { success, duplicate: false, gameResult }   // gameResult.source: "chessServer"
   -> 200 { success, duplicate: true,  gameResult }   // already recorded
+  -> 404 unknown gameId (no accepted PvpGame)
+  -> 400 reported players don't match the accepted game
 
-GET /gameResults/:username
+GET /gameResults/:username    (requireAuth — any logged-in role)
   -> { success, data: { wins, draws, losses, gamesPlayed, chessScore } }
+
+GET /challenge/game/:gameId   (requireAuth)
+  -> { gameId, you, white, black, status }   // `you` is derived from the caller's own JWT
+  -> 403 if the caller is not one of the two players; 404 if unknown
 ```
 
 ### Why a record, not a counter
@@ -241,12 +253,26 @@ duplicate, not a 500.
 ## 9. Testing
 
 - Unit: `chessServer/src/tests/GameManager.test.js` — checkmate/draw/resign
-  outcomes, winner resolution by color, PvP pairing, per-seat credentials.
+  outcomes, winner resolution by color, PvP pairing by `white`/`black`.
+- Unit: `chessServer/src/tests/EventHandlers.pvp.test.js` — `newpvpgame`
+  rejects a client-claimed username that doesn't match the middleware's, seats
+  only from the middleware's `white`/`black`, and a finished game reports
+  exactly once with `CHESS_SERVICE_KEY`.
 - Integration: two socket clients play a scholar's-mate line; assert both
   receive `gameover` with the correct `winnerUsername`.
-- Result API: `middlewareNode/tests/gameResults.test.js` — idempotency on
-  `gameId` (including the unique-index race), the participant-only guard, and
-  win/draw body validation.
+- Result API: `middlewareNode/tests/internalGameResults.test.js` — service-key
+  auth, unknown-gameId / player-mismatch rejection, idempotency on `gameId`
+  (including the unique-index race). `middlewareNode/tests/gameResults.test.js`
+  covers the read side and that the legacy player-facing POST is gone (404).
+- Contract: `middlewareNode/tests/contract.chessServerReport.test.js` imports
+  `chessServer/src/reporting/resultRequest.js` directly and sends its exact
+  output through the real `/internal/gameResults` route (real service-key
+  check, real models via mongodb-memory-server) — the two services can't pass
+  their own tests in isolation while disagreeing with each other, which is how
+  the v1 header bug went unnoticed.
+- Challenge persistence: `middlewareNode/tests/challenge.pvpgame.test.js` —
+  accepting a challenge persists exactly one `PvpGame`, and
+  `GET /challenge/game/:gameId` returns it only to one of its two players.
 - Separation: `middlewareNode/tests/leaderboard.test.js` asserts chess results
   never move the engagement `score`, and that `sortBy=chess` ranks
   independently of it.
@@ -258,9 +284,19 @@ duplicate, not a 500.
 Matchmaking queue / ELO, spectators, rematch, anti-cheat, and any spendable
 currency. Direct-challenge only.
 
-Known limitation carried into v1: the reporting client is trusted to report
-honestly. `POST /gameResults` requires the caller to be one of the two players,
-which stops a third party fabricating results, but a player could still report
-a game they lost as a win. Closing that means the chessServer holding its own
-service credential rather than relaying a player's token — worth doing before
-the chess score is used for anything that matters.
+**Closed in v2** ("PvP game results: server-authoritative reporting"): v1's
+known limitation — a player's own token reported their own game's result, so a
+losing player could report themselves a win — is gone. The chess server now
+holds its own service credential (`CHESS_SERVICE_KEY`) and reports through
+`POST /internal/gameResults`, which only the chess server can call. Identity
+is verified where players join, not trusted from reporting: on `newpvpgame`
+the chess server calls `GET /challenge/game/:gameId` with the joining player's
+own JWT and seats them under the username the middleware's own auth resolves,
+never the username the client claims. A result is only accepted if its
+winner/loser match the `PvpGame` the middleware recorded when the challenge
+was accepted — so a fabricated `gameId` or mismatched players is rejected
+before anything is stored. See §7 for the current contract.
+
+Still out of scope: win trading between two cooperating real accounts (a
+separate follow-up plan), matchmaking, ELO, spectators and rematch (unchanged
+from v1, still gated on usage data this fix makes possible to collect).

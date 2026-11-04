@@ -1,4 +1,5 @@
 const GameManager = require("./GameManager");
+const buildResultRequest = require("../reporting/resultRequest");
 
 const gameManager = new GameManager();
 
@@ -10,55 +11,35 @@ const gameManager = new GameManager();
  * balance to credit — the coin idea was dropped in favour of a separate
  * leaderboard stat). See documentation/student-vs-student-design.md §7.
  *
+ * Authenticated with CHESS_SERVICE_KEY, not a player's token — the chess
+ * server reports with its own identity, and the middleware checks the result
+ * against the PvpGame it saved when the challenge was accepted. See the PvP
+ * results plan (v2), target design point 4.
+ *
  * Idempotency is the middleware's job, keyed on `gameId`: a reconnect, a retry,
  * or both clients reporting the same game is a no-op there. This side just
  * reports once per decided game and tolerates failure — a lost report costs one
  * game's stats, it must never break the players' "game over" experience.
  *
- * Mirrors the existing activity pattern in the "move" handler, which PUTs to
- * `${MIDDLEWARE_URL}/activities/:username/activity` with a Bearer credential.
- *
  * @param {Object} game - the finished game (supplies gameId and both players)
  * @param {Object} outcome - { over, reason, winnerUsername?, loserUsername? }
- * @param {string} [credentials] - Bearer token of a player in this game
  */
-const reportGameResult = async (game, outcome, credentials) => {
+const reportGameResult = async (game, outcome) => {
     if (!process.env.MIDDLEWARE_URL) {
         console.log("[gameResults] MIDDLEWARE_URL unset — skipping report");
         return;
     }
-    // The middleware only accepts a report from a player in the game, so fall
-    // back to a seated player's token when the ending event carried none
-    // (resign and disconnect have no payload).
-    const token = credentials || (game.players || []).map((p) => p.credentials).find(Boolean);
-    if (!token) {
-        console.log(`[gameResults] no credentials for game ${game.gameId} — skipping report`);
+    if (!process.env.CHESS_SERVICE_KEY) {
+        console.log(`[gameResults] CHESS_SERVICE_KEY unset — skipping report for ${game.gameId}`);
         return;
     }
 
-    const isDraw = !outcome.winnerUsername;
-    const body = isDraw
-        ? {
-              gameId: game.gameId,
-              result: "draw",
-              reason: "draw",
-              players: game.players.map((p) => p.username),
-          }
-        : {
-              gameId: game.gameId,
-              result: "win",
-              reason: outcome.reason,
-              winnerUsername: outcome.winnerUsername,
-              loserUsername: outcome.loserUsername,
-          };
+    const { path, headers, body } = buildResultRequest(game, outcome, process.env.CHESS_SERVICE_KEY);
 
     try {
-        const response = await fetch(`${process.env.MIDDLEWARE_URL}/gameResults`, {
+        const response = await fetch(`${process.env.MIDDLEWARE_URL}${path}`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authentication: `Bearer ${token}`,
-            },
+            headers,
             body: JSON.stringify(body),
         });
         if (!response.ok) {
@@ -81,9 +62,8 @@ const reportGameResult = async (game, outcome, credentials) => {
  * @param {Object} game - the finished game
  * @param {Object} outcome - { over, reason, winnerUsername?, loserUsername? }
  * @param {Server} io
- * @param {string} [credentials] - Bearer token of the reporting client
  */
-const emitGameOver = async (game, outcome, io, credentials) => {
+const emitGameOver = async (game, outcome, io) => {
     const payload = JSON.stringify(outcome);
     [game.student.id, game.mentor.id].forEach((id) => {
         if (id) io.to(id).emit("gameover", payload);
@@ -92,7 +72,7 @@ const emitGameOver = async (game, outcome, io, credentials) => {
     // A draw still counts as a played game, so report it too — only the
     // opponent-never-joined case (no usernames at all) is skipped.
     if (game.isPvp && (outcome.winnerUsername || outcome.reason === "draw")) {
-        await reportGameResult(game, outcome, credentials);
+        await reportGameResult(game, outcome);
     }
 };
 
@@ -134,20 +114,48 @@ const registerSocketHandlers = (socket, io) => {
 
     /**
      * Handles creating or joining a student-vs-student (PvP) game by gameId.
-     * The gameId + both usernames come from an accepted challenge (middleware).
-     * Expected payload: { gameId, challenger, opponent, username, credentials }
+     *
+     * Identity is verified against the middleware, never trusted from the
+     * client: the chess server calls GET /challenge/game/:gameId with the
+     * joining player's own token, and seats the player under the `you` the
+     * middleware returns (derived from that token), not the `username` field
+     * the client sent. If the two differ, the client is lying about who it
+     * is — the join is rejected rather than silently corrected, so a client
+     * bug surfaces instead of being hidden. `white`/`black` likewise come
+     * only from that response. See the PvP results plan (v2), target design
+     * point 2 and T4.
+     *
+     * Expected payload: { gameId, username, credentials }
      */
-    socket.on("newpvpgame", (msg) => {
+    socket.on("newpvpgame", async (msg) => {
         try {
             const parsed = JSON.parse(msg);
+            const { gameId, username, credentials } = parsed;
+
+            if (!process.env.MIDDLEWARE_URL) {
+                throw new Error("MIDDLEWARE_URL unset — cannot verify game");
+            }
+
+            const response = await fetch(`${process.env.MIDDLEWARE_URL}/challenge/game/${gameId}`, {
+                headers: { Authorization: `Bearer ${credentials}` },
+            });
+            if (!response.ok) {
+                socket.emit("gameerror", `Unable to verify game (${response.status})`);
+                return;
+            }
+            const { you, white, black } = await response.json();
+
+            if (username !== you) {
+                socket.emit("gameerror", "username does not match your login");
+                return;
+            }
 
             const result = gameManager.createOrJoinPvpGame({
-                gameId: parsed.gameId,
-                challenger: parsed.challenger,
-                opponent: parsed.opponent,
-                username: parsed.username,
-                socketId: socket.id,
-                credentials: parsed.credentials
+                gameId,
+                username: you,
+                white,
+                black,
+                socketId: socket.id
             });
 
             socket.emit(
@@ -222,7 +230,7 @@ const registerSocketHandlers = (socket, io) => {
             if (outcome && outcome.over) {
                 const game = gameManager.getGameBySocketId(socket.id);
                 if (game) {
-                    await emitGameOver(game, outcome, io, credentials);
+                    await emitGameOver(game, outcome, io);
                 }
             }
             if(!computerMove && credentials) {
