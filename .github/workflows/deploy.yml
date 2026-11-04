@@ -22,10 +22,17 @@ env:
   DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
 jobs:
+  # Disarmed by default. Each trigger needs its own repository variable set to
+  # 'true' (Settings > Variables > Actions); an unset variable reads as '' and
+  # fails closed. Arming either one is an owner decision. Keep
+  # DEPLOY_AUTO_ENABLED unset until the health gate with traffic revert (C6)
+  # exists.
   deploy:
     if: >
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
-      (github.event.workflow_run.conclusion == 'success' &&
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' &&
+       vars.DEPLOY_MANUAL_ENABLED == 'true') ||
+      (vars.DEPLOY_AUTO_ENABLED == 'true' &&
+       github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.event == 'push' &&
        github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
