@@ -13,6 +13,9 @@ import ChessBoard, {
 } from "../../components/ChessBoard/ChessBoard";
 import { useChessSocket } from "../lessons/piece-lessons/lesson-overlay/hooks/useChessSocket";
 import { Move } from "../../core/types/chess";
+import { useSearchParams } from "react-router-dom";
+import { checkAndAward } from "../../core/services/badgesApi";
+import { completeActivity, getActivityNameByTaskId } from "../../core/services/activitiesApi";
 
 type PuzzlesProps = {
   student?: any;
@@ -94,6 +97,9 @@ const Puzzles: React.FC<PuzzlesProps> = ({
   // User identification
   const studentId = student || cookies.login?.studentId || uuidv4();
   const mentorId = mentor || "puzzle_mentor_" + studentId;
+
+  const [searchParams] = useSearchParams();
+  const taskId = searchParams.get("taskId");
 
   // ============================================================================
   // PUZZLE LOADING
@@ -378,6 +384,16 @@ const Puzzles: React.FC<PuzzlesProps> = ({
       if (moveListRef.current.length === 0) {
         isPuzzleEndRef.current = true;
         socket.sendMessage("puzzle completed");
+        if (role === "student" && username) {
+          if (taskId) {
+            getActivityNameByTaskId(username, cookies.login, taskId)
+            .then((name) => name && completeActivity(username, cookies.login, name))
+            .catch((err) => console.error("Failed to update activity:", err));
+          }
+          checkAndAward(username, cookies.login).catch((err) =>
+          console.error("Failed to check/award badges:", err)
+          );
+        }
         reportPuzzleSolved();
         setTimeout(() => {
           setModal({

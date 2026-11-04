@@ -25,6 +25,10 @@ import { ReactComponent as BackIconInactive } from '../../../../assets/images/ic
 import { ReactComponent as NextIcon } from '../../../../assets/images/icons/icon_next.svg';
 import { ReactComponent as NextIconInactive } from '../../../../assets/images/icons/icon_next_inactive.svg';
 
+import { SetPermissionLevel } from "../../../../globals";
+import { checkAndAward } from "../../../../core/services/badgesApi";
+import { completeActivity, getActivityNameByTaskId } from "../../../../core/services/activitiesApi";
+
 type LessonOverlayProps = {
   propPieceName?: any;
   propLessonNumber?: any;
@@ -906,6 +910,23 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
     const nextNum = lessonNum + 1;
     await updateCompletion(); // backend update for logged-in users
+
+    try {
+  const uInfo = await SetPermissionLevel(cookies);
+  if (!uInfo?.error && uInfo.username) {
+    const taskId = new URLSearchParams(location.search).get("taskId");
+    if (taskId) {
+      getActivityNameByTaskId(uInfo.username, cookies.login, taskId)
+        .then((name) => name && completeActivity(uInfo.username, cookies.login, name))
+        .catch((err) => console.error("Failed to update activity:", err));
+    }
+    checkAndAward(uInfo.username, cookies.login).catch((err) =>
+      console.error("Failed to check/award badges:", err)
+    );
+  }
+} catch (err) {
+  console.error("Post-completion calls failed:", err);
+}
 
     if (nextNum >= totalLessons) {
       setAllLessonsDone(true);
