@@ -143,10 +143,15 @@ describe('GameManager', () => {
   });
 
   // --- Student-vs-student (PvP) join by gameId (§5) -----------------------
+  //
+  // gameId, username, white and black all come from the middleware's
+  // GET /challenge/game/:gameId response (verified by EventHandlers before
+  // calling this) — never from the client directly. See the PvP results
+  // plan (v2), T4.
 
-  test('creates a PvP game and seats the challenger as white', () => {
+  test('creates a PvP game and seats white as white', () => {
     const res = gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
+      gameId: 'g1', white: 'Alice', black: 'Cara',
       username: 'Alice', socketId: 'sA'
     });
     expect(res.newGame).toBe(true);
@@ -155,44 +160,28 @@ describe('GameManager', () => {
     expect(gameManager.getGameByGameId('g1')).toBe(res.game);
   });
 
-  test('each PvP seat keeps its own credentials for the end-of-game report', () => {
-    // Resign and disconnect carry no payload, so the token has to be captured
-    // at join time or the result can never be reported to the middleware.
+  test('reconnecting with the same username reclaims the original seat', () => {
     gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
-      username: 'Alice', socketId: 'sA', credentials: 'token-alice'
+      gameId: 'g1', white: 'Alice', black: 'Cara',
+      username: 'Alice', socketId: 'sA'
     });
     const res = gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
-      username: 'Cara', socketId: 'sC', credentials: 'token-cara'
-    });
-
-    const seats = Object.fromEntries(res.game.players.map((p) => [p.username, p.credentials]));
-    expect(seats).toEqual({ Alice: 'token-alice', Cara: 'token-cara' });
-  });
-
-  test('reconnecting refreshes the seat credentials rather than blanking them', () => {
-    gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
-      username: 'Alice', socketId: 'sA', credentials: 'token-alice'
-    });
-    // Reconnect with no token supplied — keep the one we already had.
-    const res = gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
+      gameId: 'g1', white: 'Alice', black: 'Cara',
       username: 'Alice', socketId: 'sA2'
     });
     const alice = res.game.players.find((p) => p.username === 'Alice');
     expect(alice.id).toBe('sA2');
-    expect(alice.credentials).toBe('token-alice');
+    expect(res.color).toBe('white');
+    expect(res.newGame).toBe(false);
   });
 
   test('second PvP player joins the same game by gameId as black', () => {
     gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
+      gameId: 'g1', white: 'Alice', black: 'Cara',
       username: 'Alice', socketId: 'sA'
     });
     const res = gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
+      gameId: 'g1', white: 'Alice', black: 'Cara',
       username: 'Cara', socketId: 'sC'
     });
     expect(res.newGame).toBe(false);
@@ -202,7 +191,7 @@ describe('GameManager', () => {
 
   test('rejects a non-player trying to join a PvP game', () => {
     expect(() => gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
+      gameId: 'g1', white: 'Alice', black: 'Cara',
       username: 'Mallory', socketId: 'sM'
     })).toThrow(/not a player/);
   });
@@ -217,11 +206,11 @@ describe('GameManager', () => {
 
   test('a forfeit in a PvP game awards the win to the opponent', () => {
     gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
+      gameId: 'g1', white: 'Alice', black: 'Cara',
       username: 'Alice', socketId: 'sA'
     });
     gameManager.createOrJoinPvpGame({
-      gameId: 'g1', challenger: 'Alice', opponent: 'Cara',
+      gameId: 'g1', white: 'Alice', black: 'Cara',
       username: 'Cara', socketId: 'sC'
     });
     const res = gameManager.resign('sC', 'disconnect'); // Cara drops
