@@ -16,10 +16,11 @@ const connectDB = require("./config/db");
 const passport = require("passport");
 require("./config/passport.js");
 const app = express();
-// Two proxies sit in front of this process: Container Apps ingress, then the
-// frontend nginx. Express must trust them to see X-Forwarded-Proto, or it
-// treats every request as HTTP and never sends a secure session cookie.
-app.set("trust proxy", 2);
+// Trust exactly the proxies in front of this process, so Express sees
+// X-Forwarded-Proto (needed for the secure session cookie) without letting a
+// client choose its own req.ip. One today (Container Apps ingress); becomes 2
+// when the frontend nginx proxy lands.
+app.set("trust proxy", 1);
 const cors = require("cors");
 const config = require("config");
 const streakRoutes = require("./routes/streak");
