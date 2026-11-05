@@ -1,4 +1,6 @@
-FROM node:24.21.0-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+# Debian slim, not Alpine: the bundled Stockfish binary is linked against
+# glibc, which Alpine (musl) does not provide.
+FROM node:24.21.0-slim@sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20
 
 LABEL org.opencontainers.image.source="https://github.com/YSTEM-LMS/react"
 
