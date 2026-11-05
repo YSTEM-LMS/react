@@ -18,9 +18,10 @@ require("./config/passport.js");
 const app = express();
 // Trust exactly the proxies in front of this process, so Express sees
 // X-Forwarded-Proto (needed for the secure session cookie) without letting a
-// client choose its own req.ip. One today (Container Apps ingress); becomes 2
-// when the frontend nginx proxy lands.
-app.set("trust proxy", 1);
+// client choose its own req.ip. Set TRUST_PROXY_HOPS per environment to the
+// measured hop count: 1 for Container Apps ingress alone, more once traffic
+// arrives through the frontend nginx.
+app.set("trust proxy", parseInt(process.env.TRUST_PROXY_HOPS) || 1);
 const cors = require("cors");
 const config = require("config");
 const streakRoutes = require("./routes/streak");
