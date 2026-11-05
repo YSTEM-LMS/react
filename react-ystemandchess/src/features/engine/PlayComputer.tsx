@@ -7,6 +7,7 @@ import { useLocation } from 'react-router';
 import { Move } from '../../core/types/chess';
 import ChessBoard, { ChessBoardRef } from '../../components/ChessBoard/ChessBoard';
 import { environment } from "../../environments";
+import { socketTarget } from "../../environments/socketTarget";
 import { cn } from '../../core/utils/cn';
 import StockfishTutor from './StockfishTutor';
 
@@ -151,7 +152,9 @@ const PlayComputer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const socket = io(environment.urls.stockfishServerURL, {
+    const { url, path } = socketTarget(environment.urls.stockfishServerURL);
+    const socket = io(url, {
+      path,
       transports: ['websocket'],
       reconnection: true,
     });

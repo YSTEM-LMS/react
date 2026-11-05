@@ -39,7 +39,7 @@ export function useAnalyticsApi<T>(
 
     const controller = new AbortController();
 
-    const url = new URL(`${environment.urls.middlewareURL}${endpoint}`);
+    const url = new URL(`${environment.urls.middlewareURL}${endpoint}`, window.location.origin);
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         if (v) url.searchParams.set(k, v);

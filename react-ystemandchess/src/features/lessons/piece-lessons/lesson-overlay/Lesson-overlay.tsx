@@ -7,6 +7,7 @@ import ChessBoard, { ChessBoardRef } from '../../../../components/ChessBoard/Che
 import PromotionPopup from '../../lessons-main/PromotionPopup';
 import MoveTracker from '../move-tracker/MoveTracker';
 import { environment } from "../../../../environments";
+import { socketTarget } from "../../../../environments/socketTarget";
 
 import { Move } from "../../../../core/types/chess";
 import { EvaluationContext, Goal } from '../../../../core/types/goals';
@@ -208,7 +209,9 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
   // Initialize Stockfish socket for free-play mode
   useEffect(() => {
-    const stockfishSocket = io(environment.urls.stockfishServerURL, {
+    const { url, path } = socketTarget(environment.urls.stockfishServerURL);
+    const stockfishSocket = io(url, {
+      path,
       transports: ['websocket'],
       reconnection: true,
     });

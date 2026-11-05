@@ -79,15 +79,8 @@ jobs:
         run: CI=false npm run build --if-present
         working-directory: ./react-ystemandchess
         env:
-          # These are read by src/environments/environment.prod.js, which is
-          # what the app actually imports (via src/environments/index.js).
-          # The previous "Create environment file" step wrote to
-          # src/core/environments/environment.ts, a path nothing in the app
-          # imports, so these secrets never reached the built app.
-          REACT_APP_MIDDLEWARE_URL: ${{ secrets.MIDDLEWARE_URL || 'https://ystemandchess.com/middleware' }}
-          REACT_APP_STOCKFISH_SERVER_URL: ${{ secrets.STOCKFISH_URL || 'https://ystemandchess.com/stockfishserver' }}
-          REACT_APP_CHESS_SERVER_URL: ${{ secrets.CHESS_SERVER || 'https://ystemandchess.com/chessserver' }}
-          REACT_APP_CHESS_CLIENT_URL: ${{ secrets.CHESS_CLIENT_URL || 'https://ystemandchess.com/chessclient' }}
+          # Service URLs are relative (environment.prod.js), so the Agora app
+          # ID is the only build-time value.
           REACT_APP_AGORA_APP_ID: ${{ secrets.APP_ID || '' }}
 
       - name: Test react-ystemandchess
@@ -117,5 +110,20 @@ jobs:
           context: ./${{ matrix.service }}
           platforms: linux/amd64
           push: false
+          load: true
+          tags: ci-image:pr
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+      # The frontend's nginx config is a template rendered at container start,
+      # so check that it renders and parses. Upstreams point at loopback
+      # because nginx resolves proxy_pass hosts when it loads the config.
+      - name: Check frontend nginx config
+        if: matrix.service == 'react-ystemandchess'
+        run: |
+          docker run --rm \
+            -e MIDDLEWARE_UPSTREAM=http://127.0.0.1:8000 \
+            -e CHESS_SERVER_UPSTREAM=http://127.0.0.1:3001 \
+            -e STOCKFISH_UPSTREAM=http://127.0.0.1:8081 \
+            -e CHESS_CLIENT_UPSTREAM=http://127.0.0.1:8082 \
+            ci-image:pr nginx -t

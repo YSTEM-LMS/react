@@ -99,6 +99,7 @@ describe('PlayComputer', () => {
     it('should connect to Stockfish server on mount', () => {
       renderComponent();
       expect(io).toHaveBeenCalledWith('http://localhost:8080', {
+        path: '/socket.io',
         transports: ['websocket'],
         reconnection: true,
       });
