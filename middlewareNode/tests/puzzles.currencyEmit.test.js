@@ -84,7 +84,16 @@ async function waitForActionEvent(query, timeoutMs = 2000) {
   return null;
 }
 
+// Realistic Lichess shape: opponent move, then solver move. The route only
+// ever has to verify the solver's half ("e8g8" here) — see solverMoves() in
+// src/routes/puzzles.js.
 const SOLUTION_MOVES = "e1g1 e8g8";
+const SOLVER_MOVES = ["e8g8"];
+
+// A two-pair line (opponent, solver, opponent, solver), for the tests below
+// that need more than one solver move to submit a partial/extra sequence.
+const TWO_PAIR_MOVES = "e2e4 e7e5 g1f3 b8c6";
+const TWO_PAIR_SOLVER_MOVES = ["e7e5", "b8c6"];
 
 async function seedPuzzle(puzzleId, moves = SOLUTION_MOVES) {
   // Real documents use the capitalized schema field names (PuzzleId, Moves —
@@ -104,9 +113,11 @@ describe("POST /puzzles/solved — currency emit", () => {
 
     await seedPuzzle(puzzleId);
 
+    // The real client (Puzzles.tsx) never submits the opponent's automatic
+    // move — only the solver's own moves (playedMovesRef).
     const res = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId, moves: ["e1g1", "e8g8"] })
+      .send({ puzzleId, moves: SOLVER_MOVES })
       .set("x-test-user-id", userId.toString())
       .set("x-test-username", "alice");
 
@@ -126,12 +137,12 @@ describe("POST /puzzles/solved — currency emit", () => {
     const userId = new mongoose.Types.ObjectId();
     const puzzleId = "test-puzzle-promo-lenient";
 
-    // Solution requires promoting to a queen; Puzzles.tsx's
+    // Opponent move, then the solver's promotion move. Puzzles.tsx's
     // handlePlayerMove accepts the move even if the player didn't specify
     // a promotion piece (playerAttemptedMove === expectedMove.substring(0,4)),
     // so the server has to accept that same shape or it would reject a
     // move the client UI itself already treated as solved.
-    await seedPuzzle(puzzleId, "e7e8q");
+    await seedPuzzle(puzzleId, "a2a3 e7e8q");
 
     const res = await request(app)
       .post("/puzzles/solved")
@@ -146,7 +157,7 @@ describe("POST /puzzles/solved — currency emit", () => {
     const userId = new mongoose.Types.ObjectId();
     const puzzleId = "test-puzzle-wrong-promo";
 
-    await seedPuzzle(puzzleId, "e7e8q"); // solution promotes to queen
+    await seedPuzzle(puzzleId, "a2a3 e7e8q"); // solver promotes to queen
 
     const res = await request(app)
       .post("/puzzles/solved")
@@ -165,10 +176,11 @@ describe("POST /puzzles/solved — currency emit", () => {
 
     // This is the regression case: a caller who knows (or guesses) a real
     // puzzleId but never actually played — or played incorrectly — must
-    // be rejected, not credited.
+    // be rejected, not credited. Same length as the real solver move, wrong
+    // square, so this is a content mismatch and not a length mismatch.
     const res = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId, moves: ["a1a2", "a7a8"] })
+      .send({ puzzleId, moves: ["a7a8"] })
       .set("x-test-user-id", userId.toString())
       .set("x-test-username", "eve");
 
@@ -183,15 +195,75 @@ describe("POST /puzzles/solved — currency emit", () => {
     const userId = new mongoose.Types.ObjectId();
     const puzzleId = "test-puzzle-partial";
 
-    await seedPuzzle(puzzleId); // solution is two moves
+    await seedPuzzle(puzzleId, TWO_PAIR_MOVES); // solver has two moves
 
     const res = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId, moves: ["e1g1"] }) // only the first move
+      .send({ puzzleId, moves: [TWO_PAIR_SOLVER_MOVES[0]] }) // only the first
       .set("x-test-user-id", userId.toString())
       .set("x-test-username", "frank");
 
     expect(res.status).toBe(400);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
+  it("does NOT emit when the client submits the full line, including the opponent's moves", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-full-line";
+
+    await seedPuzzle(puzzleId, TWO_PAIR_MOVES);
+
+    // Submitting the whole stored answer key (as if the opponent's replies
+    // were the player's own moves) must not be treated as a valid solve.
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: TWO_PAIR_MOVES.split(" ") })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "judy");
+
+    expect(res.status).toBe(400);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
+  it("does NOT emit when extra moves are appended to an otherwise-correct solve", async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-extra-moves";
+
+    await seedPuzzle(puzzleId, TWO_PAIR_MOVES);
+
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: [...TWO_PAIR_SOLVER_MOVES, "a1a2"] })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "karl");
+
+    expect(res.status).toBe(400);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(await ActionEvent.countDocuments({})).toBe(0);
+  });
+
+  it.each([
+    ["a single move with no opponent move at all", "e7e8q"],
+    ["an odd number of moves", "e2e4 e7e5 g1f3"],
+  ])("does NOT emit when the puzzle's stored Moves is malformed (%s)", async (_label, badMoves) => {
+    const userId = new mongoose.Types.ObjectId();
+    const puzzleId = "test-puzzle-malformed-moves";
+
+    await seedPuzzle(puzzleId, badMoves);
+
+    const res = await request(app)
+      .post("/puzzles/solved")
+      .send({ puzzleId, moves: ["e7e8"] })
+      .set("x-test-user-id", userId.toString())
+      .set("x-test-username", "liam");
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/invalid/i);
 
     await new Promise((resolve) => setImmediate(resolve));
     expect(await ActionEvent.countDocuments({})).toBe(0);
@@ -301,7 +373,7 @@ describe("POST /puzzles/solved — currency emit", () => {
     const userId = new mongoose.Types.ObjectId();
     const correct = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId, moves: ["e1g1", "e8g8"] })
+      .send({ puzzleId, moves: SOLVER_MOVES })
       .set("x-test-user-id", userId.toString())
       .set("x-test-username", "regression-tester");
 
@@ -313,7 +385,7 @@ describe("POST /puzzles/solved — currency emit", () => {
     const otherUserId = new mongoose.Types.ObjectId();
     const wrong = await request(app)
       .post("/puzzles/solved")
-      .send({ puzzleId, moves: ["a1a2", "a7a8"] })
+      .send({ puzzleId, moves: ["a7a8"] })
       .set("x-test-user-id", otherUserId.toString())
       .set("x-test-username", "regression-tester-2");
 
