@@ -32,6 +32,7 @@ const { validator } = require("../utils/middleware");
 const { getAvatarUrl, getBlobServiceClient, AVATAR_CONTAINER } = require("../utils/avatars");
 const { MongoClient } = require("mongodb");
 const config = require("config");
+const fallbackDbName = require("../config/fallbackDbName");
 
 const mongoose = require("mongoose");
 
@@ -50,7 +51,7 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  return cachedClient.db("ystem");
+  return cachedClient.db(fallbackDbName(config.get("mongoURI")));
 }
 
 /**
