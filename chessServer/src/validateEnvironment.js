@@ -1,6 +1,16 @@
-const REQUIRED_PRODUCTION_VARS = [
-  "MIDDLEWARE_URL",
-];
+/**
+ * Fails fast in production when required secrets/config are missing, instead
+ * of booting and silently degrading. CHESS_SERVICE_KEY unset has exactly that
+ * silent-failure shape today: the PvP result report just logs and skips (see
+ * EventHandlers.reportGameResult) — this is the production-startup guard the
+ * PvP results plan (v2), T4, asks for, folded into the env check this repo's
+ * "signed-environment-separation" work already added for MIDDLEWARE_URL/CORS.
+ *
+ * Only enforced when NODE_ENV === "production" — local/dev/test runs are
+ * unaffected, same as the other "skip and log" call sites already behave.
+ */
+
+const REQUIRED_PRODUCTION_VARS = ["MIDDLEWARE_URL", "CHESS_SERVICE_KEY"];
 
 function hasCorsConfiguration() {
   return Boolean(
