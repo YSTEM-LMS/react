@@ -202,6 +202,101 @@ describe("POST /savedGames", () => {
   });
 });
 
+describe("games saved before slots existed", () => {
+  const OLD = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  // Inserts straight into the collection, the way pre-slot games look.
+  async function insertLegacyGames(username, n) {
+    const user = await Users.findOne({ username }).lean();
+    const docs = Array.from({ length: n }, (_, i) => ({
+      uuid: `00000000-0000-4000-8000-00000000000${i}`,
+      userId: user._id,
+      gameType: "computer",
+      playerColor: "white",
+      computerLevel: 10,
+      gameName: `Old ${i}`,
+      startFen: START,
+      pgn: "",
+      fen: START,
+      plyCount: 0,
+      status: "ongoing",
+      endReason: null,
+      notes: [],
+      createdAt: OLD,
+      updatedAt: OLD,
+    }));
+    await SavedGame.collection.insertMany(docs);
+    return docs;
+  }
+
+  test("the slot index builds even when several games have no slot", async () => {
+    await makeUser("alice");
+    await insertLegacyGames("alice", 3);
+    await SavedGame.syncIndexes();
+    const indexes = await SavedGame.collection.indexes();
+    expect(indexes.find((i) => i.key.slot === 1 && i.unique)).toBeTruthy();
+  });
+
+  test("they count toward the limit, even under concurrent creates", async () => {
+    const token = await makeUser("alice");
+    await insertLegacyGames("alice", 2);
+    const original = LIMITS.maxGamesPerUser;
+    LIMITS.maxGamesPerUser = 4;
+    try {
+      const results = await Promise.all(Array.from({ length: 6 }, () => createGame(token)));
+      expect(results.filter((r) => r.status === 201)).toHaveLength(2);
+      expect(await SavedGame.countDocuments({})).toBe(4);
+
+      const slots = (await SavedGame.find({}).lean()).map((g) => g.slot).sort();
+      expect(slots).toEqual([0, 1, 2, 3]);
+    } finally {
+      LIMITS.maxGamesPerUser = original;
+    }
+  });
+
+  test("getting a slot doesn't reset their retention clock", async () => {
+    const token = await makeUser("alice");
+    const [legacy] = await insertLegacyGames("alice", 1);
+    expect((await createGame(token)).status).toBe(201);
+
+    const game = await SavedGame.findOne({ uuid: legacy.uuid }).lean();
+    expect(game.slot).toBe(0);
+    expect(game.updatedAt.getTime()).toBe(OLD.getTime());
+  });
+
+  test("they can still be listed, read and played", async () => {
+    const token = await makeUser("alice");
+    const [legacy] = await insertLegacyGames("alice", 1);
+
+    const list = await request(app).get("/savedGames").set(auth(token));
+    expect(list.body.games.map((g) => g.uuid)).toEqual([legacy.uuid]);
+
+    const read = await request(app).get(`/savedGames/${legacy.uuid}`).set(auth(token));
+    expect(read.status).toBe(200);
+
+    const move = await request(app)
+      .patch(`/savedGames/${legacy.uuid}`)
+      .set(auth(token))
+      .send({ pgn: "1. e4" });
+    expect(move.status).toBe(200);
+    expect(move.body.game.plyCount).toBe(1);
+  });
+
+  test("a student over the limit sees all their games and can't add more", async () => {
+    const token = await makeUser("alice");
+    await insertLegacyGames("alice", 3);
+    const original = LIMITS.maxGamesPerUser;
+    LIMITS.maxGamesPerUser = 2;
+    try {
+      expect((await createGame(token)).status).toBe(409);
+      const list = await request(app).get("/savedGames").set(auth(token));
+      expect(list.body.games).toHaveLength(3);
+    } finally {
+      LIMITS.maxGamesPerUser = original;
+    }
+  });
+});
+
 describe("PATCH /savedGames/:uuid — moves", () => {
   test("replays a legal PGN and derives the position on the server", async () => {
     const token = await makeUser("alice");

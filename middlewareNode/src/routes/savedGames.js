@@ -80,6 +80,49 @@ const isSlotConflict = (err) => err && err.code === 11000 && Boolean(err.keyPatt
 // picked, so a handful of attempts is plenty even for a burst of requests.
 const MAX_SLOT_ATTEMPTS = 10;
 
+function lowestFreeSlot(games) {
+  const used = new Set(games.map((g) => g.slot));
+  let slot = 0;
+  while (used.has(slot)) slot++;
+  return slot;
+}
+
+/**
+ * Gives a slot to each of the user's games saved before slots existed, so
+ * they're covered by the unique index before the limit is checked against
+ * it. `timestamps: false` keeps `updatedAt` as it was: bumping it would
+ * reset the retention clock on games nobody played. A slot can land at or
+ * above the current limit (e.g. the student already had more games than
+ * the limit allows); the count check then blocks new games until they
+ * delete some.
+ */
+async function assignLegacySlots(userId) {
+  const legacy = await SavedGame.find({ userId, slot: { $exists: false } })
+    .sort({ createdAt: 1 })
+    .select("_id")
+    .lean();
+
+  for (const { _id } of legacy) {
+    for (let attempt = 0; attempt < MAX_SLOT_ATTEMPTS; attempt++) {
+      const slotted = await SavedGame.find({ userId, slot: { $exists: true } })
+        .select("slot")
+        .lean();
+      try {
+        // A concurrent request may have slotted this game already, in
+        // which case the filter matches nothing and we move on.
+        await SavedGame.updateOne(
+          { _id, slot: { $exists: false } },
+          { $set: { slot: lowestFreeSlot(slotted) } },
+          { timestamps: false }
+        );
+        break;
+      } catch (err) {
+        if (!isSlotConflict(err)) throw err;
+      }
+    }
+  }
+}
+
 /**
  * Creates the game in the lowest free slot of the owner's
  * LIMITS.maxGamesPerUser slots. The unique { userId, slot } index makes this
@@ -91,6 +134,7 @@ async function createInFreeSlot(fields) {
   // Make sure the unique index exists before relying on it (a no-op once
   // Mongoose has built the model's indexes).
   await SavedGame.init();
+  await assignLegacySlots(fields.userId);
 
   for (let attempt = 0; attempt < MAX_SLOT_ATTEMPTS; attempt++) {
     const taken = await SavedGame.find({ userId: fields.userId }).select("slot").lean();
@@ -98,9 +142,7 @@ async function createInFreeSlot(fields) {
     // that are already in use.
     if (taken.length >= LIMITS.maxGamesPerUser) throw limitReached();
 
-    const used = new Set(taken.map((g) => g.slot));
-    let slot = 0;
-    while (used.has(slot)) slot++;
+    const slot = lowestFreeSlot(taken);
     if (slot >= LIMITS.maxGamesPerUser) throw limitReached();
 
     try {
@@ -114,9 +156,10 @@ async function createInFreeSlot(fields) {
 
 router.get("/", async (req, res) => {
   try {
-    const games = await SavedGame.find({ userId: req.user._id })
-      .sort({ updatedAt: -1 })
-      .limit(LIMITS.maxGamesPerUser);
+    // No .limit(): creates already cap how many games a student has, and a
+    // cut-off here would hide games from a student who is over the limit
+    // (e.g. after it was lowered), leaving them unable to find and delete them.
+    const games = await SavedGame.find({ userId: req.user._id }).sort({ updatedAt: -1 });
     res.json({ games: games.map(toSummary) });
   } catch (err) {
     sendError(res, err, "list");
