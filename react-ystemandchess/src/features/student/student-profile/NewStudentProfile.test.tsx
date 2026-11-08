@@ -187,15 +187,13 @@ describe('NewStudentProfile', () => {
     // wait for stats to load first
     await screen.findByText(/10 min/i);
 
-    // check if stats for website browsing is rendered correctly
-    const web_li = await screen.findByText(/Website:/i);
-    expect(web_li).toBeInTheDocument();
-    expect(web_li.firstElementChild).toHaveTextContent('10 min');
+    // check if stats for website browsing are rendered in a StatCard
+    const webValue = screen.getByText('10 min');
+    expect(webValue.nextElementSibling).toHaveTextContent('Website');
 
-    // check if stats for playing is rendered correctly
-    const play_li = await screen.findByText(/Playing:/i);
-    expect(play_li).toBeInTheDocument();
-    expect(play_li.firstElementChild).toHaveTextContent('15 min');
+    // check if stats for playing are rendered in a StatCard
+    const playValue = screen.getByText('15 min');
+    expect(playValue.nextElementSibling).toHaveTextContent('Playing');
   });
     
   test('renders user activity', async () => {
