@@ -78,7 +78,11 @@ const SavedGameSchema = new mongoose.Schema(
     // per-student limit: two concurrent creates can't take the same slot, so
     // the limit holds even when both pass a count check at the same moment.
     // Deleting a game (or the TTL index expiring it) frees its slot.
-    slot: { type: Number, min: 0, required: true },
+    //
+    // Not `required`: games saved before slots existed have none until the
+    // owner's next create assigns one (routes/savedGames.js), and they must
+    // still be readable and playable until then.
+    slot: { type: Number, min: 0 },
   },
   { timestamps: true }
 );
@@ -87,7 +91,12 @@ const SavedGameSchema = new mongoose.Schema(
 SavedGameSchema.index({ userId: 1, updatedAt: -1 });
 
 // One game per slot per student; see `slot` above.
-SavedGameSchema.index({ userId: 1, slot: 1 }, { unique: true });
+// Partial so that games without a slot yet don't all collide as `null` and
+// stop the index from building.
+SavedGameSchema.index(
+  { userId: 1, slot: 1 },
+  { unique: true, partialFilterExpression: { slot: { $exists: true } } }
+);
 
 // Games are kept for 3 months after they were last played (Devin, 10/17).
 // Every save bumps `updatedAt`, so a game a student keeps coming back to is
