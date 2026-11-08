@@ -67,6 +67,51 @@ async function findOwned(req) {
   return game;
 }
 
+function limitReached() {
+  return new SavedGameError(
+    409,
+    `You can save up to ${LIMITS.maxGamesPerUser} games. Delete one to save another.`
+  );
+}
+
+const isSlotConflict = (err) => err && err.code === 11000 && Boolean(err.keyPattern?.slot);
+
+// Each retry happens only because a concurrent request just took the slot we
+// picked, so a handful of attempts is plenty even for a burst of requests.
+const MAX_SLOT_ATTEMPTS = 10;
+
+/**
+ * Creates the game in the lowest free slot of the owner's
+ * LIMITS.maxGamesPerUser slots. The unique { userId, slot } index makes this
+ * atomic: if a concurrent create takes the same slot first, the insert fails
+ * with a duplicate key error and we re-read the free slots and try again.
+ * When no slot is free the student is at the limit and gets a 409.
+ */
+async function createInFreeSlot(fields) {
+  // Make sure the unique index exists before relying on it (a no-op once
+  // Mongoose has built the model's indexes).
+  await SavedGame.init();
+
+  for (let attempt = 0; attempt < MAX_SLOT_ATTEMPTS; attempt++) {
+    const taken = await SavedGame.find({ userId: fields.userId }).select("slot").lean();
+    // Count check first: also covers the limit being lowered below slots
+    // that are already in use.
+    if (taken.length >= LIMITS.maxGamesPerUser) throw limitReached();
+
+    const used = new Set(taken.map((g) => g.slot));
+    let slot = 0;
+    while (used.has(slot)) slot++;
+    if (slot >= LIMITS.maxGamesPerUser) throw limitReached();
+
+    try {
+      return await SavedGame.create({ ...fields, slot });
+    } catch (err) {
+      if (!isSlotConflict(err)) throw err;
+    }
+  }
+  throw new SavedGameError(503, "Couldn't save the game right now. Please try again.");
+}
+
 router.get("/", async (req, res) => {
   try {
     const games = await SavedGame.find({ userId: req.user._id })
@@ -91,16 +136,8 @@ router.post("/", async (req, res) => {
     const name = validateGameName(gameName, "Me vs Computer");
     const start = startFen === undefined ? normalizeFen(DEFAULT_POSITION) : normalizeFen(startFen);
 
-    const count = await SavedGame.countDocuments({ userId: req.user._id });
-    if (count >= LIMITS.maxGamesPerUser) {
-      throw new SavedGameError(
-        409,
-        `You can save up to ${LIMITS.maxGamesPerUser} games. Delete one to save another.`
-      );
-    }
-
     const replay = replayPgn(pgn, start);
-    const game = await SavedGame.create({
+    const game = await createInFreeSlot({
       userId: req.user._id,
       gameType: "computer",
       playerColor,

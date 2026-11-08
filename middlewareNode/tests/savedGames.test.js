@@ -168,6 +168,38 @@ describe("POST /savedGames", () => {
       LIMITS.maxGamesPerUser = original;
     }
   });
+
+  test("concurrent creates can't push a student over the limit", async () => {
+    const token = await makeUser("alice");
+    const original = LIMITS.maxGamesPerUser;
+    LIMITS.maxGamesPerUser = 3;
+    try {
+      expect((await createGame(token)).status).toBe(201);
+      const results = await Promise.all(Array.from({ length: 8 }, () => createGame(token)));
+      const statuses = results.map((r) => r.status);
+      expect(statuses.filter((s) => s === 201)).toHaveLength(2);
+      expect(statuses.filter((s) => s === 409)).toHaveLength(6);
+      expect(await SavedGame.countDocuments({})).toBe(3);
+    } finally {
+      LIMITS.maxGamesPerUser = original;
+    }
+  });
+
+  test("deleting a game frees its slot for a new one", async () => {
+    const token = await makeUser("alice");
+    const original = LIMITS.maxGamesPerUser;
+    LIMITS.maxGamesPerUser = 2;
+    try {
+      const first = await createGame(token);
+      expect((await createGame(token)).status).toBe(201);
+      expect((await createGame(token)).status).toBe(409);
+      await request(app).delete(`/savedGames/${first.body.game.uuid}`).set(auth(token));
+      expect((await createGame(token)).status).toBe(201);
+      expect((await createGame(token)).status).toBe(409);
+    } finally {
+      LIMITS.maxGamesPerUser = original;
+    }
+  });
 });
 
 describe("PATCH /savedGames/:uuid — moves", () => {

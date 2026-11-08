@@ -72,12 +72,22 @@ const SavedGameSchema = new mongoose.Schema(
     endReason: { type: String, enum: [...END_REASONS, null], default: null },
 
     notes: { type: [NoteSchema], default: [] },
+
+    // Which of the owner's LIMITS.maxGamesPerUser slots this game fills
+    // (0-based). The unique { userId, slot } index below is what enforces the
+    // per-student limit: two concurrent creates can't take the same slot, so
+    // the limit holds even when both pass a count check at the same moment.
+    // Deleting a game (or the TTL index expiring it) frees its slot.
+    slot: { type: Number, min: 0, required: true },
   },
   { timestamps: true }
 );
 
 // A student's games, newest first: the only list query Phase A makes.
 SavedGameSchema.index({ userId: 1, updatedAt: -1 });
+
+// One game per slot per student; see `slot` above.
+SavedGameSchema.index({ userId: 1, slot: 1 }, { unique: true });
 
 // Games are kept for 3 months after they were last played (Devin, 10/17).
 // Every save bumps `updatedAt`, so a game a student keeps coming back to is
