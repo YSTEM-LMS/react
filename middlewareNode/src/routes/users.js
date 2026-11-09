@@ -32,6 +32,7 @@ const { validator } = require("../utils/middleware");
 const { getAvatarUrl, getBlobServiceClient, AVATAR_CONTAINER } = require("../utils/avatars");
 const { MongoClient } = require("mongodb");
 const config = require("config");
+const { resolveDbName } = require("../config/dbName");
 
 const mongoose = require("mongoose");
 
@@ -50,11 +51,12 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  // Use the database named in MONGO_URI (e.g. "ystem_dev") — the same DB
-  // Mongoose connects to and where the users actually live. This was
+  // Resolve the same way mongoose does (src/config/db.js), so this never
+  // lands on a different database than the rest of the app. This was
   // previously hardcoded to "ystem", an empty database, which silently broke
   // every getDb()-based route (mentorship matching, high scores, profile).
-  return cachedClient.db();
+  const dbName = resolveDbName(config.get("mongoURI"), config.get("dbName"));
+  return dbName ? cachedClient.db(dbName) : cachedClient.db();
 }
 
 // Usernames starting with "guest:" are reserved for chessServer's ephemeral,

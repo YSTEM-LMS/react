@@ -6,6 +6,7 @@
  */
 
 const config = require("config");
+const { resolveDbName } = require("../config/dbName");
 const { MongoClient } = require('mongodb');
 const { getActivityCatalogEntry } = require("../config/activityCatalog");
 require('dotenv').config();
@@ -27,9 +28,10 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  // Use the database named in MONGO_URI (e.g. "ystem_dev"), matching Mongoose —
-  // not a hardcoded "ystem", which is an empty DB with none of the app's data.
-  return cachedClient.db();
+  // Resolve the same way mongoose does (src/config/db.js), so this never
+  // lands on a different database than the rest of the app.
+  const dbName = resolveDbName(config.get("mongoURI"), config.get("dbName"));
+  return dbName ? cachedClient.db(dbName) : cachedClient.db();
 }
 
 /**

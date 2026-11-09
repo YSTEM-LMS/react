@@ -1,3 +1,5 @@
+const { resolveDbName } = require("./dbName");
+
 const REQUIRED_PRODUCTION_VARS = [
   "MONGO_URI",
   "INDEX_KEY",
@@ -28,6 +30,19 @@ function validateEnvironment() {
   if (missing.length > 0) {
     console.error(
       `[boot] Missing required environment variables for NODE_ENV=${process.env.NODE_ENV}: ${missing.join(", ")}`
+    );
+    process.exit(1);
+  }
+
+  // Not in REQUIRED_PRODUCTION_VARS: MONGO_DB_NAME is optional (most Mongo
+  // URIs already name their database in the path), so adding it wouldn't
+  // block a deploy that has no such secret yet. But a URI with no path and
+  // no MONGO_DB_NAME silently resolves to the driver's own "test" database,
+  // which this must never do unnoticed outside local/test.
+  if (!resolveDbName(process.env.MONGO_URI, process.env.MONGO_DB_NAME)) {
+    console.error(
+      `[boot] Could not determine a MongoDB database name for NODE_ENV=${process.env.NODE_ENV}. ` +
+        `Set MONGO_DB_NAME, or include a database name in MONGO_URI's path.`
     );
     process.exit(1);
   }

@@ -1,5 +1,6 @@
 {
   "mongoURI": "MONGO_URI",
+  "dbName": "MONGO_DB_NAME",
   "indexKey": "INDEX_KEY",
 
   "corsOptions": { "origin": "CORS_ORIGIN" },

@@ -58,4 +58,43 @@ describe("validateEnvironment", () => {
     expect(() => validateEnvironment()).not.toThrow();
     expect(exitSpy).not.toHaveBeenCalled();
   });
+
+  const setOtherRequired = () => {
+    process.env.INDEX_KEY = "k";
+    process.env.CORS_ORIGIN = "https://example.com";
+    process.env.SESSION_SECRET = "s";
+  };
+
+  it("exits outside local/test when the URI has no path and MONGO_DB_NAME is unset", () => {
+    process.env.NODE_ENV = "production";
+    setOtherRequired();
+    process.env.MONGO_URI = "mongodb://example.mongodb.net";
+    delete process.env.MONGO_DB_NAME;
+
+    expect(() => validateEnvironment()).toThrow("process.exit");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it("passes outside local/test when MONGO_DB_NAME is set even though the URI has no path", () => {
+    process.env.NODE_ENV = "production";
+    setOtherRequired();
+    process.env.MONGO_URI = "mongodb://example.mongodb.net";
+    process.env.MONGO_DB_NAME = "ystem_prod";
+
+    expect(() => validateEnvironment()).not.toThrow();
+    expect(exitSpy).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, "", "development", "test"])(
+    "does not crash when NODE_ENV=%p even if neither MONGO_URI's path nor MONGO_DB_NAME is set",
+    (nodeEnv) => {
+      clearRequired();
+      delete process.env.MONGO_DB_NAME;
+      if (nodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = nodeEnv;
+
+      expect(() => validateEnvironment()).not.toThrow();
+      expect(exitSpy).not.toHaveBeenCalled();
+    },
+  );
 });

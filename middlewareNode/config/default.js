@@ -45,6 +45,7 @@ if (!process.env.INDEX_KEY) {
 
 module.exports = {
   mongoURI: "",
+  dbName: "",
   indexKey: devIndexKey,
 
   corsOptions: {
