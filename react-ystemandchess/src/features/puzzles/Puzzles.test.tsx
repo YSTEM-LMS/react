@@ -990,4 +990,60 @@ describe("Puzzles Component", () => {
       );
     });
   });
+
+  // ==========================================================================
+  // The mentor cannot replace the student's puzzle (Issue 1)
+  // ==========================================================================
+
+  test("the mentor's screen does not load a new puzzle when the student clicks Get New Puzzle", async () => {
+    let captured: ((msg: string) => void) | undefined;
+    (useChessSocket as jest.Mock).mockImplementation((props) => {
+      captured = props.onMessage;
+      React.useEffect(() => {
+        props.onRoleAssigned?.("guest");
+      }, []);
+      return mockSocket;
+    });
+
+    await renderWithRoleAndTheme("mentor");
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+
+    (mockSocket.setGameStateWithColor as jest.Mock).mockClear();
+
+    // "next puzzle" is broadcast to the whole room when the student clicks
+    // Get New Puzzle — the mentor's own client receives it too.
+    await act(async () => {
+      captured?.("next puzzle");
+    });
+
+    expect(mockSocket.setGameStateWithColor).not.toHaveBeenCalled();
+  });
+
+  test("the student can still load a new puzzle when 'next puzzle' is received", async () => {
+    let captured: ((msg: string) => void) | undefined;
+    (useChessSocket as jest.Mock).mockImplementation((props) => {
+      captured = props.onMessage;
+      React.useEffect(() => {
+        props.onRoleAssigned?.("host");
+      }, []);
+      return mockSocket;
+    });
+
+    await renderPuzzlesWithTheme(); // default role = student
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+
+    // Clear the call from the initial puzzle load so this only counts the
+    // call triggered by the "next puzzle" message itself.
+    (mockSocket.setGameStateWithColor as jest.Mock).mockClear();
+
+    await act(async () => {
+      captured?.("next puzzle");
+    });
+
+    expect(mockSocket.setGameStateWithColor).toHaveBeenCalled();
+  });
 });

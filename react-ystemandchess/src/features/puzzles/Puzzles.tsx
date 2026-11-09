@@ -557,7 +557,16 @@ const Puzzles: React.FC<PuzzlesProps> = ({
           setModal({ type: "loading", title: "Loading next puzzle", message: "Please wait…" });
         }
 
-        getNextPuzzleRef.current?.();
+        // Only the student loads a new puzzle. This message is broadcast to
+        // the whole room, so without this check the mentor's own client
+        // would also run getNextPuzzleRef — picking a different puzzle from
+        // its own locally-fetched array and trying to replace the one the
+        // student is solving (the server now rejects that attempt too, see
+        // GameManager.setBoardColor's isPuzzle check, but there's no reason
+        // for the mentor's client to even try).
+        if (!isMentor) {
+          getNextPuzzleRef.current?.();
+        }
       } else if (msg === "new game received") {
         closeModal();
       } else if (msg.startsWith("<div")) {

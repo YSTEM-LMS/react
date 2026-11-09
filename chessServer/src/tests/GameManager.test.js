@@ -577,5 +577,89 @@ describe('GameManager', () => {
       const moveResult = gameManager.makeMove('sWhite', 'f2', 'f3'); // white (mentor) moves first
       expect(moveResult.result.move.from).toBe('f2');
     });
+
+    // --- Seat enforcement: only the student may load/replace a puzzle -----
+    // Issue: the mentor's own client reacting to a broadcast "next puzzle"
+    // message could load a different puzzle and overwrite the student's.
+
+    test('a setBoardColor from the mentor seat is rejected, board unchanged', async () => {
+      mockFetchRoutes({
+        getMentorship: [200, { username: 'Alice' }],
+        me: [200, { username: 'Alice' }],
+      });
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      addSocket('sMentor');
+      await gameManager.createOrJoinPuzzle(
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
+      );
+      await gameManager.createOrJoinPuzzle(
+        { student: 'Alice', mentor: 'Bob', role: 'mentor', socketId: 'sMentor', credentials: 'token-bob' }, io
+      );
+      const game = gameManager.ongoingGames[0];
+      const fenBefore = game.boardState.fen();
+
+      expect(() =>
+        gameManager.setBoardColor('sMentor', 'r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1', 'black', 'different puzzle', io)
+      ).toThrow(/Only the student may load a new puzzle/);
+      expect(game.boardState.fen()).toBe(fenBefore);
+    });
+
+    test('a setBoardColor from the student seat succeeds', async () => {
+      mockWhoAmI(200, { username: 'Alice' });
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      await gameManager.createOrJoinPuzzle(
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
+      );
+
+      gameManager.setBoardColor('sStudent', 'r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1', 'black', 'a real hint', io);
+
+      const game = gameManager.ongoingGames[0];
+      expect(game.boardState.fen()).toBe('r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1');
+      expect(game.puzzle).toBe('a real hint');
+    });
+
+    test('setBoardColor on a non-puzzle game is unaffected', () => {
+      const { game } = gameManager.createOrJoinGame({
+        student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sBlack'
+      });
+      game.mentor.id = 'sWhite';
+      const { io } = makeIo();
+
+      // The mentor seat on a regular (non-puzzle) game is not restricted.
+      gameManager.setBoardColor('sWhite', 'r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1', 'white', '', io);
+      expect(game.boardState.fen()).toBe('r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1');
+    });
+
+    test('a setBoardState from the mentor seat in a puzzle room is rejected', async () => {
+      mockFetchRoutes({
+        getMentorship: [200, { username: 'Alice' }],
+        me: [200, { username: 'Alice' }],
+      });
+      const { io, addSocket } = makeIo();
+      addSocket('sStudent');
+      addSocket('sMentor');
+      await gameManager.createOrJoinPuzzle(
+        { student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sStudent', credentials: 'token-alice' }, io
+      );
+      await gameManager.createOrJoinPuzzle(
+        { student: 'Alice', mentor: 'Bob', role: 'mentor', socketId: 'sMentor', credentials: 'token-bob' }, io
+      );
+
+      expect(() =>
+        gameManager.setBoardState('sMentor', 'r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1')
+      ).toThrow(/Only the student may set the board/);
+    });
+
+    test('setBoardState on a non-puzzle game is unaffected', () => {
+      const { game } = gameManager.createOrJoinGame({
+        student: 'Alice', mentor: 'Bob', role: 'student', socketId: 'sBlack'
+      });
+      game.mentor.id = 'sWhite';
+
+      gameManager.setBoardState('sWhite', 'r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1');
+      expect(game.boardState.fen()).toBe('r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1');
+    });
   });
 });

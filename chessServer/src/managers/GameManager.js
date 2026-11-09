@@ -538,6 +538,15 @@ class GameManager {
             throw new Error("Game not found for this socket!");
         }
 
+        // Not reached by any current client code path in a puzzle room (only
+        // setBoardColor is), but the "setstate" socket event is generic and
+        // reachable from any seated socket — guard it the same way as
+        // makeMove/undoMove/setBoardColor so a puzzle room can't be
+        // overwritten through this path either.
+        if (game.isPuzzle && socketId !== game.student.id) {
+            throw new Error("Only the student may set the board in a puzzle!");
+        }
+
         game.boardState.load(fen);
 
         return {
@@ -559,6 +568,15 @@ class GameManager {
 
         if (!game) { // if game does not exist
             throw new Error("Game not found for this socket!");
+        }
+
+        // Same seat enforcement as makeMove/undoMove: the mentor is a passive
+        // observer in a puzzle room. Without this, the mentor's own client
+        // reacting to a broadcast "next puzzle" message (see Puzzles.tsx)
+        // could load a different puzzle and overwrite the one the student
+        // is solving for everyone in the room.
+        if (game.isPuzzle && socketId !== game.student.id) {
+            throw new Error("Only the student may load a new puzzle!");
         }
 
         // modify board state by fen parameter
