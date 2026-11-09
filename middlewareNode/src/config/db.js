@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const config = require("config");
 const { isLocalEnvironment } = require("./validateEnvironment");
-const { resolveDbName } = require("./dbName");
+const fallbackDbName = require("./fallbackDbName");
 
 let db = config.get("mongoURI");
-const dbName = resolveDbName(db, config.get("dbName"));
+const dbName = fallbackDbName(db);
 
 /**
  * Seed non-credential mock data into the database: activity types, mock
@@ -222,10 +222,9 @@ const connectDB = async () => {
       // fallback below.
       serverSelectionTimeoutMS: IS_DEPLOYED ? 10000 : 1000,
       // Explicit, not left to the driver's own URI-path parsing: an empty
-      // string here would make mongoose pick its own default ("test"), the
-      // exact silent fallback this is meant to prevent. validateEnvironment
-      // has already refused to boot outside local/test if this is null.
-      ...(dbName ? { dbName } : {}),
+      // string here would make mongoose pick its own default ("test")
+      // instead of the same database the getDb() helpers fall back to.
+      dbName,
     });
     console.log("MongoDB Connected...");
     await ensureIndexes();

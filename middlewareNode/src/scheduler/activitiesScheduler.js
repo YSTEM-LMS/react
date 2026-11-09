@@ -15,7 +15,7 @@
 
 const schedule = require("node-schedule");
 const config = require("config");
-const { resolveDbName } = require("../config/dbName");
+const fallbackDbName = require("../config/fallbackDbName");
 const { MongoClient } = require('mongodb');
 const { selectActivities } = require("../utils/activities");
 require('dotenv').config();
@@ -37,10 +37,7 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  // Resolve the same way mongoose does (src/config/db.js), so this never
-  // lands on a different database than the rest of the app.
-  const dbName = resolveDbName(config.get("mongoURI"), config.get("dbName"));
-  return dbName ? cachedClient.db(dbName) : cachedClient.db();
+  return cachedClient.db(fallbackDbName(config.get("mongoURI")));
 }
 
 /**
