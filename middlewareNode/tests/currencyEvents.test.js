@@ -12,14 +12,20 @@
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 const ActionEvent = require("../src/models/actionEvent");
-const { emit, emitLessonCompleted } = require("../src/services/currencyEvents");
+const {
+  emit,
+  emitLessonCompleted,
+  emitChatMilestone,
+} = require("../src/services/currencyEvents");
 
 jest.setTimeout(60000);
 
 let mongod;
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 30000 } });
+  mongod = await MongoMemoryServer.create({
+    instance: { launchTimeout: 30000 },
+  });
   await mongoose.connect(mongod.getUri() + "ystem");
   await ActionEvent.init();
 });
@@ -45,7 +51,11 @@ describe("emit", () => {
       metadata: { piece: "knight" },
     });
 
-    expect(result).toEqual({ emitted: true, duplicate: false, eventId: "evt-1" });
+    expect(result).toEqual({
+      emitted: true,
+      duplicate: false,
+      eventId: "evt-1",
+    });
 
     const stored = await ActionEvent.findOne({ eventId: "evt-1" });
     expect(stored.actionKey).toBe("lesson.completed");
@@ -54,18 +64,36 @@ describe("emit", () => {
   });
 
   it("treats a duplicate eventId as a no-op, not an error", async () => {
-    const args = { eventId: "evt-dup", actionKey: "lesson.completed", userId, metadata: {} };
+    const args = {
+      eventId: "evt-dup",
+      actionKey: "lesson.completed",
+      userId,
+      metadata: {},
+    };
 
     const first = await emit(args);
     const second = await emit(args);
 
-    expect(first).toEqual({ emitted: true, duplicate: false, eventId: "evt-dup" });
-    expect(second).toEqual({ emitted: false, duplicate: true, eventId: "evt-dup" });
+    expect(first).toEqual({
+      emitted: true,
+      duplicate: false,
+      eventId: "evt-dup",
+    });
+    expect(second).toEqual({
+      emitted: false,
+      duplicate: true,
+      eventId: "evt-dup",
+    });
     expect(await ActionEvent.countDocuments({ eventId: "evt-dup" })).toBe(1);
   });
 
   it("survives concurrent duplicate emits of the same eventId", async () => {
-    const args = { eventId: "evt-race", actionKey: "lesson.completed", userId, metadata: {} };
+    const args = {
+      eventId: "evt-race",
+      actionKey: "lesson.completed",
+      userId,
+      metadata: {},
+    };
 
     const [a, b] = await Promise.all([emit(args), emit(args)]);
     const duplicateFlags = [a.duplicate, b.duplicate].sort();
@@ -86,24 +114,78 @@ describe("emitLessonCompleted", () => {
 
   it("never double-emits for the same (user, piece, lessonNum) — a client retry is a no-op", async () => {
     await emitLessonCompleted({ userId, piece: "The Fork", lessonNum: 2 });
-    const second = await emitLessonCompleted({ userId, piece: "The Fork", lessonNum: 2 });
+    const second = await emitLessonCompleted({
+      userId,
+      piece: "The Fork",
+      lessonNum: 2,
+    });
 
     expect(second.duplicate).toBe(true);
-    expect(await ActionEvent.countDocuments({ actionKey: "lesson.completed" })).toBe(1);
+    expect(
+      await ActionEvent.countDocuments({ actionKey: "lesson.completed" }),
+    ).toBe(1);
   });
 
   it("emits separately for different lesson numbers on the same piece", async () => {
     await emitLessonCompleted({ userId, piece: "The Fork", lessonNum: 1 });
     await emitLessonCompleted({ userId, piece: "The Fork", lessonNum: 2 });
 
-    expect(await ActionEvent.countDocuments({ actionKey: "lesson.completed" })).toBe(2);
+    expect(
+      await ActionEvent.countDocuments({ actionKey: "lesson.completed" }),
+    ).toBe(2);
   });
 
   it("emits separately for the same lesson number across different users", async () => {
     const otherUser = new mongoose.Types.ObjectId();
     await emitLessonCompleted({ userId, piece: "The Fork", lessonNum: 1 });
-    await emitLessonCompleted({ userId: otherUser, piece: "The Fork", lessonNum: 1 });
+    await emitLessonCompleted({
+      userId: otherUser,
+      piece: "The Fork",
+      lessonNum: 1,
+    });
 
-    expect(await ActionEvent.countDocuments({ actionKey: "lesson.completed" })).toBe(2);
+    expect(
+      await ActionEvent.countDocuments({ actionKey: "lesson.completed" }),
+    ).toBe(2);
+  });
+});
+
+describe("emitChatMilestone", () => {
+  it("emits a pending chat.milestone event with a deterministic session ID", async () => {
+    const sessionId = new mongoose.Types.ObjectId();
+
+    await emitChatMilestone({
+      userId,
+      sessionId,
+      topic: "math tutoring",
+    });
+
+    const stored = await ActionEvent.findOne({
+      actionKey: "chat.milestone",
+    });
+
+    expect(stored).not.toBeNull();
+    expect(stored.eventId).toBe(`chat:milestone:${sessionId}`);
+    expect(stored.userId.toString()).toBe(userId.toString());
+    expect(stored.status).toBe("pending");
+    expect(stored.metadata).toEqual({
+      sessionId: String(sessionId),
+      topic: "math tutoring",
+    });
+  });
+
+  it("does not emit a second milestone when the same session is retried", async () => {
+    const sessionId = new mongoose.Types.ObjectId();
+    const args = { userId, sessionId, topic: "math tutoring" };
+
+    await emitChatMilestone(args);
+    const second = await emitChatMilestone(args);
+
+    expect(second.duplicate).toBe(true);
+    expect(
+      await ActionEvent.countDocuments({
+        actionKey: "chat.milestone",
+      }),
+    ).toBe(1);
   });
 });
