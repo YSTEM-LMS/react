@@ -17,6 +17,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useCookies } from "react-cookie";
 import "./BadgesModal.scss";
 import { getBadgeCatalog, getUserBadges } from "../../../../core/services/badgesApi";
+import { BadgeCard } from "../../../../components/BadgeCard";
 
 /**
  * BadgesModal component - displays user's badge achievements
@@ -75,13 +76,12 @@ const BadgesModal = ({ onClose, username }: { onClose: () => void; username: str
         ) : (
           <div className="badges-grid">
             {badgeList.map(b => (
-              <div key={b.id} className={`badge-card ${b.isEarned ? "earned" : "locked"}`}>
-                <div className="badge-icon">
-                  <img src={b.icon} alt={b.name} />
-                </div>
-                <div className="badge-name">{b.name}</div>
-                {!b.isEarned && <div className="badge-locked-text">Locked</div>}
-              </div>
+              <BadgeCard
+                key={b.id}
+                icon={b.icon}
+                label={b.name}
+                state={b.isEarned ? "earned" : "locked"}
+              />
             ))}
           </div>
         )}
