@@ -43,13 +43,12 @@ const meetingsSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    // Agora cloud-recording handles; absent when recording could not be started
     resourceId: {
       type: String,
-      required: true,
     },
     sid: {
       type: String,
-      required: true,
     },
     meetingStartTime: {
       type: Date,

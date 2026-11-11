@@ -8,6 +8,7 @@ module.exports = {
     '\\.svg$': '<rootDir>/__mocks__/svgrMock.js',
     '^react-cookie$': '<rootDir>/node_modules/react-cookie',
     '^socket.io-client$': 'socket.io-client/dist/socket.io.js',
+    '^agora-rtc-sdk-ng$': '<rootDir>/__mocks__/agoraRtcSdkMock.js',
   },
   testEnvironment: 'jsdom',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
