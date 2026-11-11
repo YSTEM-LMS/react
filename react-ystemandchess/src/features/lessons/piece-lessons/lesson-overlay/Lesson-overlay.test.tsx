@@ -219,6 +219,7 @@ describe("LessonOverlay", () => {
     socketCallbacks = {};
     mockSocket = {
       connected: true,
+      startNewGame: jest.fn(),
       setGameStateWithColor: jest.fn(),
       sendMove: jest.fn(),
       startMouseTracking: jest.fn(),
@@ -249,6 +250,46 @@ describe("LessonOverlay", () => {
     expect(screen.getByText("1 / 5: Test Lesson Name")).toBeInTheDocument();
     expect(screen.getByTestId("chess-board")).toBeInTheDocument();
     expect(screen.getByTestId("move-tracker")).toBeInTheDocument();
+  });
+
+  test("starts its chessServer game before sending the lesson position", async () => {
+    render(
+      <MemoryRouter>
+        <LessonOverlay />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(mockSocket.setGameStateWithColor).toHaveBeenCalled());
+    expect(mockSocket.startNewGame).toHaveBeenCalled();
+    expect(mockSocket.startNewGame.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSocket.setGameStateWithColor.mock.invocationCallOrder[0]
+    );
+  });
+
+  test("each lesson visit joins chessServer under its own names", () => {
+    const { unmount } = render(
+      <MemoryRouter>
+        <LessonOverlay />
+      </MemoryRouter>
+    );
+    const first = { student: socketCallbacks.student, mentor: socketCallbacks.mentor };
+    unmount();
+
+    render(
+      <MemoryRouter>
+        <LessonOverlay />
+      </MemoryRouter>
+    );
+    const second = { student: socketCallbacks.student, mentor: socketCallbacks.mentor };
+
+    for (const names of [first, second]) {
+      expect(names.student).toMatch(/^lesson-.+-student$/);
+      expect(names.mentor).toMatch(/^lesson-.+-mentor$/);
+    }
+    // Shared names would put both visits into one chessServer game.
+    expect(second.student).not.toBe(first.student);
+    expect(second.mentor).not.toBe(first.mentor);
+    expect(first.mentor).not.toContain("Rook");
   });
 
   test("handles navigation buttons", async () => {
