@@ -1,0 +1,87 @@
+# Single-origin entry point: serves the built app and proxies each backend
+# service under a path prefix, stripping the prefix before forwarding.
+#
+# Rendered at container start by the nginx image's envsubst step. The
+# *_UPSTREAM variables default to the Container Apps app names (Dockerfile)
+# and are overridden with compose service names in docker-compose.yml.
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+# Container Apps ingress terminates TLS and sets X-Forwarded-Proto. Pass it on
+# so the middleware can issue its Secure session cookie; fall back to this
+# hop's scheme when nothing sits in front (local compose).
+map $http_x_forwarded_proto $forwarded_proto {
+    default $http_x_forwarded_proto;
+    ''      $scheme;
+}
+
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+
+    # Redirects stay relative, so they keep the public scheme and host instead
+    # of this container's http://...:8080.
+    absolute_redirect off;
+
+    # Avatar uploads allow up to 5 MB (middlewareNode/src/routes/users.js).
+    client_max_body_size 10m;
+
+    # Host is left as the upstream name: Container Apps routes app-to-app
+    # traffic by Host, so forwarding the public host would not reach the app.
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $forwarded_proto;
+    proxy_set_header X-Forwarded-Host $host;
+
+    location = /health {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location /middleware/ {
+        proxy_pass ${MIDDLEWARE_UPSTREAM}/;
+    }
+
+    # HTTP and socket.io. The client connects with path
+    # /chessserver/socket.io, which arrives upstream as /socket.io.
+    location /chessserver/ {
+        proxy_pass ${CHESS_SERVER_UPSTREAM}/;
+    }
+
+    location /stockfishserver/ {
+        proxy_pass ${STOCKFISH_UPSTREAM}/;
+    }
+
+    # The chess client is built with homepage /chessclient and served from /
+    # by its own nginx. PlayStudent opens /chessclient?..., without the slash.
+    location = /chessclient {
+        return 301 /chessclient/$is_args$args;
+    }
+
+    location /chessclient/ {
+        proxy_pass ${CHESS_CLIENT_UPSTREAM}/;
+    }
+
+    # The legacy board page (chessclient/public/chessclient/index.js) connects
+    # to the chess server on the default socket.io path, as the VM nginx routed.
+    location /socket.io/ {
+        proxy_pass ${CHESS_SERVER_UPSTREAM};
+    }
+
+    # Build output under /static is content-hashed, so it can be cached forever.
+    location /static/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location / {
+        add_header Cache-Control "no-cache";
+        try_files $uri $uri/ /index.html;
+    }
+}

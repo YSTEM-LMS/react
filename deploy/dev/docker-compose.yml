@@ -10,18 +10,29 @@ services:
       - middlewarenode
       - chessserver
       - stockfishserver
+      - chessclient
 
   react-app:
     build:
       context: ../../react-ystemandchess
       args:
-        REACT_APP_CHESS_SERVER_URL: http://localhost:3001
-        REACT_APP_MIDDLEWARE_URL: http://localhost:8000
-        REACT_APP_STOCKFISH_SERVER_URL: http://localhost:9324
         REACT_APP_AGORA_APP_ID: ""
     container_name: react-app
+    # The image's nginx proxies the services under path prefixes. Open
+    # http://localhost:3000 for sockets; the apache "/" route below does not
+    # proxy websockets.
+    environment:
+      MIDDLEWARE_UPSTREAM: http://middlewarenode:8000
+      CHESS_SERVER_UPSTREAM: http://chessserver:3001
+      STOCKFISH_UPSTREAM: http://stockfishserver:9324
+      CHESS_CLIENT_UPSTREAM: http://chessclient:80
     ports:
-      - "3000:3000"
+      - "3000:8080"
+    depends_on:
+      - middlewarenode
+      - chessserver
+      - stockfishserver
+      - chessclient
 
   middlewarenode:
     build: ../../middlewareNode
@@ -57,6 +68,10 @@ services:
       - NODE_ENV=development
       - PORT=9324
       - CORS_ORIGIN=http://localhost,http://localhost:3000
+
+  chessclient:
+    build: ../../chessclient
+    container_name: chessclient
 
 # Usage: docker-compose up --build
 # Access at: http://localhost

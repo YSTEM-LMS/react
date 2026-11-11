@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
+import { socketTarget } from "../../../../../environments/socketTarget";
 import { Move, BoardState, MousePosition, GameConfig, GameMode, PlayerColor } from "../../../../../core/types/chess";
 
 interface UseChessSocketOptions {
@@ -103,7 +104,9 @@ export const useChessSocket = ({
 
   // ======== connect / listeners ========
   useEffect(() => {
-    const socket = io(serverUrl, {
+    const { url, path } = socketTarget(serverUrl);
+    const socket = io(url, {
+      path,
       transports: ["websocket"],
       reconnection: true,
       reconnectionDelay: 1000,

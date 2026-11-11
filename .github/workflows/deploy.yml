@@ -110,10 +110,6 @@ jobs:
           cache-from: type=gha,scope=react-ystemandchess
           cache-to: type=gha,mode=max,scope=react-ystemandchess
           build-args: |
-            REACT_APP_MIDDLEWARE_URL=${{ secrets.MIDDLEWARE_URL }}
-            REACT_APP_STOCKFISH_SERVER_URL=${{ secrets.STOCKFISH_URL }}
-            REACT_APP_CHESS_SERVER_URL=${{ secrets.CHESS_SERVER }}
-            REACT_APP_CHESS_CLIENT_URL=${{ secrets.CHESS_CLIENT_URL }}
             REACT_APP_AGORA_APP_ID=${{ secrets.APP_ID }}
           tags: |
             ${{ env.IMAGE_PREFIX }}/ystemandchess:${{ env.DEPLOY_SHA }}

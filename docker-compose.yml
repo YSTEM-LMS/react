@@ -11,14 +11,22 @@ services:
     build:
       context: ./react-ystemandchess
       args:
-        REACT_APP_MIDDLEWARE_URL: http://localhost:8000
-        REACT_APP_STOCKFISH_SERVER_URL: http://localhost:8080
-        REACT_APP_CHESS_SERVER_URL: http://localhost:3001
-        REACT_APP_CHESS_CLIENT_URL: http://localhost:3002
         REACT_APP_AGORA_APP_ID: ""
     container_name: frontend
+    # Single origin: open http://localhost:3000. nginx in the image proxies
+    # /middleware, /chessserver, /stockfishserver and /chessclient to these.
+    environment:
+      MIDDLEWARE_UPSTREAM: http://middleware:8000
+      CHESS_SERVER_UPSTREAM: http://chess-server:3001
+      STOCKFISH_UPSTREAM: http://stockfish-server:8080
+      CHESS_CLIENT_UPSTREAM: http://chess-client:80
     ports:
-      - "3000:3000"
+      - "3000:8080"
+    depends_on:
+      - middleware
+      - chess-server
+      - stockfish-server
+      - chess-client
     restart: unless-stopped
 
   chess-server:

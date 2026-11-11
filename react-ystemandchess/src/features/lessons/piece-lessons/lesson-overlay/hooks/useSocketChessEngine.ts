@@ -1,4 +1,5 @@
 import { environment } from "../../../../../environments";
+import { socketTarget } from "../../../../../environments/socketTarget";
 import { useEffect, useRef } from "react";
 import io from "socket.io-client";
 
@@ -12,7 +13,8 @@ export function useSocketChessEngine(onEvaluationComplete: (data: any) => void) 
     }, [onEvaluationComplete]);
 
     useEffect(() => {
-        const socket = io(environment.urls.stockfishServerURL, { transports: ["websocket"] });
+        const { url, path } = socketTarget(environment.urls.stockfishServerURL);
+        const socket = io(url, { path, transports: ["websocket"] });
         socketRef.current = socket;
 
         socket.on("connect", () => {
