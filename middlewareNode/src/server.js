@@ -10,10 +10,17 @@ validateEnvironment();
 
 const express = require("express");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 const passport = require("passport");
 require("./config/passport.js");
 const app = express();
+// Trust exactly the proxies in front of this process, so Express sees
+// X-Forwarded-Proto (needed for the secure session cookie) without letting a
+// client choose its own req.ip. One today (Container Apps ingress); becomes 2
+// when the frontend nginx proxy lands.
+app.set("trust proxy", 1);
 const cors = require("cors");
 const config = require("config");
 const streakRoutes = require("./routes/streak");
@@ -101,7 +108,8 @@ app.use(
 // the connection came up. Skipped entirely under Jest — a setInterval
 // timer with no matching stop() would otherwise leak across test files as
 // an open handle.
-connectDB().then(() => {
+const dbReady = connectDB();
+dbReady.then(() => {
   if (process.env.NODE_ENV !== "test") {
     currencyConsumer.start();
   }
@@ -120,6 +128,17 @@ app.use(
         : undefined),
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      // Local stacks run over plain HTTP, where a Secure cookie is never sent.
+      secure: !validateEnvironment.isLocalEnvironment(),
+    },
+    store: MongoStore.create({
+      // Reuse mongoose's connection so sessions follow db.js, including its
+      // in-memory fallback when dev has no reachable MongoDB.
+      clientPromise: dbReady.then(() => mongoose.connection.getClient()),
+      collectionName: "sessions",
+      ttl: 14 * 24 * 60 * 60, // 14 days, in seconds
+    }),
   })
 );
 
