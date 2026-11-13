@@ -13,6 +13,7 @@ jest.mock("mongoose", () => {
   const fakeCollection = {
     createIndex: jest.fn().mockResolvedValue(undefined),
     countDocuments: jest.fn().mockResolvedValue(0),
+    distinct: jest.fn().mockResolvedValue([]),
     // Simulates a demo student account already existing (e.g. created via
     // seed:dev), so the conditional activities-seeding branch is actually
     // exercised by these tests too, not just the unconditional collections.
