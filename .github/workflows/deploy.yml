@@ -126,6 +126,27 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+
+      # Record currently deployed images for manual rollback.
+      # These values can be used to identify previous versions
+      # if a deployment or smoke test fails.
+      - name: Record images before deployment
+        run: |
+          for app in \
+            ystem-middleware \
+            ystem-chessserver \
+            ystem-stockfish \
+            ystem-chessclient \
+            ystem-frontend
+          do
+            echo "Current image for $app:"
+            az containerapp show \
+              --name "$app" \
+              --resource-group "$RESOURCE_GROUP" \
+              --query "properties.template.containers[].image" \
+              --output tsv
+          done
+
       - name: Deploy middleware
         run: |
           az containerapp update \
