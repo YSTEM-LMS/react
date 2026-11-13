@@ -68,76 +68,83 @@ const seedTestUsers = async () => {
 
     // 3. Seed newLessons
     const lessonsCollection = db.collection("newLessons");
-    const lessonsCount = await lessonsCollection.countDocuments({});
-    if (lessonsCount === 0) {
-      console.log("Seeding mock newLessons...");
-      // Must match the scenario names the lesson menu sends
-      // (react-ystemandchess/src/features/lessons/lessons-main/Scenarios.js);
-      // lessons are looked up by exact name.
-      const pieces = [
-        "Pawn - It moves forward only",
-        "Bishop - It moves diagonally",
-        "Knight - It moves in an L shape",
-        "Rook - It moves in straight lines",
-        "Queen - Queen = Rook + Bishop",
-        "King - The most important piece",
-        "Piece Checkmate 1 Basic checkmates",
-        "Checkmate Pattern 1 Recognize the patterns",
-        "Checkmate Pattern 2 Recognize the patterns",
-        "Checkmate Pattern 3 Recognize the patterns",
-        "Checkmate Pattern 4 Recognize the patterns",
-        "Piece checkmates 2 Challenging checkmates",
-        "Knight and Bishop Mate interactive lesson",
-        "The Pin Pin it to win it",
-        "The Skewer Yum - Skewers!",
-        "The Fork Use the fork, Luke",
-        "Discovered Attacks Including discovered checks",
-        "Double Check A very powerfull tactic",
-        "Overloaded Pieces They have too much work",
-        "Zwischenzug In-between moves",
-        "X-Ray Attacking through an enemy piece",
-        "Zugzwang Being forced to move",
-        "Interference Interpose a piece to great effect",
-        "Greek Gift Study the greek gift scrifice",
-        "Deflection Distracting a defender",
-        "Attraction Lure a piece to bad square",
-        "Underpromotion Promote - but not to a queen!",
-        "Desperado A piece is lost, but it can still help",
-        "Counter Check Respond to a check with a check",
-        "Undermining Remove the defending piece",
-        "Clearance Get out of the way!",
-        "Key Squares Reach the key square",
-        "Opposition take the opposition",
-        "7th-Rank Rook Pawn Versus a Queen",
-        "7th-Rank Rook Pawn And Passive Rook vs Rook",
-        "Basic Rook Endgames Lucena and Philidor",
-      ];
-      const mockLessonsDocs = pieces.map(pieceName => ({
-        piece: pieceName,
-        lessons: [
-          {
-            startFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-            name: "Introduction",
-            info: `Welcome to the ${pieceName} lesson! Let's get started.`,
-            solution: "e2e4",
-            goal: 1,
-            opponentConstraints: [],
-            maxMoves: 10,
-            moves: []
-          },
-          {
-            startFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-            name: "Challenge",
-            info: `Solve the ${pieceName} tactical challenge.`,
-            solution: "d2d4",
-            goal: 1,
-            opponentConstraints: [],
-            maxMoves: 10,
-            moves: []
-          }
-        ]
-      }));
-      await lessonsCollection.insertMany(mockLessonsDocs);
+    // Inserts every lesson piece that isn't in the collection yet, not only
+    // when it's empty: a dev database seeded with older names (e.g. a
+    // persistent Mongo volume) picks up corrected or new names on restart.
+    // Existing documents are left untouched.
+    const existingPieces = new Set(await lessonsCollection.distinct("piece"));
+    // Must match the scenario names the lesson menu sends
+    // (react-ystemandchess/src/features/lessons/lessons-main/Scenarios.js);
+    // lessons are looked up by exact name.
+    const pieces = [
+      "Pawn - It moves forward only",
+      "Bishop - It moves diagonally",
+      "Knight - It moves in an L shape",
+      "Rook - It moves in straight lines",
+      "Queen - Queen = Rook + Bishop",
+      "King - The most important piece",
+      "Piece Checkmate 1 Basic checkmates",
+      "Checkmate Pattern 1 Recognize the patterns",
+      "Checkmate Pattern 2 Recognize the patterns",
+      "Checkmate Pattern 3 Recognize the patterns",
+      "Checkmate Pattern 4 Recognize the patterns",
+      "Piece checkmates 2 Challenging checkmates",
+      "Knight and Bishop Mate interactive lesson",
+      "The Pin Pin it to win it",
+      "The Skewer Yum - Skewers!",
+      "The Fork Use the fork, Luke",
+      "Discovered Attacks Including discovered checks",
+      "Double Check A very powerfull tactic",
+      "Overloaded Pieces They have too much work",
+      "Zwischenzug In-between moves",
+      "X-Ray Attacking through an enemy piece",
+      "Zugzwang Being forced to move",
+      "Interference Interpose a piece to great effect",
+      "Greek Gift Study the greek gift scrifice",
+      "Deflection Distracting a defender",
+      "Attraction Lure a piece to bad square",
+      "Underpromotion Promote - but not to a queen!",
+      "Desperado A piece is lost, but it can still help",
+      "Counter Check Respond to a check with a check",
+      "Undermining Remove the defending piece",
+      "Clearance Get out of the way!",
+      "Key Squares Reach the key square",
+      "Opposition take the opposition",
+      "7th-Rank Rook Pawn Versus a Queen",
+      "7th-Rank Rook Pawn And Passive Rook vs Rook",
+      "Basic Rook Endgames Lucena and Philidor",
+    ];
+    const mockLessonsDocs = pieces.map(pieceName => ({
+      piece: pieceName,
+      lessons: [
+        {
+          startFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          name: "Introduction",
+          info: `Welcome to the ${pieceName} lesson! Let's get started.`,
+          solution: "e2e4",
+          goal: 1,
+          opponentConstraints: [],
+          maxMoves: 10,
+          moves: []
+        },
+        {
+          startFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          name: "Challenge",
+          info: `Solve the ${pieceName} tactical challenge.`,
+          solution: "d2d4",
+          goal: 1,
+          opponentConstraints: [],
+          maxMoves: 10,
+          moves: []
+        }
+      ]
+    }));
+    const missingLessonsDocs = mockLessonsDocs.filter(
+      (doc) => !existingPieces.has(doc.piece)
+    );
+    if (missingLessonsDocs.length > 0) {
+      console.log(`Seeding ${missingLessonsDocs.length} missing newLessons...`);
+      await lessonsCollection.insertMany(missingLessonsDocs);
       console.log("✅ Mock lessons seeded successfully!");
     }
 
