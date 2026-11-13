@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 const config = require("config");
 const { isLocalEnvironment } = require("./validateEnvironment");
+const fallbackDbName = require("./fallbackDbName");
 
 let db = config.get("mongoURI");
+const dbName = fallbackDbName(db);
 
 /**
  * Seed non-credential mock data into the database: activity types, mock
@@ -233,6 +235,10 @@ const connectDB = async () => {
       // cold-start during deploy. Dev/test fail fast to the in-memory
       // fallback below.
       serverSelectionTimeoutMS: IS_DEPLOYED ? 10000 : 1000,
+      // Explicit, not left to the driver's own URI-path parsing: an empty
+      // string here would make mongoose pick its own default ("test")
+      // instead of the same database the getDb() helpers fall back to.
+      dbName,
     });
     console.log("MongoDB Connected...");
     await ensureIndexes();
@@ -263,6 +269,9 @@ const connectDB = async () => {
       await mongoose.connect(localURI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        // mongoServer.getUri() has no path of its own; without this the
+        // fallback would silently land on "test" too.
+        dbName: "ystem_dev_fallback",
       });
       console.log("MongoDB Connected (In-Memory)...");
       await ensureIndexes();

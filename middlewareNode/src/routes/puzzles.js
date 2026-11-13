@@ -42,15 +42,33 @@ router.get("/list", async (req, res) => {
  *
  * Query Parameters:
  * - limit: Number of random puzzles to return (default: 20)
+ * - minRating: Minimum puzzle difficulty (default: 0)
+ * - maxRating: Maximum puzzle difficulty (default: 4000)
  *
  * @returns {Array} Array of randomly selected puzzles
  */
 router.get("/random", async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
-    const puzzlesArray = await puzzles.aggregate([
-      { $sample: { size: limit } },
-    ]);
+    const theme = typeof req.query.theme === "string" ? req.query.theme.trim() : "";
+    const minRating = parseInt(req.query.minRating) || 0;
+    const maxRating = parseInt(req.query.maxRating) || 4000;
+
+    const pipeline = [
+      { $match: { Rating: { $gte: minRating, $lte: maxRating } } },
+    ];
+
+    if (theme) {
+      // Themes is a space-separated token string; match on a whole token so
+      // "pin" doesn't also match "pinPossible", etc.
+      const escapedTheme = theme.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const themeTokenRegex = new RegExp(`(^|\\s)${escapedTheme}(\\s|$)`, "i");
+      pipeline.push({ $match: { Themes: themeTokenRegex } });
+    }
+
+    pipeline.push({ $sample: { size: limit } });
+
+    const puzzlesArray = await puzzles.aggregate(pipeline);
     res.status(200).json(puzzlesArray);
   } catch (error) {
     console.error(error.message);
@@ -80,22 +98,53 @@ function moveMatches(submitted, expected) {
 }
 
 /**
- * Verifies a client-submitted move sequence against a puzzle's stored
- * answer key (space-separated UCI moves). Returns true only if the
- * sequences have the same length and every move matches positionally.
+ * Splits a puzzle's stored `Moves` into its raw UCI tokens. The stored line
+ * is the full Lichess answer key: it starts with the opponent's move that
+ * creates the position shown to the player, then alternates opponent/solver
+ * (index 0, 2, 4, ... = opponent; 1, 3, 5, ... = solver), ending on a solver
+ * move — so the token count is always even and at least 2.
+ */
+function allMoves(expected) {
+  return (expected || "").trim().split(/\s+/).filter(Boolean);
+}
+
+/**
+ * True if a puzzle's stored answer key has the shape every real puzzle has:
+ * an even number of moves, at least one opponent/solver pair. A puzzle
+ * document that doesn't (bad import, hand-edited seed data, etc.) can't be
+ * verified at all, so it must be rejected rather than silently treated as
+ * solved or unsolvable.
+ */
+function isValidAnswerKey(expected) {
+  const moves = allMoves(expected);
+  return moves.length >= 2 && moves.length % 2 === 0;
+}
+
+/**
+ * Pulls out just the solver's half of the answer key (the odd indices — see
+ * allMoves() above). Puzzles.tsx's playComputerMove() plays the opponent's
+ * moves automatically and never submits them; playedMovesRef, what actually
+ * reaches this route as `moves`, holds only the solver's own moves. Comparing
+ * against the full line rejected every real submission.
+ */
+function solverMoves(expected) {
+  return allMoves(expected).filter((_, i) => i % 2 === 1);
+}
+
+/**
+ * Verifies a client-submitted move sequence against the solver's half of a
+ * puzzle's stored answer key (see solverMoves() above). Returns true only if
+ * the sequences have the same length and every move matches positionally.
  *
- * This isn't a complete defense — a client that reads the puzzle's own
- * `moves` field (already sent to the client to drive the interactive
- * play-through) and submits it verbatim without actually playing will
- * still pass. What it does stop is the cheaper, more likely attack this
- * route originally allowed outright: looping over puzzleIds with no
- * solve data at all. Raising the bar to "must know the real solution
- * string," not "must have nothing."
+ * The client is sent the full `Moves` line to drive the interactive
+ * play-through, so this only proves the submitted moves match the solver's
+ * moves — it doesn't prove the student played them on the board rather than
+ * copying them from the puzzle data.
  */
 function movesMatch(submitted, expected) {
   if (!Array.isArray(submitted)) return false;
 
-  const expectedMoves = (expected || "").trim().split(/\s+/).filter(Boolean);
+  const expectedMoves = solverMoves(expected);
   if (submitted.length === 0 || submitted.length !== expectedMoves.length) {
     return false;
   }
@@ -140,7 +189,7 @@ router.post(
         });
       }
 
-      const puzzle = await puzzles.findOne({ puzzleId });
+      const puzzle = await puzzles.findOne({ PuzzleId: puzzleId });
 
       if (!puzzle) {
         return res.status(404).json({
@@ -148,7 +197,13 @@ router.post(
         });
       }
 
-      if (!movesMatch(moves, puzzle.moves)) {
+      if (!isValidAnswerKey(puzzle.Moves)) {
+        return res.status(400).json({
+          error: "This puzzle's answer key is invalid and cannot be verified",
+        });
+      }
+
+      if (!movesMatch(moves, puzzle.Moves)) {
         return res.status(400).json({
           error: "Submitted moves do not match the puzzle's solution",
         });

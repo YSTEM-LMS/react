@@ -55,6 +55,12 @@ jest.mock("../../components/ChessBoard/ChessBoard", () => {
       >
         Make Final Move
       </button>
+      <button
+        onClick={() => props.onInvalidMove?.()}
+        data-testid="mock-invalid-btn"
+      >
+        Illegal Move
+      </button>
       <div>
         <span>Promotion Options:</span>
         <button
@@ -124,14 +130,57 @@ const mockSocket = {
   clearHighlights: jest.fn(),
 };
 
+// Builds a fake "header.<payload>.signature" login cookie like the real
+// JWTs globals.ts's SetPermissionLevel decodes. `expiresInSeconds` defaults
+// to an hour from now; pass a negative value for an already-expired token,
+// or omit `exp` entirely (pass `includeExp: false`) to test a token that
+// never had one.
+const makeLoginCookie = (
+  payload: Record<string, any>,
+  { expiresInSeconds = 3600, includeExp = true }: { expiresInSeconds?: number; includeExp?: boolean } = {}
+) => {
+  const fullPayload = includeExp
+    ? { ...payload, exp: Math.floor(Date.now() / 1000) + expiresInSeconds }
+    : payload;
+  return `header.${Buffer.from(JSON.stringify(fullPayload)).toString("base64")}.signature`;
+};
+
+const renderPuzzles = () =>
+  render(
+    <MemoryRouter>
+      <Puzzles />
+    </MemoryRouter>
+  );
+
+const renderPuzzlesWithTheme = async (theme = "fork") => {
+  renderPuzzles();
+
+  fireEvent.click(screen.getByTestId(`puzzle-theme-${theme}`));
+
+  await waitFor(() => {
+    expect(screen.getByTestId("chess-board-container")).toBeInTheDocument();
+  });
+};
+
+const renderWithRoleAndTheme = async (role: string, theme = "fork") => {
+  render(
+    <MemoryRouter>
+      <Puzzles role={role} />
+    </MemoryRouter>
+  );
+  fireEvent.click(screen.getByTestId(`puzzle-theme-${theme}`));
+  await waitFor(() => {
+    expect(screen.getByTestId("chess-board-container")).toBeInTheDocument();
+  });
+};
+
 describe("Puzzles Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
     (useCookies as jest.Mock).mockReturnValue([
       {
-        login:
-          "header.eyJ1c2VybmFtZSI6InRlc3QtdXNlciIsInJvbGUiOiJzdHVkZW50In0=.signature",
+        login: makeLoginCookie({ username: "test-user", role: "student" }),
       },
       jest.fn(),
       jest.fn(),
@@ -227,11 +276,7 @@ describe("Puzzles Component", () => {
       return Promise.reject(new Error(`Unhandled fetch: ${url}`));
     }) as jest.Mock;
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
 
     // Board is always rendered; invalid FEN means the puzzle won't start
     // but the board container is still present showing the start position.
@@ -275,50 +320,31 @@ describe("Puzzles Component", () => {
       return Promise.reject(new Error(`Unhandled fetch: ${url}`));
     }) as jest.Mock;
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
 
     // Board is always rendered, showing the start position while no puzzle is loaded.
     expect(screen.getByTestId("chess-board-container")).toBeInTheDocument();
     expect(screen.queryByText(/Loading puzzle.../i)).not.toBeInTheDocument();
   });
 
-  test("renders board immediately with no loading text", () => {
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+  test("renders puzzle theme selection before the board", () => {
+    renderPuzzles();
 
-    // Board is always present; pieces are hidden via CSS until the first FEN arrives.
-    expect(screen.getByTestId("chess-board-container")).toBeInTheDocument();
+    expect(screen.getByText("Choose what you want to practice")).toBeInTheDocument();
+    expect(screen.getByTestId("puzzle-theme-fork")).toBeInTheDocument();
+    expect(screen.queryByTestId("chess-board-container")).not.toBeInTheDocument();
     expect(screen.queryByText(/Loading puzzle.../i)).not.toBeInTheDocument();
   });
 
   test("renders Puzzles page", async () => {
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId("chess-board-container")).toBeInTheDocument();
-    });
+    await renderPuzzlesWithTheme();
 
     expect(screen.getByTestId("next-puzzle-button")).toBeInTheDocument();
     expect(screen.getByTestId("hint-button")).toBeInTheDocument();
   });
 
   test("renders chess board when puzzle is loaded", async () => {
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -328,11 +354,7 @@ describe("Puzzles Component", () => {
   test("calls startNewPuzzle if connected and status is empty", async () => {
     (useChessSocket as jest.Mock).mockReturnValue(mockSocket);
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
 
     await waitFor(() => {
       expect(mockSocket.startNewPuzzle).toHaveBeenCalled();
@@ -340,11 +362,7 @@ describe("Puzzles Component", () => {
   });
 
   test("handle 'Get New Puzzle' button click", async () => {
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -356,31 +374,51 @@ describe("Puzzles Component", () => {
     expect(mockSocket.sendMessage).toHaveBeenCalledWith("next puzzle");
   });
 
-  test("handle 'Show Hint' button click", async () => {
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+  test("shows the theme overview with the puzzle rating on load", async () => {
+    await renderPuzzlesWithTheme();
 
     await waitFor(() => {
-      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+      expect(screen.getByTestId("puzzle-overview")).toBeInTheDocument();
     });
 
-    const showHintBtn = screen.getByText("Show Hint");
-    fireEvent.click(showHintBtn);
-
+    expect(screen.getByTestId("puzzle-overview")).toHaveTextContent(
+      "Puzzle Rating:"
+    );
+    // The overview is context, so it is broadcast to anyone else in the room.
     expect(mockSocket.sendMessage).toHaveBeenCalledWith(
       expect.stringContaining("Puzzle Rating:")
     );
   });
 
+  test("locks the hint until the player attempts a move, then reveals it", async () => {
+    await renderPuzzlesWithTheme();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+
+    // Locked before any attempt.
+    expect(screen.getByTestId("hint-button")).toBeDisabled();
+    expect(screen.getByTestId("hint-locked-note")).toBeInTheDocument();
+
+    // Any attempt — even an illegal drag — unlocks the hint.
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("mock-invalid-btn"));
+    });
+
+    expect(screen.getByTestId("hint-button")).not.toBeDisabled();
+    expect(screen.queryByTestId("hint-locked-note")).not.toBeInTheDocument();
+
+    // Clicking it reveals the solution (the piece to move).
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("hint-button"));
+    });
+
+    expect(screen.getByTestId("hint-solution")).toBeInTheDocument();
+  });
+
   test("handles player move correctly", async () => {
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -402,11 +440,7 @@ describe("Puzzles Component", () => {
 
   test("drag and drop interaction triggers move callbacks", async () => {
     jest.useFakeTimers();
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme("promotion");
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
     });
@@ -465,11 +499,7 @@ describe("Puzzles Component", () => {
       return Promise.reject(new Error(`Unhandled fetch: ${url}`));
     }) as jest.Mock;
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme("promotion");
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -548,11 +578,7 @@ describe("Puzzles Component", () => {
       return Promise.reject(new Error(`Unhandled fetch: ${url}`));
     }) as jest.Mock;
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme("promotion");
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -621,11 +647,7 @@ describe("Puzzles Component", () => {
       return Promise.reject(new Error(`Unhandled fetch: ${url}`));
     }) as jest.Mock;
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme("promotion");
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -694,11 +716,7 @@ describe("Puzzles Component", () => {
       return Promise.reject(new Error(`Unhandled fetch: ${url}`));
     }) as jest.Mock;
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme("promotion");
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -720,11 +738,7 @@ describe("Puzzles Component", () => {
 
   test("puzzle completion flow shows success modal and loads next puzzle", async () => {
     jest.useFakeTimers();
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
     });
@@ -757,6 +771,166 @@ describe("Puzzles Component", () => {
     jest.useRealTimers();
   });
 
+  // ==========================================================================
+  // Identity on the standalone /puzzles route (Issue B)
+  // ==========================================================================
+
+  const renderWithPropsAndTheme = async (props: Record<string, any> = {}, theme = "fork") => {
+    render(
+      <MemoryRouter>
+        <Puzzles {...props} />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByTestId(`puzzle-theme-${theme}`));
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-container")).toBeInTheDocument();
+    });
+  };
+
+  // Puzzle fixture includes a real PuzzleId — if the identity logic in
+  // Puzzles.tsx (or the guest check in reportPuzzleSolved()) were wrong,
+  // these tests would actually reach and fire (or wrongly skip) the
+  // /puzzles/solved fetch, since nothing else would stop it either way.
+  const mockFetchForSolvedCheck = (cookieUsername = "test-user", cookieRole = "student") => {
+    global.fetch = jest.fn((url) => {
+      if (typeof url === "string" && url.includes("puzzles/random")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              {
+                PuzzleId: "guest-check-puzzle",
+                FEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Moves: "e2e4 e7e5",
+                Themes: "theme1",
+                Rating: 1500,
+              },
+            ]),
+        });
+      }
+      if (typeof url === "string" && url.includes("timeTracking")) {
+        return Promise.resolve({
+          status: 200,
+          json: () =>
+            Promise.resolve({ eventId: "123", startTime: new Date().toISOString() }),
+        });
+      }
+      if (typeof url === "string" && url.includes("auth/validate")) {
+        return Promise.resolve({
+          status: 200,
+          json: () => Promise.resolve({ username: cookieUsername, role: cookieRole }),
+          text: () =>
+            Promise.resolve(JSON.stringify({ username: cookieUsername, role: cookieRole })),
+        });
+      }
+      if (typeof url === "string" && url.includes("/puzzles/solved")) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      }
+      return Promise.reject(new Error(`Unhandled fetch: ${url}`));
+    }) as jest.Mock;
+  };
+
+  const completePuzzleAndSettle = async () => {
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+    act(() => {
+      jest.advanceTimersByTime(600);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("mock-final-move-btn"));
+    });
+    expect(mockSocket.sendMessage).toHaveBeenCalledWith("puzzle completed");
+    // Let any in-flight microtasks — including a wrongly-fired fetch —
+    // settle before asserting on the full call history.
+    await act(async () => {
+      await Promise.resolve();
+    });
+  };
+
+  const solvedFetchCalls = () =>
+    (global.fetch as jest.Mock).mock.calls.filter(
+      ([url]) => typeof url === "string" && url.includes("/puzzles/solved")
+    );
+
+  // A real login cookie, just not a student's.
+  const nonStudentCookie = makeLoginCookie({ username: "mentor-user", role: "mentor" });
+
+  test("a logged-in student on the standalone /puzzles route gets their own username, and reportPuzzleSolved is called", async () => {
+    jest.useFakeTimers();
+    mockFetchForSolvedCheck();
+
+    // No `student` prop, no guestMode — the standalone /puzzles route with
+    // a real student login cookie (set in beforeEach).
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    const solvedCalls = solvedFetchCalls();
+    expect(solvedCalls).toHaveLength(1);
+    const [, options] = solvedCalls[0];
+    expect(JSON.parse(options.body)).toMatchObject({ puzzleId: "guest-check-puzzle" });
+
+    jest.useRealTimers();
+  });
+
+  test("anonymous (no login cookie) gets a guest id, and reportPuzzleSolved is never called", async () => {
+    jest.useFakeTimers();
+    (useCookies as jest.Mock).mockReturnValue([{}, jest.fn(), jest.fn()]);
+    mockFetchForSolvedCheck();
+
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
+  test("a parent viewing a child's puzzles (guestMode) gets a guest id and never reports, even with a login cookie present", async () => {
+    jest.useFakeTimers();
+    mockFetchForSolvedCheck();
+
+    // No `student` prop, guestMode true — this is how NewStudentProfile
+    // renders Puzzles when viewing a child who isn't the logged-in parent.
+    // Must stay guest regardless of the parent's own real login cookie.
+    await renderWithPropsAndTheme({ guestMode: true });
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
+  test("a logged-in user who isn't a student (mentor/parent/admin) on /puzzles gets a guest id and never reports", async () => {
+    jest.useFakeTimers();
+    (useCookies as jest.Mock).mockReturnValue([{ login: nonStudentCookie }, jest.fn(), jest.fn()]);
+    mockFetchForSolvedCheck("mentor-user", "mentor");
+
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
+  test("an expired student token gets a guest id and never reports", async () => {
+    jest.useFakeTimers();
+    const expiredStudentCookie = makeLoginCookie(
+      { username: "test-user", role: "student" },
+      { expiresInSeconds: -60 }
+    );
+    (useCookies as jest.Mock).mockReturnValue([{ login: expiredStudentCookie }, jest.fn(), jest.fn()]);
+    mockFetchForSolvedCheck();
+
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
   test("disables controls and board when socket is disconnected", async () => {
     const disconnectedSocket = { ...mockSocket, connected: false };
     (useChessSocket as jest.Mock).mockImplementation((props) => {
@@ -766,11 +940,7 @@ describe("Puzzles Component", () => {
       return disconnectedSocket;
     });
 
-    render(
-      <MemoryRouter>
-        <Puzzles />
-      </MemoryRouter>
-    );
+    await renderPuzzlesWithTheme();
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -800,6 +970,7 @@ describe("Puzzles Component", () => {
         <Puzzles />
       </MemoryRouter>
     );
+    fireEvent.click(screen.getByTestId("puzzle-theme-fork"));
 
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
@@ -827,6 +998,152 @@ describe("Puzzles Component", () => {
     });
 
     expect(screen.getByTestId("next-puzzle-button")).not.toBeDisabled();
-    expect(screen.getByTestId("hint-button")).not.toBeDisabled();
+    // The hint has its own gate: it stays locked until the player attempts a
+    // move, so it is still disabled here even though the socket reconnected.
+    expect(screen.getByTestId("hint-button")).toBeDisabled();
+  });
+
+  // ==========================================================================
+  // Mentor feedback (mentor -> student)
+  // ==========================================================================
+
+  test("student does not see the feedback control", async () => {
+    await renderPuzzlesWithTheme(); // default role = student
+    expect(screen.queryByTestId("give-feedback-button")).not.toBeInTheDocument();
+  });
+
+  test("mentor sees the feedback control", async () => {
+    await renderWithRoleAndTheme("mentor");
+    expect(screen.getByTestId("give-feedback-button")).toBeInTheDocument();
+  });
+
+  test("mentor's board is view-only with no solving controls", async () => {
+    await renderWithRoleAndTheme("mentor");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+
+    // The mentor watches only — the board never becomes playable for them.
+    expect(screen.getByTestId("chess-board-mock")).toHaveAttribute(
+      "data-disabled",
+      "true"
+    );
+    // Student-only solving controls are hidden from the mentor.
+    expect(screen.queryByTestId("next-puzzle-button")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("hint-button")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mentor-watch-note")).toBeInTheDocument();
+  });
+
+  test("mentor composes and sends feedback over the room channel", async () => {
+    await renderWithRoleAndTheme("mentor");
+
+    fireEvent.click(screen.getByTestId("give-feedback-button"));
+    fireEvent.change(screen.getByTestId("feedback-textarea"), {
+      target: { value: "Look for a fork!" },
+    });
+    fireEvent.click(screen.getByTestId("send-feedback-button"));
+
+    expect(mockSocket.sendMessage).toHaveBeenCalledWith(
+      "MENTOR_FEEDBACK::Look for a fork!"
+    );
+    expect(screen.getByTestId("feedback-sent-note")).toBeInTheDocument();
+  });
+
+  test("student gets a blocking popup that pauses the board until acknowledged", async () => {
+    let captured: ((msg: string) => void) | undefined;
+    (useChessSocket as jest.Mock).mockImplementation((props) => {
+      captured = props.onMessage;
+      React.useEffect(() => {
+        props.onRoleAssigned?.("host");
+      }, []);
+      return mockSocket;
+    });
+
+    await renderPuzzlesWithTheme(); // student
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toHaveAttribute(
+        "data-disabled",
+        "false"
+      );
+    });
+
+    await act(async () => {
+      captured?.("MENTOR_FEEDBACK::Try attacking the king");
+    });
+
+    const modal = screen.getByTestId("mock-modal");
+    expect(modal).toHaveAttribute("data-type", "info");
+    expect(screen.getByText("Try attacking the king")).toBeInTheDocument();
+    // Board is paused while the message is up.
+    expect(screen.getByTestId("chess-board-mock")).toHaveAttribute(
+      "data-disabled",
+      "true"
+    );
+
+    // Acknowledging unblocks the board.
+    fireEvent.click(screen.getByTestId("modal-confirm-btn"));
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toHaveAttribute(
+        "data-disabled",
+        "false"
+      );
+    });
+  });
+
+  // ==========================================================================
+  // The mentor cannot replace the student's puzzle (Issue 1)
+  // ==========================================================================
+
+  test("the mentor's screen does not load a new puzzle when the student clicks Get New Puzzle", async () => {
+    let captured: ((msg: string) => void) | undefined;
+    (useChessSocket as jest.Mock).mockImplementation((props) => {
+      captured = props.onMessage;
+      React.useEffect(() => {
+        props.onRoleAssigned?.("guest");
+      }, []);
+      return mockSocket;
+    });
+
+    await renderWithRoleAndTheme("mentor");
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+
+    (mockSocket.setGameStateWithColor as jest.Mock).mockClear();
+
+    // "next puzzle" is broadcast to the whole room when the student clicks
+    // Get New Puzzle — the mentor's own client receives it too.
+    await act(async () => {
+      captured?.("next puzzle");
+    });
+
+    expect(mockSocket.setGameStateWithColor).not.toHaveBeenCalled();
+  });
+
+  test("the student can still load a new puzzle when 'next puzzle' is received", async () => {
+    let captured: ((msg: string) => void) | undefined;
+    (useChessSocket as jest.Mock).mockImplementation((props) => {
+      captured = props.onMessage;
+      React.useEffect(() => {
+        props.onRoleAssigned?.("host");
+      }, []);
+      return mockSocket;
+    });
+
+    await renderPuzzlesWithTheme(); // default role = student
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
+    });
+
+    // Clear the call from the initial puzzle load so this only counts the
+    // call triggered by the "next puzzle" message itself.
+    (mockSocket.setGameStateWithColor as jest.Mock).mockClear();
+
+    await act(async () => {
+      captured?.("next puzzle");
+    });
+
+    expect(mockSocket.setGameStateWithColor).toHaveBeenCalled();
   });
 });

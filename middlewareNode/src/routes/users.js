@@ -54,6 +54,28 @@ async function getDb() {
   return cachedClient.db(fallbackDbName(config.get("mongoURI")));
 }
 
+// Usernames starting with "guest:" are reserved for chessServer's ephemeral,
+// unauthenticated puzzle rooms (anonymous /puzzles visits and Puzzle Streak —
+// see chessServer/src/managers/GameManager.js). No real account may use one,
+// so a real student's room can never collide with a guest room.
+const RESERVED_USERNAME_PREFIX = /^guest:/i;
+function isReservedUsername(username) {
+  return typeof username === "string" && RESERVED_USERNAME_PREFIX.test(username);
+}
+
+/**
+ * GET /user/me
+ *
+ * Returns the authenticated caller's own username. Used by chessServer to
+ * verify that a socket claiming to be a given student actually holds that
+ * student's login token, before seating them in a puzzle room.
+ *
+ * @access JWT authenticated
+ */
+router.get("/me", passport.authenticate("jwt"), async (req, res) => {
+  res.json({ username: req.user.username });
+});
+
 /**
  * GET /user/children
  * 
@@ -105,6 +127,12 @@ router.post(
     const { username, password, first, last, email, role, students, zipcode, gender, gradeLevel, occupation } =
       req.query;
 
+    if (isReservedUsername(username)) {
+      return res
+        .status(400)
+        .json({ error: 'Usernames starting with "guest:" are reserved.' });
+    }
+
     //Error catching when using mongoose functions like Users.findOne()
     try {
       const sha384 = crypto.createHash("sha384");
@@ -127,6 +155,11 @@ router.post(
         if (studentsArray && studentsArray.length > 0) {
           //Ensure student usernames aren't already in the database
           for (i = 0; i < studentsArray.length; i++) {
+            if (isReservedUsername(studentsArray[i].username)) {
+              return res
+                .status(400)
+                .json({ error: 'Usernames starting with "guest:" are reserved.' });
+            }
             const studentUser = await users.findOne({
               username: studentsArray[i].username,
             });
@@ -234,6 +267,12 @@ router.post(
     }
 
     const { username, password, first, last, email, birthday, gender, gradeLevel } = req.query;
+
+    if (isReservedUsername(username)) {
+      return res
+        .status(400)
+        .json({ error: 'Usernames starting with "guest:" are reserved.' });
+    }
 
     try {
       const sha384 = crypto.createHash("sha384");
@@ -558,17 +597,20 @@ router.put("/profile", passport.authenticate("jwt"), async (req, res) => {
   try {
     const { zipcode, gender, gradeLevel, country, state, school } = req.body;
     const allowed = ["M", "F", "Other", null];
+    // Empty string means "clear the field", same as the other fields' `|| null`
+    // below — normalize before validating so it isn't rejected as an invalid value.
+    const normalizedGender = gender === "" ? null : gender;
 
-    if (gender !== undefined && !allowed.includes(gender))
+    if (normalizedGender !== undefined && !allowed.includes(normalizedGender))
       return res.status(400).json({ error: "gender must be M, F, Other, or null" });
 
     const updates = {};
-    if (zipcode    !== undefined) updates.zipcode    = zipcode    || null;
-    if (gender     !== undefined) updates.gender     = gender     || null;
-    if (gradeLevel !== undefined) updates.gradeLevel = gradeLevel || null;
-    if (country    !== undefined) updates.country    = country    || null;
-    if (state      !== undefined) updates.state      = state      || null;
-    if (school     !== undefined) updates.school     = school     || null;
+    if (zipcode          !== undefined) updates.zipcode    = zipcode    || null;
+    if (normalizedGender !== undefined) updates.gender     = normalizedGender;
+    if (gradeLevel       !== undefined) updates.gradeLevel = gradeLevel || null;
+    if (country          !== undefined) updates.country    = country    || null;
+    if (state            !== undefined) updates.state      = state      || null;
+    if (school           !== undefined) updates.school     = school     || null;
 
     if (Object.keys(updates).length === 0)
       return res.status(400).json({ error: "No updatable fields provided" });
