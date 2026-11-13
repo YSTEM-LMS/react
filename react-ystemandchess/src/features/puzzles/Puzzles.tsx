@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import {
   themesName,
   themesDescription,
@@ -19,7 +19,39 @@ type PuzzlesProps = {
   mentor?: any;
   role?: any;
   styleType?: any;
+  /** A parent viewing a child's puzzles (not their own): always guest,
+   * regardless of the parent's own login cookie. Set by NewStudentProfile
+   * when !isOwnProfile. */
+  guestMode?: boolean;
 };
+
+/**
+ * Decodes the logged-in user's role/username straight from the JWT payload
+ * in cookies.login, the same way globals.ts's SetPermissionLevel does
+ * (JSON.parse(atob(token.split(".")[1]))). Done synchronously and locally
+ * rather than calling SetPermissionLevel itself: that function also hits
+ * POST /auth/validate over the network, and studentId has to be known on
+ * the very first render, before useChessSocket ever connects — changing it
+ * after mount wouldn't reconnect the socket under a new identity.
+ *
+ * Returns null — treated as a guest by the caller — for a missing/malformed
+ * token, one with no `exp` claim, or one that's already expired. This never
+ * does what SetPermissionLevel's server round-trip does (check the token is
+ * actually valid, not just well-formed and unexpired), so an id handed out
+ * here still only grants currency once chessServer verifies it server-side
+ * via /user/me — this is just the "don't even bother claiming to be a
+ * verified student" filter, not the verification itself.
+ */
+function decodeLoginToken(token: string | undefined | null): { username?: string; role?: string } | null {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (!payload?.exp || payload.exp * 1000 <= Date.now()) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
 
 type PuzzleThemeKey = keyof typeof themesName;
 
@@ -85,6 +117,7 @@ const Puzzles: React.FC<PuzzlesProps> = ({
   mentor = null,
   role = "student",
   styleType = "page",
+  guestMode = false,
 }) => {
   const isProfile = styleType === "profile";
   const isMentor = role === "mentor";
@@ -142,14 +175,31 @@ const Puzzles: React.FC<PuzzlesProps> = ({
   const [startTime, setStartTime] = useState(null);
   const [username, setUsername] = useState(null);
 
-  // User identification. A real `student` prop (the mentor/student profile
-  // flow) is used as-is — it's a real, verifiable username. Without one,
-  // this is an anonymous visit, so the id is "guest:"-prefixed: chessServer
-  // keys guest rooms separately and skips the login-token check for them
-  // (see GameManager.js). Real usernames can never start with "guest:"
-  // (rejected at signup), so this can never collide with or take over an
-  // actual student's puzzle room.
-  const studentId = student || `guest:${cookies.login?.studentId || uuidv4()}`;
+  // Random guest id, computed once per mount (not per render) — used below
+  // whenever this visit isn't a verified real student.
+  const guestUuid = useMemo(() => uuidv4(), []);
+
+  // User identification, in priority order:
+  //   1. a real `student` prop (mentor viewing a specific student, or the
+  //      student's own profile) — used as-is, it's already a real,
+  //      verifiable username.
+  //   2. guestMode (a parent viewing a child's puzzles, not their own) —
+  //      always guest, regardless of the parent's own login cookie.
+  //   3. the standalone /puzzles route: no `student` prop is passed at all,
+  //      so a logged-in student gets their own real username (decoded
+  //      straight from the login cookie) instead of silently falling back
+  //      to a throwaway guest id that could never earn currency.
+  //   4. anyone else (no login, or logged in as something other than a
+  //      student — mentor/parent/admin visiting /puzzles directly) — guest.
+  // Guest ids are "guest:"-prefixed: chessServer keys guest rooms separately
+  // and skips the login-token check for them (see GameManager.js). Real
+  // usernames can never start with "guest:" (rejected at signup), so this
+  // can never collide with or take over an actual student's puzzle room.
+  const loginInfo = decodeLoginToken(cookies.login);
+  const studentId =
+    student ||
+    (!guestMode && loginInfo?.role === "student" && loginInfo.username) ||
+    `guest:${guestUuid}`;
   const mentorId = mentor || "puzzle_mentor_" + studentId;
 
   // ============================================================================

@@ -499,7 +499,7 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
               check would reject that mismatch. Omit the student prop in
               that case so it falls back to an unauthenticated guest room
               instead of being rejected. */}
-          <Puzzles student={isOwnProfile ? username : undefined} mentor={mentorUsername} role={"student"} styleType="profile" />
+          <Puzzles student={isOwnProfile ? username : undefined} mentor={mentorUsername} role={"student"} styleType="profile" guestMode={!isOwnProfile} />
         </div>
       );
     

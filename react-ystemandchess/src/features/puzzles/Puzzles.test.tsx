@@ -130,6 +130,21 @@ const mockSocket = {
   clearHighlights: jest.fn(),
 };
 
+// Builds a fake "header.<payload>.signature" login cookie like the real
+// JWTs globals.ts's SetPermissionLevel decodes. `expiresInSeconds` defaults
+// to an hour from now; pass a negative value for an already-expired token,
+// or omit `exp` entirely (pass `includeExp: false`) to test a token that
+// never had one.
+const makeLoginCookie = (
+  payload: Record<string, any>,
+  { expiresInSeconds = 3600, includeExp = true }: { expiresInSeconds?: number; includeExp?: boolean } = {}
+) => {
+  const fullPayload = includeExp
+    ? { ...payload, exp: Math.floor(Date.now() / 1000) + expiresInSeconds }
+    : payload;
+  return `header.${Buffer.from(JSON.stringify(fullPayload)).toString("base64")}.signature`;
+};
+
 const renderPuzzles = () =>
   render(
     <MemoryRouter>
@@ -165,8 +180,7 @@ describe("Puzzles Component", () => {
 
     (useCookies as jest.Mock).mockReturnValue([
       {
-        login:
-          "header.eyJ1c2VybmFtZSI6InRlc3QtdXNlciIsInJvbGUiOiJzdHVkZW50In0=.signature",
+        login: makeLoginCookie({ username: "test-user", role: "student" }),
       },
       jest.fn(),
       jest.fn(),
@@ -757,13 +771,27 @@ describe("Puzzles Component", () => {
     jest.useRealTimers();
   });
 
-  test("does not report to /puzzles/solved when studentId is guest-prefixed, even with a login cookie present", async () => {
-    jest.useFakeTimers();
+  // ==========================================================================
+  // Identity on the standalone /puzzles route (Issue B)
+  // ==========================================================================
 
-    // Puzzle fixture includes a real PuzzleId this time — if the guest
-    // check in reportPuzzleSolved() were missing or checking the wrong
-    // thing, this test would actually reach and fire the /puzzles/solved
-    // fetch below, since nothing else would stop it.
+  const renderWithPropsAndTheme = async (props: Record<string, any> = {}, theme = "fork") => {
+    render(
+      <MemoryRouter>
+        <Puzzles {...props} />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByTestId(`puzzle-theme-${theme}`));
+    await waitFor(() => {
+      expect(screen.getByTestId("chess-board-container")).toBeInTheDocument();
+    });
+  };
+
+  // Puzzle fixture includes a real PuzzleId — if the identity logic in
+  // Puzzles.tsx (or the guest check in reportPuzzleSolved()) were wrong,
+  // these tests would actually reach and fire (or wrongly skip) the
+  // /puzzles/solved fetch, since nothing else would stop it either way.
+  const mockFetchForSolvedCheck = (cookieUsername = "test-user", cookieRole = "student") => {
     global.fetch = jest.fn((url) => {
       if (typeof url === "string" && url.includes("puzzles/random")) {
         return Promise.resolve({
@@ -790,43 +818,115 @@ describe("Puzzles Component", () => {
       if (typeof url === "string" && url.includes("auth/validate")) {
         return Promise.resolve({
           status: 200,
-          json: () => Promise.resolve({ username: "test-user", role: "student" }),
+          json: () => Promise.resolve({ username: cookieUsername, role: cookieRole }),
           text: () =>
-            Promise.resolve(JSON.stringify({ username: "test-user", role: "student" })),
+            Promise.resolve(JSON.stringify({ username: cookieUsername, role: cookieRole })),
         });
+      }
+      if (typeof url === "string" && url.includes("/puzzles/solved")) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
       }
       return Promise.reject(new Error(`Unhandled fetch: ${url}`));
     }) as jest.Mock;
+  };
 
-    // No `student` prop is passed — Puzzles.tsx falls back to a
-    // "guest:"-prefixed studentId — even though useCookies (mocked in
-    // beforeEach) still returns a real-looking login cookie. This mirrors
-    // a parent viewing a child's profile: a real cookie, but not a
-    // verified real student identity for the puzzle being played.
-    await renderPuzzlesWithTheme();
+  const completePuzzleAndSettle = async () => {
     await waitFor(() => {
       expect(screen.getByTestId("chess-board-mock")).toBeInTheDocument();
     });
-
     act(() => {
       jest.advanceTimersByTime(600);
     });
     await act(async () => {
       fireEvent.click(screen.getByTestId("mock-final-move-btn"));
     });
-
     expect(mockSocket.sendMessage).toHaveBeenCalledWith("puzzle completed");
-
     // Let any in-flight microtasks — including a wrongly-fired fetch —
     // settle before asserting on the full call history.
     await act(async () => {
       await Promise.resolve();
     });
+  };
 
-    const solvedCalls = (global.fetch as jest.Mock).mock.calls.filter(
+  const solvedFetchCalls = () =>
+    (global.fetch as jest.Mock).mock.calls.filter(
       ([url]) => typeof url === "string" && url.includes("/puzzles/solved")
     );
-    expect(solvedCalls).toHaveLength(0);
+
+  // A real login cookie, just not a student's.
+  const nonStudentCookie = makeLoginCookie({ username: "mentor-user", role: "mentor" });
+
+  test("a logged-in student on the standalone /puzzles route gets their own username, and reportPuzzleSolved is called", async () => {
+    jest.useFakeTimers();
+    mockFetchForSolvedCheck();
+
+    // No `student` prop, no guestMode — the standalone /puzzles route with
+    // a real student login cookie (set in beforeEach).
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    const solvedCalls = solvedFetchCalls();
+    expect(solvedCalls).toHaveLength(1);
+    const [, options] = solvedCalls[0];
+    expect(JSON.parse(options.body)).toMatchObject({ puzzleId: "guest-check-puzzle" });
+
+    jest.useRealTimers();
+  });
+
+  test("anonymous (no login cookie) gets a guest id, and reportPuzzleSolved is never called", async () => {
+    jest.useFakeTimers();
+    (useCookies as jest.Mock).mockReturnValue([{}, jest.fn(), jest.fn()]);
+    mockFetchForSolvedCheck();
+
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
+  test("a parent viewing a child's puzzles (guestMode) gets a guest id and never reports, even with a login cookie present", async () => {
+    jest.useFakeTimers();
+    mockFetchForSolvedCheck();
+
+    // No `student` prop, guestMode true — this is how NewStudentProfile
+    // renders Puzzles when viewing a child who isn't the logged-in parent.
+    // Must stay guest regardless of the parent's own real login cookie.
+    await renderWithPropsAndTheme({ guestMode: true });
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
+  test("a logged-in user who isn't a student (mentor/parent/admin) on /puzzles gets a guest id and never reports", async () => {
+    jest.useFakeTimers();
+    (useCookies as jest.Mock).mockReturnValue([{ login: nonStudentCookie }, jest.fn(), jest.fn()]);
+    mockFetchForSolvedCheck("mentor-user", "mentor");
+
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
+  test("an expired student token gets a guest id and never reports", async () => {
+    jest.useFakeTimers();
+    const expiredStudentCookie = makeLoginCookie(
+      { username: "test-user", role: "student" },
+      { expiresInSeconds: -60 }
+    );
+    (useCookies as jest.Mock).mockReturnValue([{ login: expiredStudentCookie }, jest.fn(), jest.fn()]);
+    mockFetchForSolvedCheck();
+
+    await renderWithPropsAndTheme();
+    await completePuzzleAndSettle();
+
+    expect(solvedFetchCalls()).toHaveLength(0);
 
     jest.useRealTimers();
   });
