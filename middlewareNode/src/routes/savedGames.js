@@ -1,0 +1,267 @@
+/**
+ * Saved games routes (Phase A: Play Computer games)
+ *
+ * Mounted at /savedGames behind requireAuth (see server.js), so every route
+ * has a logged-in req.user. All game rules live in services/savedGames.js.
+ *
+ *   GET    /savedGames          the caller's own games, newest first
+ *   POST   /savedGames          start saving a new computer game
+ *   GET    /savedGames/:uuid    one game (owner, paired mentor, or admin)
+ *   PATCH  /savedGames/:uuid    update moves, rename, or resign (owner only)
+ *   DELETE /savedGames/:uuid    delete (owner only)
+ *
+ * A game the caller can't see returns 404, not 403, so ids can't be probed
+ * to find out which games exist.
+ */
+
+const express = require("express");
+const SavedGame = require("../models/savedGame");
+const {
+  LIMITS,
+  SavedGameError,
+  normalizeFen,
+  replayPgn,
+  resultForPlayer,
+  isOwner,
+  canRead,
+  toPublic,
+  toSummary,
+  DEFAULT_POSITION,
+} = require("../services/savedGames");
+
+const router = express.Router();
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const NOT_FOUND = { error: "Game not found" };
+
+function validateGameName(name, fallback) {
+  if (name === undefined || name === null || name === "") return fallback;
+  if (typeof name !== "string" || !name.trim()) {
+    throw new SavedGameError(400, "gameName must be a non-empty string");
+  }
+  if (name.trim().length > 80) {
+    throw new SavedGameError(400, "gameName must be 80 characters or fewer");
+  }
+  return name.trim();
+}
+
+function sendError(res, err, context) {
+  if (err instanceof SavedGameError) {
+    return res.status(err.status).json({ error: err.message });
+  }
+  console.error(`[savedGames] ${context}:`, err);
+  return res.status(500).json({ error: "Server error" });
+}
+
+async function findReadable(req) {
+  if (!UUID_RE.test(req.params.uuid)) return null;
+  const game = await SavedGame.findOne({ uuid: req.params.uuid });
+  if (!game || !(await canRead(req.user, game))) return null;
+  return game;
+}
+
+async function findOwned(req) {
+  if (!UUID_RE.test(req.params.uuid)) return null;
+  const game = await SavedGame.findOne({ uuid: req.params.uuid });
+  if (!game || !isOwner(req.user, game)) return null;
+  return game;
+}
+
+function limitReached() {
+  return new SavedGameError(
+    409,
+    `You can save up to ${LIMITS.maxGamesPerUser} games. Delete one to save another.`
+  );
+}
+
+const isSlotConflict = (err) => err && err.code === 11000 && Boolean(err.keyPattern?.slot);
+
+// Each retry happens only because a concurrent request just took the slot we
+// picked, so a handful of attempts is plenty even for a burst of requests.
+const MAX_SLOT_ATTEMPTS = 10;
+
+function lowestFreeSlot(games) {
+  const used = new Set(games.map((g) => g.slot));
+  let slot = 0;
+  while (used.has(slot)) slot++;
+  return slot;
+}
+
+/**
+ * Gives a slot to each of the user's games saved before slots existed, so
+ * they're covered by the unique index before the limit is checked against
+ * it. `timestamps: false` keeps `updatedAt` as it was: bumping it would
+ * reset the retention clock on games nobody played. A slot can land at or
+ * above the current limit (e.g. the student already had more games than
+ * the limit allows); the count check then blocks new games until they
+ * delete some.
+ */
+async function assignLegacySlots(userId) {
+  const legacy = await SavedGame.find({ userId, slot: { $exists: false } })
+    .sort({ createdAt: 1 })
+    .select("_id")
+    .lean();
+
+  for (const { _id } of legacy) {
+    for (let attempt = 0; attempt < MAX_SLOT_ATTEMPTS; attempt++) {
+      const slotted = await SavedGame.find({ userId, slot: { $exists: true } })
+        .select("slot")
+        .lean();
+      try {
+        // A concurrent request may have slotted this game already, in
+        // which case the filter matches nothing and we move on.
+        await SavedGame.updateOne(
+          { _id, slot: { $exists: false } },
+          { $set: { slot: lowestFreeSlot(slotted) } },
+          { timestamps: false }
+        );
+        break;
+      } catch (err) {
+        if (!isSlotConflict(err)) throw err;
+      }
+    }
+  }
+}
+
+/**
+ * Creates the game in the lowest free slot of the owner's
+ * LIMITS.maxGamesPerUser slots. The unique { userId, slot } index makes this
+ * atomic: if a concurrent create takes the same slot first, the insert fails
+ * with a duplicate key error and we re-read the free slots and try again.
+ * When no slot is free the student is at the limit and gets a 409.
+ */
+async function createInFreeSlot(fields) {
+  // Make sure the unique index exists before relying on it (a no-op once
+  // Mongoose has built the model's indexes).
+  await SavedGame.init();
+  await assignLegacySlots(fields.userId);
+
+  for (let attempt = 0; attempt < MAX_SLOT_ATTEMPTS; attempt++) {
+    const taken = await SavedGame.find({ userId: fields.userId }).select("slot").lean();
+    // Count check first: also covers the limit being lowered below slots
+    // that are already in use.
+    if (taken.length >= LIMITS.maxGamesPerUser) throw limitReached();
+
+    const slot = lowestFreeSlot(taken);
+    if (slot >= LIMITS.maxGamesPerUser) throw limitReached();
+
+    try {
+      return await SavedGame.create({ ...fields, slot });
+    } catch (err) {
+      if (!isSlotConflict(err)) throw err;
+    }
+  }
+  throw new SavedGameError(503, "Couldn't save the game right now. Please try again.");
+}
+
+router.get("/", async (req, res) => {
+  try {
+    // No .limit(): creates already cap how many games a student has, and a
+    // cut-off here would hide games from a student who is over the limit
+    // (e.g. after it was lowered), leaving them unable to find and delete them.
+    const games = await SavedGame.find({ userId: req.user._id }).sort({ updatedAt: -1 });
+    res.json({ games: games.map(toSummary) });
+  } catch (err) {
+    sendError(res, err, "list");
+  }
+});
+
+router.post("/", async (req, res) => {
+  try {
+    const { playerColor, computerLevel, gameName, startFen, pgn } = req.body || {};
+
+    if (!SavedGame.PLAYER_COLORS.includes(playerColor)) {
+      throw new SavedGameError(400, "playerColor must be 'white' or 'black'");
+    }
+    if (!Number.isInteger(computerLevel) || computerLevel < 0 || computerLevel > 20) {
+      throw new SavedGameError(400, "computerLevel must be an integer from 0 to 20");
+    }
+    const name = validateGameName(gameName, "Me vs Computer");
+    const start = startFen === undefined ? normalizeFen(DEFAULT_POSITION) : normalizeFen(startFen);
+
+    const replay = replayPgn(pgn, start);
+    const game = await createInFreeSlot({
+      userId: req.user._id,
+      gameType: "computer",
+      playerColor,
+      computerLevel,
+      gameName: name,
+      startFen: start,
+      pgn: replay.pgn,
+      fen: replay.fen,
+      plyCount: replay.plyCount,
+      ...resultForPlayer(replay, playerColor),
+    });
+
+    res.status(201).json({ game: toPublic(game) });
+  } catch (err) {
+    sendError(res, err, "create");
+  }
+});
+
+router.get("/:uuid", async (req, res) => {
+  try {
+    const game = await findReadable(req);
+    if (!game) return res.status(404).json(NOT_FOUND);
+    res.json({ game: toPublic(game) });
+  } catch (err) {
+    sendError(res, err, "read");
+  }
+});
+
+router.patch("/:uuid", async (req, res) => {
+  try {
+    const game = await findOwned(req);
+    if (!game) return res.status(404).json(NOT_FOUND);
+
+    const { pgn, gameName, resign } = req.body || {};
+    if (pgn === undefined && gameName === undefined && resign === undefined) {
+      throw new SavedGameError(400, "Nothing to update. Send pgn, gameName or resign.");
+    }
+    if (resign !== undefined && resign !== true) {
+      throw new SavedGameError(400, "resign can only be true");
+    }
+
+    const finished = game.status !== "ongoing";
+    if (finished && (pgn !== undefined || resign)) {
+      throw new SavedGameError(409, "This game is finished. Only its name can change.");
+    }
+
+    if (gameName !== undefined) {
+      game.gameName = validateGameName(gameName, game.gameName);
+    }
+
+    if (pgn !== undefined) {
+      const replay = replayPgn(pgn, game.startFen);
+      game.pgn = replay.pgn;
+      game.fen = replay.fen;
+      game.plyCount = replay.plyCount;
+      Object.assign(game, resultForPlayer(replay, game.playerColor));
+    }
+
+    // Resigning is the one result the browser may claim. If the moves sent in
+    // the same request already ended the game, that result stands.
+    if (resign && game.status === "ongoing") {
+      game.status = "lost";
+      game.endReason = "resign";
+    }
+
+    await game.save();
+    res.json({ game: toPublic(game) });
+  } catch (err) {
+    sendError(res, err, "update");
+  }
+});
+
+router.delete("/:uuid", async (req, res) => {
+  try {
+    const game = await findOwned(req);
+    if (!game) return res.status(404).json(NOT_FOUND);
+    await SavedGame.deleteOne({ _id: game._id });
+    res.status(204).end();
+  } catch (err) {
+    sendError(res, err, "delete");
+  }
+});
+
+module.exports = router;
