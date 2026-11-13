@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Modal, { ModalProps } from "../../components/modal/Modal";
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 import { v4 as uuidv4 } from "uuid";
 import { useCookies } from "react-cookie";
 import ChessBoard, { ChessBoardRef } from "../../components/ChessBoard/ChessBoard";
