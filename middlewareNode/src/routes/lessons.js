@@ -12,6 +12,7 @@
  */
 
 const config = require("config");
+const fallbackDbName = require("../config/fallbackDbName");
 const express = require('express');
 const passport = require("passport");
 const router = express.Router();
@@ -37,7 +38,7 @@ async function getDb() {
     cachedClient = new MongoClient(config.get("mongoURI"));
     await cachedClient.connect();
   }
-  return cachedClient.db("ystem");
+  return cachedClient.db(fallbackDbName(config.get("mongoURI")));
 }
 
 /**
@@ -154,15 +155,17 @@ router.get(
     })(req, res, next) // authenticate jwt
   },
   async (req, res) => {
-    const piece = decodeURIComponent(req.query.piece); // get the chess piece
-    if (!piece) {
+    // Check before decoding: decodeURIComponent(undefined) is the string "undefined".
+    if (!req.query.piece) {
       return res.status(400).json("Error: 400. Please provide a piece.");
     }
+    const piece = decodeURIComponent(req.query.piece); // get the chess piece
 
     try {
       const db = await getDb();
       const lessons = db.collection("newLessons"); // get lessons collection
       const lessonDoc = await lessons.findOne({ piece: piece }); // all lessons for that piece
+      if (!lessonDoc) return res.status(404).json("Error: 404. No lessons for that piece.");
 
       res.json(lessonDoc.lessons.length); // respond with length of lessons
     } catch (err) {

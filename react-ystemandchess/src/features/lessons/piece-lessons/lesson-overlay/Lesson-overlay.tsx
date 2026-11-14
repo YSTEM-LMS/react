@@ -141,10 +141,20 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
   const xPopupShouldResetRef = useRef(true);
   const [isNavigating, setIsNavigating] = useState(false);
 
+  // One chessServer game per lesson visit. chessServer finds a game by student
+  // OR mentor name, so the old shared names ("guest_student", and
+  // "mentor_<piece>" for everyone on the same lesson) would put every student
+  // on that lesson into one game, each new arrival taking over its seat.
+  // (cookies.login is the token string, so the old profile-mode
+  // cookies.login.studentId was always undefined.)
+  const lessonSessionRef = useRef<string>(
+    `lesson-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+  );
+
   // Initialize socket
   const socket = useChessSocket({
-    student: styleType === 'profile' ? cookies.login?.studentId : "guest_student",
-    mentor: "mentor_" + piece,
+    student: `${lessonSessionRef.current}-student`,
+    mentor: `${lessonSessionRef.current}-mentor`,
     role: 'student',
     serverUrl: environment.urls.chessServerURL,
     mode: 'lesson',
@@ -506,6 +516,9 @@ const LessonOverlay: React.FC<LessonOverlayProps> = ({
 
     isInitializedRef.current = true;
 
+    // chessServer only accepts a position for a game it knows about, so the
+    // game has to exist before setstateColor (the same socket keeps the order).
+    socket.startNewGame();
     socket.setGameStateWithColor(
       lessonData.startFen,
       playerColorRef.current,

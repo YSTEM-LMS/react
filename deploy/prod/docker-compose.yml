@@ -51,7 +51,7 @@ services:
       - "8080"
 
   middleware:
-    image: middlewarenode
+    image: middlewarenode:${TAG:-latest}
     container_name: middleware
     environment:
       - NODE_ENV=production
