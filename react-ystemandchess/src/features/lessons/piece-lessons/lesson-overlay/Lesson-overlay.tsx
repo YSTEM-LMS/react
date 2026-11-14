@@ -19,11 +19,11 @@ import { useLessonManager } from './hooks/useLessonManager';
 import { useChessSocket } from './hooks/useChessSocket';
 import { useTimeTracking } from './hooks/useTimeTracking';
 
-import { ReactComponent as RedoIcon } from '../../../../assets/images/icons/icon_redo.svg';
-import { ReactComponent as BackIcon } from '../../../../assets/images/icons/icon_back.svg';
-import { ReactComponent as BackIconInactive } from '../../../../assets/images/icons/icon_back_inactive.svg';
-import { ReactComponent as NextIcon } from '../../../../assets/images/icons/icon_next.svg';
-import { ReactComponent as NextIconInactive } from '../../../../assets/images/icons/icon_next_inactive.svg';
+import RedoIcon from '../../../../assets/images/icons/icon_redo.svg?react';
+import BackIcon from '../../../../assets/images/icons/icon_back.svg?react';
+import BackIconInactive from '../../../../assets/images/icons/icon_back_inactive.svg?react';
+import NextIcon from '../../../../assets/images/icons/icon_next.svg?react';
+import NextIconInactive from '../../../../assets/images/icons/icon_next_inactive.svg?react';
 
 type LessonOverlayProps = {
   propPieceName?: any;

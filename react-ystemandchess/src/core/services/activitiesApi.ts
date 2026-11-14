@@ -1,4 +1,4 @@
-import { environment } from "../../environments/environment";
+import { environment } from "../../environments";
 
 /**
  * Marks a specific activity as completed for the given user via

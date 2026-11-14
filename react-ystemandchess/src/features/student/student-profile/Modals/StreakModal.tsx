@@ -16,12 +16,12 @@
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./StreakModal.scss";
-import { ReactComponent as Polygon } from "../../../../assets/images/StreakProgressAssets/polygon.svg";
-import { ReactComponent as Polygon_2 } from "../../../../assets/images/StreakProgressAssets/polygon_2.svg";
+import Polygon from "../../../../assets/images/StreakProgressAssets/polygon.svg?react";
+import Polygon_2 from "../../../../assets/images/StreakProgressAssets/polygon_2.svg?react";
 import streakClock from "../../../../assets/images/StreakProgressAssets/streak_progress_clock.png";
-import { ReactComponent as Stemette } from "../../../../assets/images/StreakProgressAssets/stemette.svg";
-import { ReactComponent as Stemmy } from "../../../../assets/images/StreakProgressAssets/stemmy.svg";
-import { environment } from "../../../../environments/environment";
+import Stemette from "../../../../assets/images/StreakProgressAssets/stemette.svg?react";
+import Stemmy from "../../../../assets/images/StreakProgressAssets/stemmy.svg?react";
+import { environment } from "../../../../environments";
 
 /**
  * StreakModal component - displays user's streak progress
