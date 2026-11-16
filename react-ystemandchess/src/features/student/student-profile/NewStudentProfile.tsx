@@ -13,6 +13,7 @@ import BadgesModal from "./Modals/BadgesModal";
 import LeaderboardModal from "./Modals/LeaderboardModal";
 import Confetti from "../../../components/animations/Confetti/Confetti";
 import ChatWidget from '../../../components/ChatWidget/ChatWidget';
+import { StatCard } from "../../../components/StatCard";
 import { ReactComponent as StreakIcon } from "../../../assets/images/student/streak_button.svg";
 import { ReactComponent as ActivitiesIcon } from "../../../assets/images/student/activities_button.svg";
 import { ReactComponent as BadgesIcon } from "../../../assets/images/student/badges_button.svg";
@@ -625,23 +626,13 @@ const NewStudentProfile = ({ userPortraitSrc }: any) => {
           
           <div className="text-left">
             <h3 className="text-xl font-bold mb-4 text-dark">Time Spent:</h3>
-            <ul className="list-none p-0 space-y-2">
-              <li className="text-dark font-medium">
-                Website: <strong className="text-primary">{webTime} min</strong>
-              </li>
-              <li className="text-dark font-medium">
-                Playing: <strong className="text-primary">{playTime} min</strong>
-              </li>
-              <li className="text-dark font-medium">
-                Lessons: <strong className="text-primary">{lessonTime} min</strong>
-              </li>
-              <li className="text-dark font-medium">
-                Puzzle: <strong className="text-primary">{puzzleTime} min</strong>
-              </li>
-              <li className="text-dark font-medium">
-                Mentoring: <strong className="text-primary">{mentorTime} min</strong>
-              </li>
-            </ul>
+            <div className="flex flex-col gap-2">
+              <StatCard icon="🌐" value={`${webTime} min`} label="Website" layout="horizontal" />
+              <StatCard icon="♟️" value={`${playTime} min`} label="Playing" layout="horizontal" />
+              <StatCard icon="📚" value={`${lessonTime} min`} label="Lessons" layout="horizontal" />
+              <StatCard icon="🧩" value={`${puzzleTime} min`} label="Puzzle" layout="horizontal" />
+              <StatCard icon="🤝" value={`${mentorTime} min`} label="Mentoring" layout="horizontal" />
+            </div>
           </div>
         </div>
 

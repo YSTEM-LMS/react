@@ -129,9 +129,10 @@ router.post('/:id/accept', requireAuth, async (req, res) => {
 
     const acceptedChallenge = challengeStore.accept(challenge.id);
     if (!acceptedChallenge) {
-        // An overlapping accept may have won the race while PvpGame.create() was awaited.
-        return challengeStore.get(challenge.id)
-            ? res.status(409).json({ error: 'Challenge already accepted' })
+        // Another accept or a decline may have won the race while PvpGame.create() was awaited.
+        const current = challengeStore.get(challenge.id);
+        return current
+            ? res.status(409).json({ error: `Challenge already ${current.status}` })
             : res.status(404).json({ error: 'Challenge not found or expired' });
     }
     return res.status(200).json({
