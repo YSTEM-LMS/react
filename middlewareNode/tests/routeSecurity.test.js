@@ -46,6 +46,11 @@ jest.mock("../src/models/users");
 jest.mock("../src/models/timeTracking");
 jest.mock("../src/models/puzzles");
 jest.mock("../src/models/categorys");
+jest.mock("../src/services/currencyEvents", () => ({
+  emitChatMilestone: jest.fn().mockResolvedValue(undefined),
+  emitLessonCompleted: jest.fn().mockResolvedValue(undefined),
+  emitPuzzleSolved: jest.fn().mockResolvedValue(undefined),
+}));
 
 const express = require("express");
 const request = require("supertest");
@@ -71,6 +76,7 @@ const users = require("../src/models/users");
 const TimeTracking = require("../src/models/timeTracking");
 const puzzles = require("../src/models/puzzles");
 const categorys = require("../src/models/categorys");
+const { emitChatMilestone } = require("../src/services/currencyEvents");
 
 const app = express();
 app.use(express.json());
@@ -271,6 +277,141 @@ describe("Security Audit Regression: Role & Ownership Authorization (403 Forbidd
     const res = await request(app).get("/chat/sessions?userId=student2");
     expect(res.status).toBe(403);
     expect(res.body.error).toMatch(/cannot access another user's sessions/i);
+  });
+
+  test("POST /chat/session/:sessionId/end completes an empty session without a chat milestone", async () => {
+    mockAuthUser = { _id: "u1", username: "student1", role: "student" };
+  
+    const session = {
+      _id: "session-123",
+      userId: "u1",
+      topic: "algebra",
+      status: "active",
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+  
+    ChatSession.findById.mockResolvedValue(session);
+    ChatMessage.find.mockReturnValue({
+      sort: jest.fn().mockResolvedValue([]),
+    });
+  
+    const fetchSpy = jest
+      .spyOn(global, "fetch")
+      .mockRejectedValue(new Error("Test: skip external LLM request"));
+  
+    try {
+      const res = await request(app).post("/chat/session/session-123/end");
+  
+      expect(res.status).toBe(200);
+      expect(session.status).toBe("completed");
+      expect(session.save).toHaveBeenCalledTimes(1);
+  
+      expect(emitChatMilestone).not.toHaveBeenCalled();
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
+  test("POST /chat/session/:sessionId/end emits a chat milestone after sufficient engagement", async () => {
+    mockAuthUser = { _id: "u1", username: "student1", role: "student" };
+  
+    const session = {
+      _id: "session-123",
+      userId: "u1",
+      topic: "algebra",
+      status: "active",
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+  
+    ChatSession.findById.mockResolvedValue(session);
+    ChatMessage.find.mockReturnValue({
+      sort: jest.fn().mockResolvedValue([
+        { role: "user", content: "What is algebra?" },
+        { role: "assistant", content: "Algebra uses symbols." },
+        { role: "user", content: "Can you give me an example?" },
+      ]),
+    });
+  
+    const fetchSpy = jest
+      .spyOn(global, "fetch")
+      .mockRejectedValue(new Error("Test: skip external LLM request"));
+  
+    try {
+      const res = await request(app).post("/chat/session/session-123/end");
+  
+      expect(res.status).toBe(200);
+      expect(session.status).toBe("completed");
+      expect(session.save).toHaveBeenCalledTimes(1);
+  
+      expect(emitChatMilestone).toHaveBeenCalledWith({
+        userId: "u1",
+        sessionId: "session-123",
+        topic: "algebra",
+      });
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
+  test("POST /chat/session/:sessionId/end retries a failed milestone write for a completed session", async () => {
+    mockAuthUser = { _id: "u1", username: "student1", role: "student" };
+
+    const session = {
+      _id: "session-retry-123",
+      userId: "u1",
+      topic: "algebra",
+      status: "active",
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+
+    const messages = [
+      { role: "user", content: "What is algebra?" },
+      { role: "assistant", content: "Algebra uses symbols." },
+      { role: "user", content: "Can you give me an example?" },
+    ];
+
+    ChatSession.findById.mockResolvedValue(session);
+    ChatMessage.find.mockReturnValue({
+      sort: jest.fn().mockResolvedValue(messages),
+    });
+
+    // Simulate a failed first write. The default mock resolves on retry.
+    emitChatMilestone.mockRejectedValueOnce(
+      new Error("Simulated currency event write failure")
+    );
+
+    const fetchSpy = jest
+      .spyOn(global, "fetch")
+      .mockRejectedValue(new Error("Test: skip external LLM request"));
+
+    try {
+      // First attempt completes the session, but the event write fails.
+      const firstRes = await request(app)
+        .post("/chat/session/session-retry-123/end");
+
+      expect(firstRes.status).toBe(500);
+      expect(session.status).toBe("completed");
+      expect(session.save).toHaveBeenCalledTimes(1);
+      expect(emitChatMilestone).toHaveBeenCalledTimes(1);
+
+      // Retry should emit the event without regenerating the summary.
+      const retryRes = await request(app)
+        .post("/chat/session/session-retry-123/end");
+
+      expect(retryRes.status).toBe(200);
+      expect(retryRes.body.session.status).toBe("completed");
+      expect(session.save).toHaveBeenCalledTimes(1);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(emitChatMilestone).toHaveBeenCalledTimes(2);
+
+      expect(emitChatMilestone).toHaveBeenLastCalledWith({
+        userId: "u1",
+        sessionId: "session-retry-123",
+        topic: "algebra",
+      });
+    } finally {
+      fetchSpy.mockRestore();
+    }
   });
 
   test("403 — Student cannot view details/messages of another user's chat session", async () => {
