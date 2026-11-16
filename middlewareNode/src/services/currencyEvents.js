@@ -101,8 +101,25 @@ async function emitPuzzleSolved({ userId, puzzleId, occurredAt }) {
   });
 }
 
+/**
+ * Emits chat.milestone when a coaching session is completed.
+ *
+ * eventId is deterministic per session, so retries cannot emit
+ * a second milestone for the same session.
+ */
+async function emitChatMilestone({ userId, sessionId, topic, occurredAt }) {
+  return emit({
+    eventId: `chat:milestone:${sessionId}`,
+    actionKey: "chat.milestone",
+    userId,
+    metadata: { sessionId: String(sessionId), topic },
+    occurredAt,
+  });
+}
+
 module.exports = {
   emit,
   emitLessonCompleted,
   emitPuzzleSolved,
+  emitChatMilestone,
 };
