@@ -13,6 +13,30 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 
+ENV_FILE="$SCRIPT_DIR/.env"
+
+if [ -f "$ENV_FILE" ]; then
+    set -a
+    . "$ENV_FILE"
+    set +a
+fi
+
+required_vars=(
+  REACT_APP_MIDDLEWARE_URL
+  REACT_APP_STOCKFISH_SERVER_URL
+  REACT_APP_CHESS_SERVER_URL
+  REACT_APP_CHESS_CLIENT_URL
+  REACT_APP_AGORA_APP_ID
+)
+
+for var in "${required_vars[@]}"; do
+    if [ -z "${!var:-}" ]; then
+        echo "ERROR: Missing required production build variable: $var"
+        echo "Provide it via the shell environment or $ENV_FILE"
+        exit 1
+    fi
+done
+
 build_image() {
     service_dir="$1"
     image_name="$2"

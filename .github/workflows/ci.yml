@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MONGOMS_VERSION: 8.2.6
 
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +26,12 @@ jobs:
           cache: 'npm'
 
       # middlewareNode
+      - name: Cache MongoDB binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongodb-${{ env.MONGOMS_VERSION }}
+
       - name: Install dependencies (middlewareNode)
         run: npm ci
         working-directory: ./middlewareNode
@@ -33,7 +41,7 @@ jobs:
         working-directory: ./middlewareNode
 
       - name: Test middlewareNode
-        run: npm test
+        run: npm test -- --testTimeout=30000
         working-directory: ./middlewareNode
 
       # chessServer
@@ -85,3 +93,29 @@ jobs:
       - name: Test react-ystemandchess
         run: npm test
         working-directory: ./react-ystemandchess
+
+  # Builds every image on pull requests so a Dockerfile regression fails before
+  # merge instead of during a deploy. Build-only: nothing is pushed. Shares its
+  # per-service layer cache scopes with deploy.yml.
+  docker-build:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [middlewareNode, chessServer, stockfishServer, chessclient, react-ystemandchess]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.service }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.service }}
+          platforms: linux/amd64
+          push: false
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
