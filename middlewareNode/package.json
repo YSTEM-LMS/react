@@ -37,7 +37,9 @@
   "scripts": {
     "start": "nodemon src/server.js",
     "test": "jest --testPathPatterns=tests/",
-    "seed:dev": "node src/scripts/seedDevAccounts.js"
+    "seed:puzzles": "node src/scripts/seedPuzzles.js",
+    "seed:dev": "node src/scripts/seedDevAccounts.js",
+    "migrate:puzzle-casing": "node src/scripts/migratePuzzleFieldCasing.js"
   },
   "author": "",
   "license": "ISC",

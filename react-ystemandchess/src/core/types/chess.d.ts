@@ -19,6 +19,7 @@ export interface GameConfig {
   mentor: string;
   student: string;
   role: UserRole;
+  credentials?: string;
 }
 
 export interface BoardState {
