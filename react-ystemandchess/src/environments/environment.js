@@ -8,5 +8,5 @@ export const environment = {
     stockfishServerURL: 'http://localhost:8080', // unified naming
     chessServerURL: 'http://localhost:3001',     // chessServer (socket.io game state)
   },
-	productionType: 'development', // development/production
+  productionType: 'development',
 };
