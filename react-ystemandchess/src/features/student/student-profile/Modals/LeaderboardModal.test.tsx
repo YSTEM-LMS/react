@@ -60,9 +60,9 @@ describe("LeaderboardModal", () => {
   it("closes when the overlay is clicked", async () => {
     global.fetch = mockFetch() as any;
     const onClose = jest.fn();
-    const { container } = render(<LeaderboardModal onClose={onClose} />);
+    render(<LeaderboardModal onClose={onClose} />);
 
-    fireEvent.click(container.querySelector(".modal-overlay")!);
+    fireEvent.click(screen.getByTestId("leaderboard-overlay"));
     expect(onClose).toHaveBeenCalled();
   });
 
