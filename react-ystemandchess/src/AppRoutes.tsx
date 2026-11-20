@@ -21,6 +21,7 @@ import PlayComputer from "./features/engine/PlayComputer";
 import SelectGame from "./features/engine/SelectGame";
 import Lessons from "./features/lessons/lessons-main/Lessons";
 import Puzzles from './features/puzzles/Puzzles';
+import PuzzleStreak from "./features/puzzles/PuzzleStreak";
 import LessonSelection from "./features/lessons/lessons-selection/LessonsSelection";
 import LessonOverlay from "./features/lessons/piece-lessons/lesson-overlay/Lesson-overlay";
 import Login from "./features/auth/login/Login";
@@ -84,6 +85,7 @@ const AppRoutes = () => {
       <Route path="/play" element={<PlayComputer />} />
       <Route path="/select-game" element={<SelectGame />} />
       <Route path="/puzzles" element={<Puzzles />} />
+      <Route path="/puzzle-streak" element={<PuzzleStreak />} />
       <Route path="/lessons-selection" element={<LessonSelection />} />
       <Route path="/lessons" element={<LessonOverlay />} />
       <Route path="/learnings" element={<Lessons />} />
