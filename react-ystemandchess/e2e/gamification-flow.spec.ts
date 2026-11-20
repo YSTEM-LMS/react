@@ -68,7 +68,7 @@ test('step 3-4 — badge check-and-award makes an earned achievement visible in 
   await page.goto('/student-profile');
   await page.getByRole('button', { name: 'Badges' }).click();
 
-  const badgesModal = page.locator('.modal-overlay, [class*="modal"]').filter({ hasText: 'Badges' });
+  const badgesModal = page.getByTestId('badges-modal').filter({ hasText: 'Badges' });
   await expect(badgesModal.first()).toBeVisible();
   await expect(page.getByText('On a Roll')).toBeVisible(); // streak_5 badge name, still locked
   await expect(page.getByText('Locked').first()).toBeVisible();
@@ -78,7 +78,7 @@ test('step 5 — leaderboard reflects the seeded student with a nonzero score', 
   await page.goto('/student-profile');
   await page.getByRole('button', { name: 'Leaderboard' }).click();
 
-  const leaderboardModal = page.locator('.modal-overlay, [class*="modal"]').filter({ hasText: 'Leaderboard' });
+  const leaderboardModal = page.getByTestId('leaderboard-modal').filter({ hasText: 'Leaderboard' });
   await expect(leaderboardModal.first()).toBeVisible();
 
   // Search for the seeded student by username (LeaderboardModal.tsx's

@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import "./LeaderboardModal.scss";
 import { ReactComponent as LeaderboardIcon } from "../../../../assets/images/student/leaderboard_sidebar_icon.svg";
 import { environment } from "../../../../environments";
-
-import rank1Img from "../../../../assets/images/student/Leaderboard_rank_1.svg";
-import rank2Img from "../../../../assets/images/student/Leaderboard_rank_2.svg";
-import rank3Img from "../../../../assets/images/student/Leaderboard_rank_3.svg";
-
-import avatar1 from "../../../../assets/images/student/Leaderboard_User_avatar_1.png";
-import avatar2 from "../../../../assets/images/student/Leaderboard_User_avatar_2.png";
-import avatar3 from "../../../../assets/images/student/Leaderboard_User_avatar_3.png";
-import avatarAll from "../../../../assets/images/student/Leaderboard_User_avatar_all.png";
+import { FilterChip } from "../../../../components/FilterChip";
+import { LeaderboardRow } from "../../../../components/LeaderboardRow";
+import { SortHeader } from "../../../../components/SortHeader";
 
 type Props = { onClose: () => void };
 
@@ -47,6 +40,61 @@ type Row = {
 };
 
 const EMPTY_CHESS_RECORD: ChessRecord = { wins: 0, draws: 0, losses: 0, gamesPlayed: 0 };
+
+// Filter lists this long or shorter show as chips; longer ones stay a dropdown.
+const MAX_CHIPS = 8;
+
+// The logged-in student's username, read from the login token without a
+// network call (the same way Puzzles.tsx does), so their row can be
+// highlighted. Empty when the token can't be read.
+function usernameFromToken(token?: string): string {
+  try {
+    return JSON.parse(atob(token.split(".")[1]))?.username ?? "";
+  } catch {
+    return "";
+  }
+}
+
+type FilterProps = {
+  name: string;
+  allLabel: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+};
+
+// One filter (country, state or school): chips for a short list, a dropdown
+// for a long one. Clicking the chip that's on goes back to "All".
+function Filter({ name, allLabel, options, value, onChange }: FilterProps) {
+  if (options.length > MAX_CHIPS) {
+    return (
+      <select
+        aria-label={name}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="min-w-40 max-w-full rounded-lg border border-borderLight bg-light p-2.5 text-base text-dark"
+      >
+        <option>{allLabel}</option>
+        {options.map((option, idx) => (
+          <option key={idx} value={option}>{option}</option>
+        ))}
+      </select>
+    );
+  }
+
+  return (
+    <div role="group" aria-label={name} className="flex max-w-full flex-wrap items-center justify-center gap-2">
+      {[allLabel, ...options].map((option, idx) => (
+        <FilterChip
+          key={idx}
+          label={option}
+          active={value === option}
+          onToggle={() => onChange(value === option ? allLabel : option)}
+        />
+      ))}
+    </div>
+  );
+}
 
 const LeaderboardModal: React.FC<Props> = ({ onClose }) => {
   const navigate = useNavigate();
@@ -175,165 +223,126 @@ const LeaderboardModal: React.FC<Props> = ({ onClose }) => {
     }
   };
 
-  const badgeForRank = (rank: number, sortByCol: string) => {
-    // Only show medals if we are actively sorting by highest score
-    if (sortByCol !== "score" || sortDir !== "desc") return null;
-    if (rank === 1) return rank1Img;
-    if (rank === 2) return rank2Img;
-    if (rank === 3) return rank3Img;
-    return null;
+  // The arrow a column shows: only the column we're sorting by has one.
+  const directionFor = (column: string) => {
+    if (sortBy !== column) return "none" as const;
+    return sortDir === "asc" ? ("asc" as const) : ("desc" as const);
   };
 
-  const getAvatar = (rank: number, avatarUrl: string | null) => {
-    if (avatarUrl) return avatarUrl; 
-    if (rank === 1) return avatar1;
-    if (rank === 2) return avatar2;
-    if (rank === 3) return avatar3;
-    return avatarAll;
-  };
+  // Only show medals when sorting by highest score: rank is the row's place
+  // in the current sort.
+  const showMedals = sortBy === "score" && sortDir === "desc";
+  const me = usernameFromToken(cookies.login);
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose} aria-label="Close modal">
+    <div
+      data-testid="leaderboard-overlay"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-dark/25 py-20"
+      onClick={handleOverlayClick}
+    >
+      <div
+        data-testid="leaderboard-modal"
+        className="relative max-h-full w-11/12 max-w-4xl animate-modal-in overflow-y-auto overflow-x-hidden rounded-2xl bg-soft bg-none px-2 pb-3 pt-5 shadow-2xl sm:px-4 sm:pt-6"
+      >
+        <button
+          className="absolute right-2 top-2 z-10 inline-flex h-10 w-10 items-center justify-center text-3xl font-extrabold leading-none text-red hover:opacity-75"
+          onClick={onClose}
+          aria-label="Close modal"
+        >
           &times;
         </button>
 
-        <header className="lb-header">
-          <div className="lb-heading">
-            <button className="lb-backpill" type="button" onClick={handleGoToBackpack}>Go To<br />Backpack</button>
-            <h2 className="lb-title">Leaderboard</h2>
+        <header className="relative mx-3.5 mb-3 h-14 pr-14 sm:mx-12 sm:h-16 sm:pr-16">
+          <div className="flex h-full">
+            <button
+              className="flex w-16 shrink-0 items-center justify-center rounded-l-lg bg-accent text-xs font-bold leading-tight text-dark sm:w-20 sm:text-sm"
+              type="button"
+              onClick={handleGoToBackpack}
+            >
+              Go To<br />Backpack
+            </button>
+            <h2 className="flex flex-1 items-center justify-center rounded-r-lg bg-primary px-4 text-xl font-extrabold text-dark sm:text-2xl">
+              Leaderboard
+            </h2>
           </div>
-          <LeaderboardIcon className="lb-crown-img" aria-hidden />
+          <LeaderboardIcon className="absolute right-3 top-1/2 w-8 -translate-y-1/2 sm:w-9" aria-hidden />
         </header>
 
         {/* Dynamic Filters & Search */}
-        <div className="lb-filters" style={{ display: 'flex', gap: '15px', padding: '10px 0', width: '100%' }}>
-          <input 
-            type="text" 
-            placeholder="Search by name..." 
+        <div className="mb-3 mt-2 flex w-full flex-col gap-3 py-2.5 sm:px-5">
+          <input
+            type="text"
+            placeholder="Search by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '16px' }}
+            className="w-full rounded-lg border border-borderLight bg-light p-2.5 text-base text-dark"
           />
-          <select
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '16px', minWidth: '160px' }}
-          >
-            <option>All Countries</option>
-            {countriesList.map((c, idx) => (
-              <option key={idx} value={c}>{c}</option>
-            ))}
-          </select>
-          <select
-            value={state}
-            onChange={(e) => setState(e.target.value)}
-            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '16px', minWidth: '160px' }}
-          >
-            <option>All States</option>
-            {statesList.map((s, idx) => (
-              <option key={idx} value={s}>{s}</option>
-            ))}
-          </select>
-          <select
-            value={school}
-            onChange={(e) => setSchool(e.target.value)}
-            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '16px', minWidth: '250px' }}
-          >
-            <option>All Schools</option>
-            {schoolsList.map((s, idx) => (
-              <option key={idx} value={s}>{s}</option>
-            ))}
-          </select>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            <Filter name="Country" allLabel="All Countries" options={countriesList} value={country} onChange={setCountry} />
+            <Filter name="State" allLabel="All States" options={statesList} value={state} onChange={setState} />
+            <Filter name="School" allLabel="All Schools" options={schoolsList} value={school} onChange={setSchool} />
+          </div>
         </div>
 
         {/* TABLE */}
-        <div className="lb-table-wrap">
-          <table className="lb-table">
-            <colgroup>
-              <col className="col-rank" />
-              <col className="col-name" />
-              <col className="col-school" />
-              <col className="col-chess" />
-              <col className="col-score" />
-            </colgroup>
-
+        <div className="rounded-3xl bg-secondary p-1.5 pb-5 shadow-inner sm:mx-5 sm:p-3 sm:pb-7">
+          <table className="w-full table-fixed border-separate border-spacing-0 text-dark">
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>
-                  <button className="lb-sort-btn" type="button" onClick={() => handleSort("name")}>
-                    <span>Name</span>
-                    {sortBy === "name" && (
-                      <span style={{ fontSize: '12px', marginLeft: '5px' }}>{sortDir === "asc" ? "▲" : "▼"}</span>
-                    )}
-                  </button>
+                <th scope="col" className="w-10 rounded-l-3xl bg-accent px-1.5 py-2.5 text-sm sm:px-2.5 sm:py-3 sm:text-base text-center font-extrabold sm:w-16">
+                  Rank
                 </th>
-                <th>School</th>
-                <th>
-                  {/* Separate from Score on purpose — competitive results are a
-                      different signal from engagement, so they rank separately. */}
-                  <button className="lb-sort-btn" type="button" onClick={() => handleSort("chess")}>
-                    <span>Chess</span>
-                    {sortBy === "chess" && (
-                      <span style={{ fontSize: '12px', marginLeft: '5px' }}>{sortDir === "desc" ? "▼" : "▲"}</span>
-                    )}
-                  </button>
+                <SortHeader
+                  label="Name"
+                  direction={directionFor("name")}
+                  onSort={() => handleSort("name")}
+                  className="bg-accent px-1.5 py-2.5 text-sm sm:px-2.5 sm:py-3 sm:text-base"
+                />
+                <th scope="col" className="hidden bg-accent px-1.5 py-2.5 text-sm sm:px-2.5 sm:py-3 sm:text-base text-left font-extrabold sm:table-cell">
+                  School
                 </th>
-                <th>
-                  <button className="lb-sort-btn" type="button" onClick={() => handleSort("score")}>
-                    <span>Score</span>
-                    {sortBy === "score" && (
-                      <span style={{ fontSize: '12px', marginLeft: '5px' }}>{sortDir === "desc" ? "▼" : "▲"}</span>
-                    )}
-                  </button>
-                </th>
+                {/* Separate from Score on purpose — competitive results are a
+                    different signal from engagement, so they rank separately. */}
+                <SortHeader
+                  label="Chess"
+                  direction={directionFor("chess")}
+                  onSort={() => handleSort("chess")}
+                  className="w-14 bg-accent px-1.5 py-2.5 text-sm sm:px-2.5 sm:py-3 sm:text-base text-center sm:w-24"
+                />
+                <SortHeader
+                  label="Score"
+                  direction={directionFor("score")}
+                  onSort={() => handleSort("score")}
+                  className="w-16 rounded-r-3xl bg-accent px-1.5 py-2.5 text-sm sm:px-2.5 sm:py-3 sm:text-base text-center sm:w-24"
+                />
               </tr>
             </thead>
 
-            <tbody>
-              {rows.map((r) => {
-                const badge = badgeForRank(r.rank, sortBy);
-                const avatar = getAvatar(r.rank, r.avatar_url);
-
-                return (
-                  <tr key={r.id} data-rank={r.rank}>
-                    <td className="lb-rank">
-                      {badge ? <span className="lb-rank-img" style={{ backgroundImage: `url(${badge})` }} /> : r.rank}
-                    </td>
-                    <td className="lb-user">
-                      <img src={avatar} alt="avatar" className="lb-avatar-img" />
-                      <span className="lb-name">{r.name}</span>
-                    </td>
-                    <td className="lb-school">{r.school}</td>
-                    <td className="lb-chess">
-                      {r.chessRecord.gamesPlayed === 0 ? (
-                        <span className="lb-chess-empty" title="No student-vs-student games yet">—</span>
-                      ) : (
-                        <>
-                          <span className="lb-chess-score">{r.chessScore}</span>
-                          <span
-                            className="lb-chess-record"
-                            title={`${r.chessRecord.wins} wins, ${r.chessRecord.draws} draws, ${r.chessRecord.losses} losses`}
-                          >
-                            {r.chessRecord.wins}–{r.chessRecord.draws}–{r.chessRecord.losses}
-                          </span>
-                        </>
-                      )}
-                    </td>
-                    <td className="lb-score">{r.score}</td>
-                  </tr>
-                );
-              })}
+            {/* Light under the rows, so the highlighted row reads as pale yellow. */}
+            <tbody className="bg-light">
+              {rows.map((r) => (
+                <LeaderboardRow
+                  key={r.id}
+                  rank={r.rank}
+                  name={r.name}
+                  school={r.school}
+                  avatarSrc={r.avatar_url}
+                  chessScore={r.chessScore}
+                  chessRecord={r.chessRecord}
+                  score={r.score}
+                  variant={me && r.name === me ? "self" : "default"}
+                  medal={showMedals}
+                />
+              ))}
             </tbody>
           </table>
         </div>
 
         {/* LOAD MORE */}
-        <div className="lb-loadmore">
+        <div className="relative mb-4 mt-7 flex w-full items-center justify-center">
+          <span aria-hidden="true" className="absolute left-1/2 top-1/2 h-0.5 w-4/5 -translate-x-1/2 -translate-y-1/2 bg-accent" />
           <button
-            className="lb-load-btn"
+            className="relative rounded-full bg-accent px-16 py-2.5 text-base font-bold text-dark transition hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:shadow-inner disabled:cursor-default disabled:hover:translate-y-0 disabled:hover:shadow-none sm:px-24"
             type="button"
             onClick={() => fetchLeaderboard(false)}
             disabled={!hasMore || isLoading}

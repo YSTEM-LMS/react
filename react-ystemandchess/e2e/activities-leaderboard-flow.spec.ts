@@ -10,7 +10,7 @@
  * gamification-flow.spec.ts header comment for the same setup.
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import {
   signupTestStudent,
   loginAndGetToken,
@@ -53,6 +53,18 @@ test.beforeAll(async () => {
   await updateProfile(peerBToken, { country: 'Canada', state: 'ON', school: `E2E School C ${RUN_ID}` });
 });
 
+// Each leaderboard filter is a row of chips, or a dropdown once it has more
+// than 8 options (LeaderboardModal.tsx), so pick the option either way.
+async function chooseFilter(page: Page, name: 'Country' | 'State' | 'School', option: string) {
+  const dropdown = page.getByRole('combobox', { name });
+  if (await dropdown.count()) {
+    await dropdown.selectOption({ label: option });
+  } else {
+    const chip = page.getByRole('group', { name }).getByRole('button', { name: option, exact: true });
+    if ((await chip.getAttribute('aria-pressed')) !== 'true') await chip.click();
+  }
+}
+
 test.beforeEach(async ({ context }) => {
   await context.addCookies([
     { name: 'login', value: selfToken, url: process.env.FRONTEND_URL || 'http://localhost:3000' },
@@ -86,7 +98,7 @@ test('item 2 — leaderboard shows real backend data, not dummy rows, with corre
   await page.goto('/student-profile');
   await page.getByRole('button', { name: 'Leaderboard' }).click();
 
-  const leaderboardModal = page.locator('.modal-content').filter({ hasText: 'Leaderboard' });
+  const leaderboardModal = page.getByTestId('leaderboard-modal').filter({ hasText: 'Leaderboard' });
   await expect(leaderboardModal.first()).toBeVisible();
 
   // The dummy data the modal used to ship with was fixed rows (princel04,
@@ -111,22 +123,19 @@ test('item 3 — Country, State, and School filters each narrow results via the 
 
   // School filter — narrows to exactly the one student in that school.
   // No fixed sleep for the debounce — toBeVisible/toHaveCount auto-retry.
-  const schoolSelect = page.locator('select').nth(2); // Country, State, School order
-  await schoolSelect.selectOption({ label: `E2E School A ${RUN_ID}` });
+  await chooseFilter(page, 'School', `E2E School A ${RUN_ID}`);
   await expect(table.getByText(SELF.username)).toBeVisible();
   await expect(table.getByText(PEER_A.username)).toHaveCount(0);
-  await schoolSelect.selectOption({ label: 'All Schools' });
+  await chooseFilter(page, 'School', 'All Schools');
 
   // Country filter — Canada should isolate PEER_B only.
-  const countrySelect = page.locator('select').nth(0);
-  await countrySelect.selectOption({ label: 'Canada' });
+  await chooseFilter(page, 'Country', 'Canada');
   await expect(table.getByText(PEER_B.username)).toBeVisible();
   await expect(table.getByText(SELF.username)).toHaveCount(0);
-  await countrySelect.selectOption({ label: 'All Countries' });
+  await chooseFilter(page, 'Country', 'All Countries');
 
   // State filter — GA should isolate PEER_A only.
-  const stateSelect = page.locator('select').nth(1);
-  await stateSelect.selectOption({ label: 'GA' });
+  await chooseFilter(page, 'State', 'GA');
   await expect(table.getByText(PEER_A.username)).toBeVisible();
   await expect(table.getByText(SELF.username)).toHaveCount(0);
 });
@@ -140,8 +149,8 @@ test('item 3 — Load More triggers real backend pagination, not client-side dum
 
   // The button's accessible name is dynamic — "Load More" when there's a
   // next page, "No more data" once exhausted (LeaderboardModal.tsx) — so
-  // match on the stable class instead of text that may not exist yet.
-  const loadMoreButton = page.locator('button.lb-load-btn');
+  // match any of its labels instead of one that may not exist yet.
+  const loadMoreButton = page.getByRole('button', { name: /^(load more|no more data|loading\.\.\.)$/i });
   await expect(loadMoreButton).toBeVisible();
 
   // Only meaningfully testable when there are more results than one page —
@@ -171,7 +180,8 @@ test('item 4 — uploading a real avatar replaces the rank-based placeholder in 
   await searchBox.fill(SELF.username);
 
   const row = page.getByRole('table').locator('tr', { has: page.getByText(SELF.username) });
-  const avatarImg = row.locator('img.lb-avatar-img');
+  // The avatar is the row's only image (rows without a photo show initials).
+  const avatarImg = row.locator('img');
   await expect(avatarImg).toBeVisible();
   const src = await avatarImg.getAttribute('src');
   // A real uploaded avatar resolves to a presigned S3 URL, not one of the

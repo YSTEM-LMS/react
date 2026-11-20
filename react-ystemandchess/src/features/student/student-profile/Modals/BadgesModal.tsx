@@ -64,9 +64,21 @@ const BadgesModal = ({ onClose, username }: { onClose: () => void; username: str
   console.log(" badgeList:", badgeList);
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose} aria-label="Close modal">
+    // Same shell as LeaderboardModal: this popup used to get its look from
+    // LeaderboardModal.scss (deleted in #317), so it keeps that look with tokens.
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-dark/25 py-20"
+      onClick={handleOverlayClick}
+    >
+      <div
+        data-testid="badges-modal"
+        className="relative max-h-full w-11/12 max-w-4xl animate-modal-in overflow-y-auto overflow-x-hidden rounded-2xl bg-soft bg-none px-3 pb-3 pt-5 shadow-2xl sm:px-4 sm:pt-6"
+      >
+        <button
+          className="absolute right-2 top-2 z-10 inline-flex h-10 w-10 items-center justify-center text-3xl font-extrabold leading-none text-red hover:opacity-75"
+          onClick={onClose}
+          aria-label="Close modal"
+        >
           &times;
         </button>
         <h2>Badges</h2>
