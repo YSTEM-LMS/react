@@ -171,6 +171,8 @@ function toPublic(game) {
     })),
     createdAt: game.createdAt,
     updatedAt: game.updatedAt,
+    // sent back with the next PATCH so the server can spot a stale save
+    version: game.__v ?? 0,
   };
 }
 

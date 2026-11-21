@@ -11,7 +11,7 @@ import { SavedGame } from '../../core/types/savedGame';
 import ChessBoard, { ChessBoardRef } from '../../components/ChessBoard/ChessBoard';
 import { environment } from "../../environments";
 import { cn } from '../../core/utils/cn';
-import { createSavedGame, getSavedGame, updateSavedGame } from '../../core/services/savedGamesApi';
+import { createSavedGame, deleteSavedGame, getSavedGame, updateSavedGame } from '../../core/services/savedGamesApi';
 import StockfishTutor from './StockfishTutor';
 
 // chess.js exposes a named export `Chess`; normalize to a local constructor variable.
@@ -133,6 +133,11 @@ const PlayComputer: React.FC = () => {
   const token: string | undefined = cookies.login || undefined;
   const tokenRef = useRef<string | undefined>(token);
   const savedUuidRef = useRef<string | null>(null);
+  // The version the server last gave us for that game, sent back with each save.
+  const savedVersionRef = useRef<{ uuid: string; version: number } | null>(null);
+  // Bumped whenever the player leaves a game, so a slow "create game" reply for
+  // the old game can tell it's out of date.
+  const saveGenRef = useRef(0);
   const startFenRef = useRef<string>(START_FEN);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Saves run one at a time, in order, so an older save can't land last.
@@ -157,13 +162,20 @@ const PlayComputer: React.FC = () => {
     const changes = { pgn: gameRef.current.pgn(), ...extra };
     setSaveState('saving');
     saveChainRef.current = saveChainRef.current.then(async () => {
+      // read the version here, after the save before this one has finished
+      const known = savedVersionRef.current;
+      const version = known && known.uuid === uuid ? known.version : undefined;
       try {
-        await updateSavedGame(tok, uuid, changes);
+        const saved = await updateSavedGame(tok, uuid, { ...changes, version });
+        savedVersionRef.current = { uuid, version: saved.version };
         setSaveState('saved');
         setSaveError('');
       } catch (err: any) {
         setSaveState('error');
         setSaveError(err?.message || 'Save failed');
+        // 409: another tab saved this game first. Stop saving here so we don't
+        // overwrite its moves; reloading the game picks up the newer version.
+        if (err?.status === 409 && savedUuidRef.current === uuid) savedUuidRef.current = null;
       }
     });
     return saveChainRef.current;
@@ -187,6 +199,7 @@ const PlayComputer: React.FC = () => {
   // game starts a new record.
   const detachSavedGame = useCallback(() => {
     if (saveTimerRef.current) flushSave();
+    saveGenRef.current += 1;
     savedUuidRef.current = null;
     startFenRef.current = START_FEN;
     setSaveState('off');
@@ -197,19 +210,29 @@ const PlayComputer: React.FC = () => {
   const startSavingNewGame = useCallback(() => {
     const tok = tokenRef.current;
     if (!tok) return;
+    const gen = ++saveGenRef.current;
     setSaveState('saving');
     createSavedGame(tok, {
       playerColor: playerColorRef.current,
       computerLevel: difficultyRef.current,
     })
       .then((game) => {
+        // The player left this game (or started another) before the reply came
+        // back. Don't attach it to whatever is on the board now, and delete the
+        // empty record so it doesn't use up one of their save slots.
+        if (gen !== saveGenRef.current) {
+          deleteSavedGame(tok, game.uuid).catch(() => {});
+          return;
+        }
         savedUuidRef.current = game.uuid;
+        savedVersionRef.current = { uuid: game.uuid, version: game.version };
         setSaveState('saved');
         setSaveError('');
         // Save any moves made while the game was being created.
         if (gameRef.current.history().length > 0) scheduleSave();
       })
       .catch((err: any) => {
+        if (gen !== saveGenRef.current) return;
         setSaveState('error');
         setSaveError(err?.message || 'Could not start saving this game');
       });
@@ -350,7 +373,9 @@ const PlayComputer: React.FC = () => {
 
     gameRef.current = restored;
     startFenRef.current = game.startFen;
+    saveGenRef.current += 1;
     savedUuidRef.current = game.uuid;
+    savedVersionRef.current = { uuid: game.uuid, version: game.version };
     playerColorRef.current = game.playerColor;
     setPlayerColor(game.playerColor);
     if (game.computerLevel !== null) {

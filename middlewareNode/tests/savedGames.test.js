@@ -397,6 +397,72 @@ describe("PATCH /savedGames/:uuid — moves", () => {
   });
 });
 
+describe("PATCH /savedGames/:uuid — two tabs", () => {
+  test("each save returns a new version", async () => {
+    const token = await makeUser("alice");
+    const { uuid, version } = (await createGame(token)).body.game;
+    const res = await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn: "1. e4", version });
+    expect(res.status).toBe(200);
+    expect(res.body.game.version).toBeGreaterThan(version);
+  });
+
+  test("a save from an old version is rejected and the newer moves stay", async () => {
+    const token = await makeUser("alice");
+    const { uuid, version } = (await createGame(token)).body.game;
+    // tab A saves two moves
+    const a = await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn: "1. e4 e5", version });
+    expect(a.status).toBe(200);
+    // tab B still has the first version and tries to save a different game
+    const b = await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn: "1. d4", version });
+    expect(b.status).toBe(409);
+    expect(b.body.error).toMatch(/another tab/);
+
+    const saved = await request(app).get(`/savedGames/${uuid}`).set(auth(token));
+    expect(saved.body.game.pgn).toMatch(/1\. e4 e5/);
+  });
+
+  test("an undo or reset from an old version can't wipe newer moves", async () => {
+    const token = await makeUser("alice");
+    const { uuid, version } = (await createGame(token)).body.game;
+    const a = await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn: "1. e4 e5 2. Nf3", version });
+    const b = await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn: "", version });
+    expect(a.status).toBe(200);
+    expect(b.status).toBe(409);
+    const saved = await request(app).get(`/savedGames/${uuid}`).set(auth(token));
+    expect(saved.body.game.plyCount).toBe(3);
+  });
+
+  test("two saves sent at the same time: one lands, the other gets 409", async () => {
+    const token = await makeUser("alice");
+    const { uuid, version } = (await createGame(token)).body.game;
+    const results = await Promise.all(
+      ["1. e4", "1. d4", "1. c4", "1. Nf3"].map((pgn) =>
+        request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn, version })
+      )
+    );
+    const ok = results.filter((r) => r.status === 200);
+    expect(ok).toHaveLength(1);
+    expect(results.filter((r) => r.status === 409)).toHaveLength(3);
+    const saved = await request(app).get(`/savedGames/${uuid}`).set(auth(token));
+    expect(saved.body.game.pgn).toBe(ok[0].body.game.pgn);
+  });
+
+  test("version must be a whole number", async () => {
+    const token = await makeUser("alice");
+    const { uuid } = (await createGame(token)).body.game;
+    const res = await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ pgn: "1. e4", version: "1" });
+    expect(res.status).toBe(400);
+  });
+
+  test("a rename without a version still works", async () => {
+    const token = await makeUser("alice");
+    const { uuid } = (await createGame(token)).body.game;
+    const res = await request(app).patch(`/savedGames/${uuid}`).set(auth(token)).send({ gameName: "Sunday game" });
+    expect(res.status).toBe(200);
+    expect(res.body.game.gameName).toBe("Sunday game");
+  });
+});
+
 describe("results are decided by the server", () => {
   test.each([
     ["white", "lost"],

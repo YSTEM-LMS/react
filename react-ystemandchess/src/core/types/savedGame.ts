@@ -40,6 +40,8 @@ export type SavedGameSummary = {
   endReason: SavedGameEndReason | null;
   createdAt: string;
   updatedAt: string;
+  /** Goes up on every save. Sent back with the next update so the server can reject a stale one. */
+  version: number;
 };
 
 export type SavedGame = SavedGameSummary & {

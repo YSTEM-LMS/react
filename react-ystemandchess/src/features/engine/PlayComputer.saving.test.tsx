@@ -10,7 +10,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import * as ReactRouter from 'react-router';
 import PlayComputer, { SAVE_DEBOUNCE_MS } from './PlayComputer';
-import { createSavedGame, getSavedGame, updateSavedGame } from '../../core/services/savedGamesApi';
+import { createSavedGame, deleteSavedGame, getSavedGame, updateSavedGame } from '../../core/services/savedGamesApi';
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -68,6 +68,7 @@ const savedGame = (overrides = {}) => ({
   notes: [],
   createdAt: '2026-10-01T00:00:00.000Z',
   updatedAt: '2026-10-01T00:00:00.000Z',
+  version: 3,
   ...overrides,
 });
 
@@ -166,6 +167,66 @@ describe('PlayComputer saving', () => {
       () => expect(screen.getByTestId('save-status')).toHaveTextContent('Not saved: This game is finished.'),
       { timeout: SAVE_DEBOUNCE_MS + 1500 }
     );
+  });
+
+  test('each save sends back the version the server last gave', async () => {
+    renderPage();
+    await startGame();
+    await waitFor(() => expect(createSavedGame).toHaveBeenCalled());
+    await act(async () => {});
+
+    fireEvent.click(screen.getByTestId('move-e2e4'));
+    await waitFor(() => expect(updateSavedGame).toHaveBeenCalledTimes(1), {
+      timeout: SAVE_DEBOUNCE_MS + 1500,
+    });
+    expect((updateSavedGame as jest.Mock).mock.calls[0][2].version).toBe(3);
+  });
+
+  test('a save rejected because another tab saved first stops saving here', async () => {
+    const stale = Object.assign(new Error('This game was changed somewhere else, like another tab. Reload it to keep playing.'), { status: 409 });
+    (updateSavedGame as jest.Mock).mockRejectedValue(stale);
+    renderPage();
+    await startGame();
+    await waitFor(() => expect(createSavedGame).toHaveBeenCalled());
+    await act(async () => {});
+
+    fireEvent.click(screen.getByTestId('move-e2e4'));
+    await waitFor(
+      () => expect(screen.getByTestId('save-status')).toHaveTextContent('another tab'),
+      { timeout: SAVE_DEBOUNCE_MS + 1500 }
+    );
+
+    // the computer's reply would normally be saved; it isn't, so the other tab's moves stay
+    fire('evaluation-complete', { mode: 'move', move: 'e7e5' });
+    await act(async () => { await new Promise((r) => setTimeout(r, SAVE_DEBOUNCE_MS + 300)); });
+    expect(updateSavedGame).toHaveBeenCalledTimes(1);
+  });
+
+  test("a slow create reply for a game the player already left isn't used, and is deleted", async () => {
+    let finishFirst: (g: any) => void = () => {};
+    (createSavedGame as jest.Mock)
+      .mockReturnValueOnce(new Promise((resolve) => { finishFirst = resolve; }))
+      .mockResolvedValueOnce(savedGame({ uuid: 'game-2' }));
+    (deleteSavedGame as jest.Mock).mockResolvedValue(undefined);
+
+    renderPage();
+    await startGame();
+    // leave before the first game's record comes back, then start another
+    fireEvent.click(screen.getByText('New Game'));
+    fireEvent.click(screen.getByText('Start Game'));
+    fire('session-started', { success: true });
+    await waitFor(() => expect(createSavedGame).toHaveBeenCalledTimes(2));
+    await act(async () => {});
+
+    // the first reply arrives last
+    await act(async () => { finishFirst(savedGame({ uuid: 'game-1' })); });
+    expect(deleteSavedGame).toHaveBeenCalledWith('tok', 'game-1');
+
+    fireEvent.click(screen.getByTestId('move-e2e4'));
+    await waitFor(() => expect(updateSavedGame).toHaveBeenCalledTimes(1), {
+      timeout: SAVE_DEBOUNCE_MS + 1500,
+    });
+    expect((updateSavedGame as jest.Mock).mock.calls[0][1]).toBe('game-2');
   });
 
   test('a guest plays without saving', async () => {

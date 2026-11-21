@@ -75,7 +75,7 @@ export async function createSavedGame(
 export async function updateSavedGame(
   token: string,
   uuid: string,
-  changes: { pgn?: string; gameName?: string; resign?: true }
+  changes: { pgn?: string; gameName?: string; resign?: true; version?: number }
 ): Promise<SavedGame> {
   const { game } = await call<{ game: SavedGame }>(`/${encodeURIComponent(uuid)}`, token, {
     method: "PATCH",

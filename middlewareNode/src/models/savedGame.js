@@ -84,7 +84,9 @@ const SavedGameSchema = new mongoose.Schema(
     // still be readable and playable until then.
     slot: { type: Number, min: 0 },
   },
-  { timestamps: true }
+  // optimisticConcurrency: save() fails if the game changed since it was
+  // loaded, so two tabs can't silently overwrite each other's moves.
+  { timestamps: true, optimisticConcurrency: true }
 );
 
 // A student's games, newest first: the only list query Phase A makes.

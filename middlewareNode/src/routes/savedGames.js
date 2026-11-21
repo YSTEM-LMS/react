@@ -15,6 +15,7 @@
  */
 
 const express = require("express");
+const mongoose = require("mongoose");
 const SavedGame = require("../models/savedGame");
 const {
   LIMITS,
@@ -44,6 +45,8 @@ function validateGameName(name, fallback) {
   }
   return name.trim();
 }
+
+const STALE_SAVE = "This game was changed somewhere else, like another tab. Reload it to keep playing.";
 
 function sendError(res, err, context) {
   if (err instanceof SavedGameError) {
@@ -214,12 +217,20 @@ router.patch("/:uuid", async (req, res) => {
     const game = await findOwned(req);
     if (!game) return res.status(404).json(NOT_FOUND);
 
-    const { pgn, gameName, resign } = req.body || {};
+    const { pgn, gameName, resign, version } = req.body || {};
     if (pgn === undefined && gameName === undefined && resign === undefined) {
       throw new SavedGameError(400, "Nothing to update. Send pgn, gameName or resign.");
     }
     if (resign !== undefined && resign !== true) {
       throw new SavedGameError(400, "resign can only be true");
+    }
+    // The client sends the version it last saw. If the game moved on since
+    // (another tab saved first), reject instead of replacing newer moves.
+    if (version !== undefined) {
+      if (!Number.isInteger(version) || version < 0) {
+        throw new SavedGameError(400, "version must be a whole number");
+      }
+      if (version !== (game.__v ?? 0)) throw new SavedGameError(409, STALE_SAVE);
     }
 
     const finished = game.status !== "ongoing";
@@ -246,7 +257,13 @@ router.patch("/:uuid", async (req, res) => {
       game.endReason = "resign";
     }
 
-    await game.save();
+    try {
+      await game.save();
+    } catch (err) {
+      // another request saved between our load and this save
+      if (err instanceof mongoose.Error.VersionError) throw new SavedGameError(409, STALE_SAVE);
+      throw err;
+    }
     res.json({ game: toPublic(game) });
   } catch (err) {
     sendError(res, err, "update");
