@@ -361,10 +361,13 @@ router.get("/mentorless", passport.authenticate("jwt", { session: false }), asyn
   }
 });
 
-// @route PUT /user/updateMentorship/:mentorship
-// @desc if user is student, update its mentor username to the mentorship= query
-// @desc if user is mentor, update its student username to the mentorship= query
-// @access  Public with jwt Authentication
+// @route PUT /user/updateMentorship?mentorship=<studentUsername>
+// @desc A mentor claims a student: sets the link on both accounts.
+// @desc Only mentors may call this, and only for a student who has no mentor
+// @desc (or already has this mentor). Live sessions pair on this link, so it
+// @desc must not let anyone attach themselves to an arbitrary student.
+// @desc Switching students releases the mentor's previous student.
+// @access  Private with jwt Authentication, mentors only
 router.put(
   "/updateMentorship",
   async (req, res, next) => {
@@ -381,38 +384,64 @@ router.put(
     )(req, res, next); // authenticate jwt
   },
   async (req, res) => {
-    // get the student/mentor username
-    const mentorship = req.query.mentorship;
-    if (!mentorship) {
-      // mentorship query is required
+    const studentUsername =
+      typeof req.query.mentorship === "string" ? req.query.mentorship.trim() : "";
+    if (!studentUsername) {
       return res
         .status(400)
         .json({ message: "Missing mentorship username in query" });
     }
+    if (req.user.role !== "mentor") {
+      return res
+        .status(403)
+        .json({ message: "Only mentors can choose a student." });
+    }
+    if (studentUsername === req.user.username) {
+      return res
+        .status(400)
+        .json({ message: "You can't be your own student." });
+    }
 
+    const mentorUsername = req.user.username;
     try {
-      // get db & collection
-      const db = await getDb();
-      const users = db.collection("users");
-      // update user's mentor relationship
-      const result = await users.updateOne(
-        { username: req.user.username },
-        { $set: { mentorshipUsername: mentorship } }
+      // Claim the student atomically: the filter only matches a student who is
+      // unassigned (empty or missing field) or already ours, so two mentors
+      // racing for the same student can't both win, and nobody can take over
+      // another mentor's student.
+      const student = await users.findOneAndUpdate(
+        {
+          username: studentUsername,
+          role: "student",
+          mentorshipUsername: { $in: ["", null, mentorUsername] },
+        },
+        { $set: { mentorshipUsername: mentorUsername } },
+        { new: true }
       );
-      // update mentor relationshp both ways
-      const result2 = await users.updateOne(
-        { username: mentorship },
-        { $set: { mentorshipUsername: req.user.username } }
-      );
-
-      // if mentorship field is not modified
-      if (result.modifiedCount === 0) {
-        return res.status(404).json({ message: "User not found or already has that mentorshipUsername, username: " + req.user.username });
+      if (!student) {
+        return res.status(409).json({
+          message: "That student doesn't exist or already has a mentor.",
+        });
       }
+
+      // A mentor has one student at a time: release the previous one so they
+      // don't keep pointing at this mentor.
+      const previousStudent = req.user.mentorshipUsername;
+      if (previousStudent && previousStudent !== studentUsername) {
+        await users.updateOne(
+          { username: previousStudent, mentorshipUsername: mentorUsername },
+          { $set: { mentorshipUsername: "" } }
+        );
+      }
+
+      await users.updateOne(
+        { username: mentorUsername },
+        { $set: { mentorshipUsername: studentUsername } }
+      );
 
       res.json({ message: "Mentorship updated successfully" });
     } catch (err) {
-      res.status(500).json({ error: err.message }); // error
+      console.error("Error in updateMentorship:", err);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 );
