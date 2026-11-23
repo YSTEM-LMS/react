@@ -41,8 +41,34 @@ const app = express();
 app.use(express.json());
 app.use("/meetings", meetingsRoute);
 
-const STUDENT = { username: "alice", firstName: "Alice", lastName: "S", role: "student" };
-const MENTOR = { username: "bob", firstName: "Bob", lastName: "M", role: "mentor" };
+// alice and bob are assigned to each other; carol is a different mentor.
+const STUDENT = {
+  username: "alice",
+  firstName: "Alice",
+  lastName: "S",
+  role: "student",
+  mentorshipUsername: "bob",
+};
+const MENTOR = {
+  username: "bob",
+  firstName: "Bob",
+  lastName: "M",
+  role: "mentor",
+  mentorshipUsername: "alice",
+};
+const OTHER_MENTOR = {
+  username: "carol",
+  firstName: "Carol",
+  lastName: "M",
+  role: "mentor",
+  mentorshipUsername: "dave",
+};
+const ACCOUNTS = { alice: STUDENT, bob: MENTOR, carol: OTHER_MENTOR };
+
+// users.findOne({ username }) resolves the account from ACCOUNTS.
+function useAccounts(accounts = ACCOUNTS) {
+  users.findOne.mockImplementation(async ({ username }) => accounts[username] || null);
+}
 
 const RECORDING_FAILED = "Could not start recording. Server error.";
 
@@ -54,6 +80,7 @@ beforeEach(() => {
   waitingStudents.deleteMany.mockResolvedValue({});
   waitingMentors.deleteMany.mockResolvedValue({});
   startRecording.mockResolvedValue({ sid: "sid-1", resourceId: "res-1" });
+  useAccounts();
 });
 
 describe("POST /meetings/pairUp", () => {
@@ -142,6 +169,121 @@ describe("POST /meetings/pairUp", () => {
 
     expect(waitingStudents.deleteMany).toHaveBeenCalledWith({ username: "alice" });
     expect(waitingMentors.deleteMany).toHaveBeenCalledWith({ username: "bob" });
+  });
+});
+
+describe("POST /meetings/pairUp only pairs assigned mentor and student", () => {
+  test("a student only looks for their own mentor in the queue", async () => {
+    mockCurrentAuthUser = STUDENT;
+    waitingMentors.findOne.mockResolvedValue({ ...MENTOR });
+
+    await request(app).post("/meetings/pairUp");
+
+    expect(waitingMentors.findOne.mock.calls[0][0]).toEqual({ username: "bob" });
+  });
+
+  test("a mentor only looks for their own student in the queue", async () => {
+    mockCurrentAuthUser = MENTOR;
+    waitingStudents.findOne.mockResolvedValue({ ...STUDENT });
+
+    await request(app).post("/meetings/pairUp");
+
+    expect(waitingStudents.findOne.mock.calls[0][0]).toEqual({ username: "alice" });
+  });
+
+  test("a student is not paired when only another mentor is waiting", async () => {
+    // Arrange: carol is first in the queue, alice's mentor bob is not waiting.
+    mockCurrentAuthUser = STUDENT;
+    waitingMentors.findOne.mockImplementation(async (filter) =>
+      filter.username === "carol" ? { ...OTHER_MENTOR } : null,
+    );
+
+    // Act
+    const res = await request(app).post("/meetings/pairUp");
+
+    // Assert
+    expect(res.status).toBe(200);
+    expect(res.body).toMatch(/mentor hasn't joined/);
+    expect(meetings.create).not.toHaveBeenCalled();
+    expect(startRecording).not.toHaveBeenCalled();
+  });
+
+  test("a student with no mentor is refused and never searches the queue", async () => {
+    mockCurrentAuthUser = { ...STUDENT, mentorshipUsername: "" };
+
+    const res = await request(app).post("/meetings/pairUp");
+
+    expect(res.status).toBe(403);
+    expect(res.body).toMatch(/don't have an assigned mentor/);
+    expect(waitingMentors.findOne).not.toHaveBeenCalled();
+    expect(meetings.create).not.toHaveBeenCalled();
+  });
+
+  test("a one-sided link is refused (the mentor is assigned to someone else)", async () => {
+    // alice still points at carol, but carol's student is dave.
+    mockCurrentAuthUser = { ...STUDENT, mentorshipUsername: "carol" };
+
+    const res = await request(app).post("/meetings/pairUp");
+
+    expect(res.status).toBe(403);
+    expect(waitingMentors.findOne).not.toHaveBeenCalled();
+    expect(meetings.create).not.toHaveBeenCalled();
+  });
+
+  test("a link to an account with the wrong role is refused", async () => {
+    // A mentor whose link points at another mentor (who points back).
+    useAccounts({ ...ACCOUNTS, carol: { ...OTHER_MENTOR, mentorshipUsername: "bob" } });
+    mockCurrentAuthUser = { ...MENTOR, mentorshipUsername: "carol" };
+
+    const res = await request(app).post("/meetings/pairUp");
+
+    expect(res.status).toBe(403);
+    expect(meetings.create).not.toHaveBeenCalled();
+  });
+
+  test("a link to a deleted account is refused", async () => {
+    mockCurrentAuthUser = { ...STUDENT, mentorshipUsername: "ghost" };
+
+    const res = await request(app).post("/meetings/pairUp");
+
+    expect(res.status).toBe(403);
+    expect(meetings.create).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /meetings/queue", () => {
+  beforeEach(() => {
+    waitingStudents.create.mockResolvedValue({});
+    waitingMentors.create.mockResolvedValue({});
+  });
+
+  test("an assigned student joins the queue", async () => {
+    mockCurrentAuthUser = STUDENT;
+
+    const res = await request(app).post("/meetings/queue");
+
+    expect(res.status).toBe(200);
+    expect(waitingStudents.create).toHaveBeenCalledTimes(1);
+  });
+
+  test("a student with no mentor can't join the queue", async () => {
+    mockCurrentAuthUser = { ...STUDENT, mentorshipUsername: "" };
+
+    const res = await request(app).post("/meetings/queue");
+
+    expect(res.status).toBe(403);
+    expect(res.body).toMatch(/don't have an assigned mentor/);
+    expect(waitingStudents.create).not.toHaveBeenCalled();
+  });
+
+  test("a mentor with no student can't join the queue", async () => {
+    mockCurrentAuthUser = { ...MENTOR, mentorshipUsername: "" };
+
+    const res = await request(app).post("/meetings/queue");
+
+    expect(res.status).toBe(403);
+    expect(res.body).toMatch(/don't have an assigned student/);
+    expect(waitingMentors.create).not.toHaveBeenCalled();
   });
 });
 

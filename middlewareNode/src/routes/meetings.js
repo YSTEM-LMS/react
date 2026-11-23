@@ -5,7 +5,7 @@
  * Handles meeting creation, pairing, recording management, and chess move tracking.
  * 
  * Features:
- * - Automatic mentor-student pairing (matchmaking)
+ * - Pairing a student with their own assigned mentor (no open matchmaking)
  * - Video meeting room management with Agora
  * - Cloud recording start/stop via Agora API
  * - Chess move storage during meetings
@@ -39,6 +39,37 @@ const { CAMERA_UID, buildRtcCredentials } = require("../utils/agoraTokens");
 var isBusy = false;
 
 const NO_MEETING = "There are no current meetings with this user.";
+
+const OPPOSITE_ROLE = { student: "mentor", mentor: "student" };
+const NO_PARTNER_MESSAGE = {
+  student: "You don't have an assigned mentor yet. Ask your program coordinator to connect you with one.",
+  mentor: "You don't have an assigned student yet. Choose a student on your profile first.",
+};
+
+/**
+ * Returns the username of the user's assigned mentor (for a student) or
+ * student (for a mentor), or null when there is no valid assignment.
+ *
+ * Live sessions are recorded video calls with minors, so a student may only
+ * ever be paired with their own mentor. The link must point both ways and the
+ * partner must hold the opposite role; a one-sided or stale link (left over
+ * from before assignments were validated) counts as no assignment.
+ */
+async function getAssignedPartner(user) {
+  const partnerUsername = user.mentorshipUsername;
+  if (!partnerUsername || !OPPOSITE_ROLE[user.role]) {
+    return null;
+  }
+  const partner = await users.findOne({ username: partnerUsername });
+  if (
+    !partner ||
+    partner.role !== OPPOSITE_ROLE[user.role] ||
+    partner.mentorshipUsername !== user.username
+  ) {
+    return null;
+  }
+  return partnerUsername;
+}
 
 /**
  * GET /meetings/singleRecording
@@ -266,6 +297,10 @@ router.post("/queue", passport.authenticate("jwt", { session: false }), async (r
       return res.status(400).json(message);
     }
 
+    if (OPPOSITE_ROLE[role] && !(await getAssignedPartner(req.user))) {
+      return res.status(403).json(NO_PARTNER_MESSAGE[role]);
+    }
+
     if (role === "mentor") {
       await waitingMentors.create({
         username,
@@ -301,30 +336,32 @@ router.post("/pairUp", passport.authenticate("jwt", { session: false }), async (
     let studentInfo = {};
     let mentorInfo = {};
 
-    //Get a first person in queue from either waitingMentors or waitingStudents collection
-    let waitingQueue;
-    if (role === "student") {
-      waitingQueue = await waitingMentors.findOne(
-        {},
-        {},
-        { sort: { requestedGameAt: 1 } },
-      );
-    } else if (role === "mentor") {
-      waitingQueue = await waitingStudents.findOne(
-        {},
-        {},
-        { sort: { requestedGameAt: 1 } },
-      );
-    } else {
+    if (!OPPOSITE_ROLE[role]) {
       return res
         .status(404)
         .json("Must be a student or mentor to pair up for a game.");
     }
+
+    //Only ever pair with the user's own assigned mentor/student, never with
+    //whoever happens to be first in the queue.
+    const partnerUsername = await getAssignedPartner(req.user);
+    if (!partnerUsername) {
+      return res.status(403).json(NO_PARTNER_MESSAGE[role]);
+    }
+
+    const partnerQueue = role === "student" ? waitingMentors : waitingStudents;
+    const waitingQueue = await partnerQueue.findOne(
+      { username: partnerUsername },
+      {},
+      { sort: { requestedGameAt: 1 } },
+    );
     if (!waitingQueue) {
       return res
         .status(200)
         .json(
-          "No one is available for matchmaking. Please wait for the next available person",
+          role === "student"
+            ? "Your mentor hasn't joined yet. Please wait for them."
+            : "Your student hasn't joined yet. Please wait for them.",
         );
     }
 
