@@ -9,11 +9,13 @@ jest.mock("../src/models/ChatSession");
 jest.mock("../src/models/ChatMessage");
 jest.mock("../src/models/CoachTemplate");
 jest.mock("../src/models/Guardrail");
-// Unrelated to seeding — this test resetModules()'s chat.js twice, and the
-// real chatService kicks off a genuine (fire-and-forget) NLP training run
-// on each require that can otherwise still be in flight after the test
-// file finishes, producing spurious "log after tests are done" noise.
-jest.mock("../src/utils/chatService");
+// Use an explicit mock factory to prevent Jest from evaluating the
+// real chatService module and triggering unrelated NLP model training.
+jest.mock("../src/utils/chatService", () => ({
+  processMessage: jest.fn(),
+  getCoachingResponse: jest.fn(),
+  generateSessionSummary: jest.fn(),
+}));
 jest.mock("passport", () => ({
   authenticate: jest.fn(() => (req, res, next) => next()),
 }));
